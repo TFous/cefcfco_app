@@ -1,3 +1,4 @@
+import 'package:cefcfco_app/components/ITextField.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,7 +12,6 @@ import 'package:cefcfco_app/utils/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   LoginPage({Key key}) : super(key: key);
-
   @override
   _LoginPageState createState() => new _LoginPageState();
 }
@@ -20,35 +20,32 @@ class _LoginPageState extends State<LoginPage>
     with SingleTickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
-  String _username,_password;
   final formKey = GlobalKey<FormState>();
+  static String _userName='',_password='';
 
-
-  TextEditingController _controllerUsername = TextEditingController();
-  TextEditingController _controllerPassword = TextEditingController();
-
-  final FocusNode myFocusNodeEmailLogin = FocusNode();
-  final FocusNode myFocusNodePasswordLogin = FocusNode();
-
-  final FocusNode myFocusNodePassword = FocusNode();
-  final FocusNode myFocusNodeEmail = FocusNode();
-  final FocusNode myFocusNodeName = FocusNode();
-
-  TextEditingController loginEmailController = new TextEditingController();
-  TextEditingController loginPasswordController = new TextEditingController();
-
-  bool _obscureTextLogin = true;
-
-  TextEditingController signupEmailController = new TextEditingController();
-  TextEditingController signupNameController = new TextEditingController();
-  TextEditingController signupPasswordController = new TextEditingController();
-  TextEditingController signupConfirmPasswordController =
-      new TextEditingController();
-
-  PageController _pageController;
-
-  Color left = Colors.black;
-  Color right = Colors.white;
+  ITextField _phoneCode = new ITextField(
+    keyboardType: ITextInputType.text,
+    hintText: 'Username',
+    inputBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.lightGreenAccent)),
+    prefixIcon:Icon(Icons.person),
+    hintStyle: TextStyle(color: Colors.white),
+    textStyle: TextStyle(color: Colors.white),
+    fieldCallBack: (content) {
+      _userName = content;
+    },
+  );
+  ITextField _authCode = new ITextField(
+    keyboardType: ITextInputType.password,
+    hintText: 'Password',
+    prefixIcon:Icon(Icons.lock),
+    inputBorder: UnderlineInputBorder(
+        borderSide: BorderSide(color: Colors.white)),
+    hintStyle: TextStyle(color: Colors.white),
+    textStyle: TextStyle(color: Colors.white),
+    fieldCallBack: (content) {
+      _password = content;
+    },
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -98,31 +95,32 @@ class _LoginPageState extends State<LoginPage>
 
   @override
   void dispose() {
-
     super.dispose();
   }
 
   @override
   void initState() {
     super.initState();
-
+//     保持竖屏
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
-
-    _pageController = PageController();
   }
 
   void loginFn() async {
-    var token = await UserServices.userLogin(_controllerUsername.text, _controllerPassword.text);
-    var user = await UserServices.getUser(token);
-    if(user.isNotEmpty){
-      Application.router.navigateTo(context, '/home',transition: TransitionType.fadeIn);
+    var token = await UserServices.userLogin(_userName,_password);
+    if (token == 400) {
+      showInSnackBar('账号或密码错误！');
+    } else {
+      var user = await UserServices.getUser(token);
+      Application.router
+          .navigateTo(context, '/home', transition: TransitionType.fadeIn);
       await SpUtil.getInstance()
-    ..putString(globals.userName, user['username'])
-      ..putString(globals.accessToken, token['access_token'])
-      ..putBool(globals.isLogin, true);
+        ..putString(globals.userName, user['username'])
+        ..putString(globals.accessToken, token['access_token'])
+        ..putBool(globals.isLogin, true);
+//    设置 dio 的token
       await Request.setDio();
     }
   }
@@ -139,16 +137,19 @@ class _LoginPageState extends State<LoginPage>
             fontSize: 16.0,
             fontFamily: "WorkSansSemiBold"),
       ),
-      backgroundColor: Colors.blue,
+      backgroundColor: Colors.pinkAccent,
       duration: Duration(seconds: 3),
     ));
   }
-  Future<Null> _submit() async {
-    final form = formKey.currentState;
-    if (form.validate()) {
+
+  Future _submit() async {
+    if (_userName.isNotEmpty&&_password.isNotEmpty) {
       loginFn();
+    }else{
+      showInSnackBar('账号或密码不能为空！');
     }
   }
+
   Widget _buildSignIn(BuildContext context) {
     return Container(
       padding: EdgeInsets.only(top: 23.0),
@@ -164,33 +165,10 @@ class _LoginPageState extends State<LoginPage>
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     ListTile(
-                      title: TextFormField(
-                        decoration: const InputDecoration(
-                          icon: Icon(Icons.person),
-                          labelText: 'Username',
-                        ),
-                        validator: (val) =>
-                        val.length < 1 ? 'Username Required' : null,
-                        obscureText: false,
-                        keyboardType: TextInputType.text,
-                        controller: _controllerUsername,
-                        autocorrect: false,
-                      ),
+                      title: _phoneCode
                     ),
                     ListTile(
-                      title: TextFormField(
-                        decoration: const InputDecoration(
-                          icon: Icon(Icons.lock),
-                          labelText: 'Password',
-                        ),
-                        validator: (val) =>
-                        val.length < 1 ? 'Password Required' : null,
-                        obscureText: true,
-                        controller: _controllerPassword,
-                        keyboardType: TextInputType.text,
-                        autocorrect: false,
-
-                      ),
+                        title: _authCode
                     ),
                   ],
                 ),
@@ -256,11 +234,5 @@ class _LoginPageState extends State<LoginPage>
         ],
       ),
     );
-  }
-
-  void _toggleLogin() {
-    setState(() {
-      _obscureTextLogin = !_obscureTextLogin;
-    });
   }
 }

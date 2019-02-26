@@ -19,11 +19,13 @@ class MyApp extends StatelessWidget {
 
   showLoginPage() {
     bool isLogin = sp.getBool(globals.isLogin);
-    if (isLogin != true) {
-      return AppPage();
-    } else {
-      return LoginPage();
-    }
+//    if (isLogin == true) {
+//      return AppPage();
+//    } else {
+//      return LoginPage();
+//    }
+
+    return LoginPage();
   }
 
   @override

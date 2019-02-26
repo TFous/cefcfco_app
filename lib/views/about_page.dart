@@ -39,6 +39,8 @@ class AboutPageState extends State<AboutPage> with AutomaticKeepAliveClientMixin
     super.build(context);
     return new Column(
       children: <Widget>[
+        Text(_user),
+        Text(_accessToken),
       ],
     );
   }
