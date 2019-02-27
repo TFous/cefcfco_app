@@ -120,7 +120,7 @@ class _ITextFieldState extends State<ITextField> {
             iconSize: 18.0,
             icon: widget.deleteIcon != null
                 ? widget.deleteIcon
-                : Icon(Icons.cancel),
+                : Icon(Icons.cancel,color:Colors.white),
             onPressed: () {
               setState(() {
                 _inputText = "";

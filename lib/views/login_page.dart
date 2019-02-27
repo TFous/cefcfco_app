@@ -27,9 +27,9 @@ class _LoginPageState extends State<LoginPage>
     keyboardType: ITextInputType.text,
     hintText: 'Username',
     inputBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.lightGreenAccent)),
-    prefixIcon:Icon(Icons.person),
+    prefixIcon:Icon(Icons.person,color:Colors.white),
     hintStyle: TextStyle(color: Colors.white),
-    textStyle: TextStyle(color: Colors.white),
+    textStyle: TextStyle(fontSize:18,color: Colors.white),
     fieldCallBack: (content) {
       _userName = content;
     },
@@ -37,7 +37,7 @@ class _LoginPageState extends State<LoginPage>
   ITextField _authCode = new ITextField(
     keyboardType: ITextInputType.password,
     hintText: 'Password',
-    prefixIcon:Icon(Icons.lock),
+    prefixIcon:Icon(Icons.lock,color:Colors.white),
     inputBorder: UnderlineInputBorder(
         borderSide: BorderSide(color: Colors.white)),
     hintStyle: TextStyle(color: Colors.white),
@@ -51,46 +51,42 @@ class _LoginPageState extends State<LoginPage>
   Widget build(BuildContext context) {
     return new Scaffold(
       key: _scaffoldKey,
-      body: NotificationListener<OverscrollIndicatorNotification>(
-        onNotification: (overscroll) {
-          overscroll.disallowGlow();
-        },
-        child: SingleChildScrollView(
-          child:new  Container(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-            decoration: new BoxDecoration(
-              gradient: new LinearGradient(
-                  colors: [
-                    Theme.Colors.loginGradientStart,
-                    Theme.Colors.loginGradientEnd
-                  ],
-                  begin: const FractionalOffset(0.0, 0.0),
-                  end: const FractionalOffset(1.0, 1.0),
-                  stops: [0.0, 1.0],
-                  tileMode: TileMode.clamp),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.only(top: 75.0),
-                  child: new Image(
-                      width: 170.0,
-                      height: 170.0,
-                      fit: BoxFit.fill,
-                      image: new AssetImage('assets/img/login_logo.png')),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(top: 20.0),
-                  child: _buildSignIn(context),
-                ),
-              ],
-            ),
+      body: SingleChildScrollView(
+        child:new  Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          decoration: new BoxDecoration(
+            gradient: new LinearGradient(
+                colors: [
+                  Theme.Colors.loginGradientStart,
+                  Theme.Colors.loginGradientEnd
+                ],
+                begin: const FractionalOffset(0.0, 0.0),
+                end: const FractionalOffset(1.0, 1.0),
+                stops: [0.0, 1.0],
+                tileMode: TileMode.clamp),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.only(top: 55.0),
+                child: new Image(
+                    width: 170.0,
+                    height: 170.0,
+                    fit: BoxFit.fill,
+                    image: new AssetImage('assets/img/login_logo.png')),
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 0.0),
+                child: _buildSignIn(context),
+              ),
+            ],
           ),
         ),
       ),
+      resizeToAvoidBottomPadding: false, // 键盘不遮挡
     );
   }
 
@@ -166,24 +162,11 @@ class _LoginPageState extends State<LoginPage>
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     ListTile(
-                      title: TextFormField(
-                        decoration: const InputDecoration(
-                          icon: Icon(Icons.person),
-                          labelText: 'Username',
-                        ),
-                        validator: (val) =>
-                        val.length < 1 ? 'Username Required' : null,
-                        obscureText: false,
-                        keyboardType: TextInputType.text,
-                        autocorrect: false,
-                      ),
+                      title: _phoneCode
                     ),
-//                    ListTile(
-//                      title: _phoneCode
-//                    ),
-//                    ListTile(
-//                        title: _authCode
-//                    ),
+                    ListTile(
+                        title: _authCode
+                    ),
                   ],
                 ),
               ),
