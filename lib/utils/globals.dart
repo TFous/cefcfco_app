@@ -1,4 +1,6 @@
 library globals;
+import 'package:flutter/material.dart';
+
 
 String identityUrl = 'https://identity-wucc.apps.dev-cefcfco.com';
 String keyValueUrl = 'https://api-platform.apps.dev-cefcfco.com';
@@ -30,3 +32,16 @@ Map<String, dynamic> codeMessage = {
   '503': '服务不可用，服务器暂时过载或维护。',
   '504': '网关超时。',
 };
+
+List homePageTabData = [
+  {'text': '首页', 'router':'/home','icon': new Icon(Icons.language)},
+  {'text': '动态', 'router':'/home', 'icon': new Icon(Icons.extension)},
+  {'text': '我的','router':'/about', 'icon': new Icon(Icons.favorite)},
+];
+
+
+List myPageTabData = [
+  {'text': '222', 'router':'/home','icon': new Icon(Icons.edit)},
+  {'text': '333', 'router':'/home', 'icon': new Icon(Icons.add)},
+  {'text': '444','router':'/about', 'icon': new Icon(Icons.dashboard)},
+];

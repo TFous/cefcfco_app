@@ -1,3 +1,4 @@
+import 'package:cefcfco_app/views/about_page.dart';
 import 'package:flutter/material.dart';
 import 'package:fluro/fluro.dart';
 import 'package:cefcfco_app/views/login_page.dart';
@@ -14,5 +15,13 @@ var loginHandler = new Handler(
 var homeHandler = new Handler(
   handlerFunc: (BuildContext context, Map<String, List<String>> params) {
     return new AppPage();
+  },
+);
+
+
+// 主页
+var aboutHandler = new Handler(
+  handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+    return new AboutPage();
   },
 );

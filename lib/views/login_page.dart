@@ -21,7 +21,7 @@ class _LoginPageState extends State<LoginPage>
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   final formKey = GlobalKey<FormState>();
-  static String _userName='',_password='';
+  static String _userName='test123',_password='111111';
 
   ITextField _phoneCode = new ITextField(
     keyboardType: ITextInputType.text,
@@ -56,7 +56,7 @@ class _LoginPageState extends State<LoginPage>
           overscroll.disallowGlow();
         },
         child: SingleChildScrollView(
-          child: Container(
+          child:new  Container(
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
             decoration: new BoxDecoration(
@@ -72,6 +72,7 @@ class _LoginPageState extends State<LoginPage>
             ),
             child: Column(
               mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
                 Padding(
                   padding: EdgeInsets.only(top: 75.0),
@@ -165,11 +166,24 @@ class _LoginPageState extends State<LoginPage>
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     ListTile(
-                      title: _phoneCode
+                      title: TextFormField(
+                        decoration: const InputDecoration(
+                          icon: Icon(Icons.person),
+                          labelText: 'Username',
+                        ),
+                        validator: (val) =>
+                        val.length < 1 ? 'Username Required' : null,
+                        obscureText: false,
+                        keyboardType: TextInputType.text,
+                        autocorrect: false,
+                      ),
                     ),
-                    ListTile(
-                        title: _authCode
-                    ),
+//                    ListTile(
+//                      title: _phoneCode
+//                    ),
+//                    ListTile(
+//                        title: _authCode
+//                    ),
                   ],
                 ),
               ),

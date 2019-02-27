@@ -1,3 +1,5 @@
+import 'package:cefcfco_app/components/homeBottomNavigationBar.dart';
+import 'package:cefcfco_app/components/search_input.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:cefcfco_app/routers/application.dart';
@@ -5,6 +7,7 @@ import 'package:cefcfco_app/views/about_page.dart';
 import 'package:cefcfco_app/views/first_page.dart';
 import 'package:cefcfco_app/views/user_page.dart';
 
+import 'package:cefcfco_app/utils/globals.dart' as globals;
 
 const int ThemeColor = 0xFFC91B3A;
 
@@ -48,47 +51,36 @@ class _MyHomePageState extends State<AppPage>
 
   @override
   void dispose() {
-    controller.dispose();
     super.dispose();
+  }
+
+  Widget buildSearchInput(BuildContext context) {
+    return new SearchInput((value) async {
+      if (value != '') {
+        List list = [];
+        return list
+            .map((item) => new MaterialSearchResult<String>(
+          value: item.name,
+          icon:null,
+          text: 'widget',
+          onTap: () {
+          },
+        ))
+            .toList();
+      } else {
+        return null;
+      }
+    }, (value) {}, () {});
   }
 
   @override
   Widget build(BuildContext context) {
-
     return new Scaffold(
+      appBar: new AppBar(title: buildSearchInput(context)),
       body: new TabBarView(controller: controller, children: <Widget>[
         new FirstPage(),
-        new AboutPage(),
-        new UserPage()
       ]),
-      bottomNavigationBar: Material(
-        color: const Color(0xFFF0EEEF), //底部导航栏主题颜色
-        child: SafeArea(
-          child: Container(
-            height: 65.0,
-            decoration: BoxDecoration(
-              color: const Color(0xFFF0F0F0),
-              boxShadow: <BoxShadow>[
-                BoxShadow(
-                  color: const Color(0xFFd0d0d0),
-                  blurRadius: 3.0,
-                  spreadRadius: 2.0,
-                  offset: Offset(-1.0, -1.0),
-                ),
-              ],
-            ),
-            child: TabBar(
-                controller: controller,
-                indicatorColor: Theme.of(context).primaryColor, //tab标签的下划线颜色
-                // labelColor: const Color(0xFF000000),
-                indicatorWeight: 3.0,
-                labelColor: Theme.of(context).primaryColor,
-                unselectedLabelColor: const Color(0xFF8E8E8E),
-                tabs: myTabs
-            ),
-          ),
-        ),
-      ),
+      bottomNavigationBar: new HomeBottomNavigationBar(tabData:globals.homePageTabData,activeIndex:0),
     );
   }
 
