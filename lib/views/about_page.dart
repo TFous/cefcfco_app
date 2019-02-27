@@ -72,51 +72,167 @@ class AboutPageState extends State<AboutPage>
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-        appBar: new AppBar(
-          backgroundColor: Colors.blue,//设置标题栏的背景颜色
-          title: new Title(
-            child:new Text(
-              '我的',
-              style: new TextStyle(
-                fontSize: 20.0,
-                color: Colors.white,
-              ),
+      appBar: new AppBar(
+        backgroundColor: Colors.blue,
+        //设置标题栏的背景颜色
+        title: new Title(
+          child: new Text(
+            '我的',
+            style: new TextStyle(
+              fontSize: 20.0,
+              color: Colors.white,
             ),
-            color: Colors.white,//设置标题栏文字的颜色(new title的时候color不能为null不然会报错一般可以不用new title 直接new text,不过最终的文字里面还是以里面new text的style样式文字颜色为准)
           ),
+          color: Colors
+              .white, //设置标题栏文字的颜色(new title的时候color不能为null不然会报错一般可以不用new title 直接new text,不过最终的文字里面还是以里面new text的style样式文字颜色为准)
+        ),
 //          centerTitle: true,//设置标题居中
-          elevation: 0,//设置标题栏下面阴影的高度
+        elevation: 0,
+        //设置标题栏下面阴影的高度
 //        brightness:Brightness.dark,//设置明暗模式（不过写了没看出变化，后面再看）
-          primary: true,//是否设置内容避开状态栏
+        primary: true,
+        //是否设置内容避开状态栏
 //        flexibleSpace: ,//伸缩控件后面再看
 //        automaticallyImplyLeading: true,
-          actions: <Widget>[ //设置显示在右边的控件
-            new Padding(
-              child: new Icon(Icons.settings),
-              padding: EdgeInsets.all(10.0),
-            ),
-          ],
-        ),
-      body:new  ListView.separated(
-        scrollDirection: Axis.vertical,
-        itemCount: 100, // item 的个数
-        separatorBuilder: (BuildContext context, int index) => Divider(height:1.0,color: Colors.black12),  // 添加分割线
-        itemBuilder: (BuildContext context, int index) {
-          return ListTile(
-            title:  Text("title $index"), // item 标题
-            leading: Icon(Icons.keyboard), // item 前置图标
-            trailing: Icon(Icons.keyboard_arrow_right),// item 后置图标
-            isThreeLine:false,  // item 是否三行显示
-            dense:true,                // item 直观感受是整体大小
-            contentPadding: EdgeInsets.all(3.0),// item 内容内边距
-            enabled:true,
-            onTap:(){print('点击:$index');},// item onTap 点击事件
-            onLongPress:(){print('长按:$index');},// item onLongPress 长按事件
-            selected:false,     // item 是否选中状态
-          );
-        },
+        actions: <Widget>[
+          //设置显示在右边的控件
+          new Padding(
+            child: new Icon(Icons.settings),
+            padding: EdgeInsets.all(10.0),
+          ),
+        ],
       ),
-      bottomNavigationBar: new HomeBottomNavigationBar(tabData:globals.myPageTabData,activeIndex:2),
+      body: new Container(
+          padding: const EdgeInsets.all(30.0),
+          child: Column(
+            children: <Widget>[
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Container(
+                      color: Colors.red,
+                      padding: EdgeInsets.all(5.0),
+                    ),
+                    flex: 1,
+                  ),
+                  Expanded(
+                    child: Container(
+                      color: Colors.yellow,
+                      padding: EdgeInsets.all(5.0),
+                    ),
+                    flex: 2,
+                  ),
+                  Expanded(
+                    child: Container(
+                      color: Colors.blue,
+                      padding: EdgeInsets.all(5.0),
+                    ),
+                    flex: 1,
+                  ),
+                ],
+              ),
+              new Container(
+                padding: const EdgeInsets.all(1.0),
+                decoration: new BoxDecoration(
+                    border: new Border(bottom: BorderSide(
+                        width: 1.0,
+                        color: Color(0xFFf2f2f2)
+                    ))
+                ),
+                child: ListTile(
+                  title: Text("title"),
+                  // item 标题
+                  leading: Icon(Icons.keyboard),
+                  // item 前置图标
+                  trailing: Icon(Icons.keyboard_arrow_right),
+                  // item 后置图标
+                  isThreeLine: false,
+                  // item 是否三行显示
+                  dense: true,
+                  // item 直观感受是整体大小
+                  contentPadding: EdgeInsets.all(3.0),
+                  // item 内容内边距
+                  enabled: true,
+                  onTap: () {
+                    print('点击:');
+                  },
+                  // item onTap 点击事件
+                  onLongPress: () {
+                    print('长按:');
+                  },
+                  // item onLongPress 长按事件
+                  selected: false, // item 是否选中状态
+                ),
+              ),
+              new Container(
+                padding: const EdgeInsets.all(1.0),
+                decoration: new BoxDecoration(
+                    border: new Border(bottom: BorderSide(color: Color(0xFFf2f2f2)))
+                ),
+                child: ListTile(
+                  title: Text("title123"),
+                  // item 标题
+                  leading: Icon(Icons.keyboard),
+                  // item 前置图标
+                  trailing: Icon(Icons.keyboard_arrow_right),
+                  // item 后置图标
+                  isThreeLine: false,
+                  // item 是否三行显示
+                  dense: true,
+                  // item 直观感受是整体大小
+                  contentPadding: EdgeInsets.all(3.0),
+                  // item 内容内边距
+                  enabled: true,
+                  onTap: () {
+                    print('点击:');
+                  },
+                  // item onTap 点击事件
+                  onLongPress: () {
+                    print('长按12312312:');
+                  },
+                  // item onLongPress 长按事件
+                  selected: false, // item 是否选中状态
+                ),
+              ),
+//              SizedBox(
+//                height: MediaQuery.of(context).size.height,
+//                child: ListView.separated(
+//                  scrollDirection: Axis.vertical,
+//                  itemCount: 10, // item 的个数
+//                  separatorBuilder: (BuildContext context, int index) =>
+//                      Divider(height: 1.0, color: Colors.black12), // 添加分割线
+//                  itemBuilder: (BuildContext context, int index) {
+//                    return ListTile(
+//                      title: Text("title $index"),
+//                      // item 标题
+//                      leading: Icon(Icons.keyboard),
+//                      // item 前置图标
+//                      trailing: Icon(Icons.keyboard_arrow_right),
+//                      // item 后置图标
+//                      isThreeLine: false,
+//                      // item 是否三行显示
+//                      dense: true,
+//                      // item 直观感受是整体大小
+//                      contentPadding: EdgeInsets.all(3.0),
+//                      // item 内容内边距
+//                      enabled: true,
+//                      onTap: () {
+//                        print('点击:$index');
+//                      },
+//                      // item onTap 点击事件
+//                      onLongPress: () {
+//                        print('长按:$index');
+//                      },
+//                      // item onLongPress 长按事件
+//                      selected: false, // item 是否选中状态
+//                    );
+//                  },
+//                ),
+//              )
+            ],
+          )),
+      bottomNavigationBar: new HomeBottomNavigationBar(
+          tabData: globals.myPageTabData, activeIndex: 2),
     );
   }
 }
