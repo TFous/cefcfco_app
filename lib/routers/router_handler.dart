@@ -1,4 +1,5 @@
 import 'package:cefcfco_app/views/about_page.dart';
+import 'package:cefcfco_app/views/user_page.dart';
 import 'package:flutter/material.dart';
 import 'package:fluro/fluro.dart';
 import 'package:cefcfco_app/views/login_page.dart';
@@ -19,9 +20,16 @@ var homeHandler = new Handler(
 );
 
 
-// 主页
+// 关于
 var aboutHandler = new Handler(
   handlerFunc: (BuildContext context, Map<String, List<String>> params) {
     return new AboutPage();
+  },
+);
+
+// 用户
+var userHandler = new Handler(
+  handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+    return new UserPage();
   },
 );

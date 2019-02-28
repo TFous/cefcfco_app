@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:cefcfco_app/routers/application.dart';
 import 'package:cefcfco_app/style/theme.dart' as Theme;
 import 'package:cefcfco_app/services/user.dart';
-
+import 'package:cefcfco_app/utils/common.dart' as common;
 import 'package:cefcfco_app/utils/globals.dart' as globals;
 import 'package:cefcfco_app/utils/request.dart';
 import 'package:cefcfco_app/utils/shared_preferences.dart';
@@ -58,8 +58,8 @@ class _LoginPageState extends State<LoginPage>
           decoration: new BoxDecoration(
             gradient: new LinearGradient(
                 colors: [
-                  Theme.Colors.loginGradientStart,
-                  Theme.Colors.loginGradientEnd
+                  Theme.loginGradientStart,
+                  Theme.loginGradientEnd
                 ],
                 begin: const FractionalOffset(0.0, 0.0),
                 end: const FractionalOffset(1.0, 1.0),
@@ -107,10 +107,10 @@ class _LoginPageState extends State<LoginPage>
 
   void loginFn() async {
     var token = await UserServices.userLogin(_userName,_password);
-    if (token == 400) {
-      showInSnackBar('账号或密码错误！');
+    if (token is num) {
+      common.showInSnackBar('账号或密码错误！',_scaffoldKey);
     } else {
-      var user = await UserServices.getUser(token);
+      var user = await UserServices.getUser(token,_scaffoldKey);
       Application.router
           .navigateTo(context, '/home', transition: TransitionType.fadeIn);
       await SpUtil.getInstance()
@@ -122,28 +122,37 @@ class _LoginPageState extends State<LoginPage>
     }
   }
 
-  void showInSnackBar(String value) {
-    FocusScope.of(context).requestFocus(new FocusNode());
-    _scaffoldKey.currentState?.removeCurrentSnackBar();
-    _scaffoldKey.currentState.showSnackBar(new SnackBar(
-      content: new Text(
-        value,
-        textAlign: TextAlign.center,
-        style: TextStyle(
-            color: Colors.white,
-            fontSize: 16.0,
-            fontFamily: "WorkSansSemiBold"),
-      ),
-      backgroundColor: Colors.pinkAccent,
-      duration: Duration(seconds: 3),
-    ));
+  void showAlertDialog(BuildContext context) {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return Dialog(
+            child: Container(
+              height: 100,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  Text('我是一个dialog'),
+                  RaisedButton(
+                    child: Text('取消'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  )
+                ],
+              ),
+            )
+        );
+      },
+    );
   }
 
   Future _submit() async {
     if (_userName.isNotEmpty&&_password.isNotEmpty) {
       loginFn();
     }else{
-      showInSnackBar('账号或密码不能为空！');
+      common.showInSnackBar('账号或密码不能为空！',_scaffoldKey);
     }
   }
 
@@ -176,20 +185,20 @@ class _LoginPageState extends State<LoginPage>
                   borderRadius: BorderRadius.all(Radius.circular(5.0)),
                   boxShadow: <BoxShadow>[
                     BoxShadow(
-                      color: Theme.Colors.loginGradientStart,
+                      color: Theme.loginGradientStart,
                       offset: Offset(1.0, 6.0),
                       blurRadius: 20.0,
                     ),
                     BoxShadow(
-                      color: Theme.Colors.loginGradientEnd,
+                      color: Theme.loginGradientEnd,
                       offset: Offset(1.0, 6.0),
                       blurRadius: 20.0,
                     ),
                   ],
                   gradient: new LinearGradient(
                       colors: [
-                        Theme.Colors.loginGradientEnd,
-                        Theme.Colors.loginGradientStart
+                        Theme.loginGradientEnd,
+                        Theme.loginGradientStart
                       ],
                       begin: const FractionalOffset(0.2, 0.2),
                       end: const FractionalOffset(1.0, 1.0),
@@ -198,7 +207,7 @@ class _LoginPageState extends State<LoginPage>
                 ),
                 child: MaterialButton(
                     highlightColor: Colors.transparent,
-                    splashColor: Theme.Colors.loginGradientEnd,
+                    splashColor: Theme.loginGradientEnd,
                     //shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(

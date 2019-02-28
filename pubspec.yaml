@@ -33,6 +33,7 @@ flutter:
 
   assets:
   - assets/login_logo.png
+  - assets/user.jpg
 
   fonts:
   - family: WorkSansSemiBold

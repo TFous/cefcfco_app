@@ -76,7 +76,9 @@ class _MyHomePageState extends State<AppPage>
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      appBar: new AppBar(title: buildSearchInput(context)),
+      appBar: new AppBar(title: buildSearchInput(context),
+        automaticallyImplyLeading: false,
+      ),
       body: new TabBarView(controller: controller, children: <Widget>[
         new FirstPage(),
       ]),

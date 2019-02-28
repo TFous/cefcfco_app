@@ -2,11 +2,12 @@ import 'dart:async';
 import 'package:cefcfco_app/components/homeBottomNavigationBar.dart';
 import 'package:flutter/material.dart';
 import 'package:cefcfco_app/utils/globals.dart' as globals;
+import 'package:cefcfco_app/utils/request.dart';
 import 'package:cefcfco_app/utils/shared_preferences.dart';
 import 'package:cefcfco_app/services/keyValue.dart';
 import 'package:cefcfco_app/components/list_view_item.dart';
 import 'package:cefcfco_app/components/list_refresh.dart' as listComp;
-import 'package:cefcfco_app/style/theme.dart' as Theme;
+import 'package:cefcfco_app/views/first_page_item.dart';
 
 class AboutPage extends StatefulWidget {
   @override
@@ -15,19 +16,15 @@ class AboutPage extends StatefulWidget {
 
 class AboutPageState extends State<AboutPage>
     with AutomaticKeepAliveClientMixin {
-  var _keyValueList = {};
-
-  String _user = '', _accessToken = '';
-
+  final GlobalKey<AnimatedListState> _listKey = new GlobalKey<AnimatedListState>();
+  String _user = '',_accessToken='';
   @override
   bool get wantKeepAlive => true;
-
   @override
   void initState() {
     super.initState();
     _getUserName();
   }
-
   _getUserName() async {
     SpUtil sp = await SpUtil.getInstance();
     setState(() {
@@ -35,11 +32,20 @@ class AboutPageState extends State<AboutPage>
       _accessToken = sp.getString(globals.accessToken);
     });
   }
+  headerView(){
+    return
+      Column(
+        children: <Widget>[
+          Stack(
+            //alignment: const FractionalOffset(0.9, 0.1),//方法一
+              children: <Widget>[
+                Text('123'),
+              ]),
+          SizedBox(height: 1, child:Container(color: Theme.of(context).primaryColor)),
+          SizedBox(height: 10),
+        ],
+      );
 
-  headerView() {
-    return Column(
-      children: <Widget>[],
-    );
   }
 
   Widget makeCard(index, item) {
@@ -52,32 +58,26 @@ class AboutPageState extends State<AboutPage>
   }
 
   Future getIndexListData([Map<String, dynamic> params]) async {
-    var dd = await keyValuesServices.getKeyValueList();
+    var data = await keyValuesServices.getKeyValueList();
     Map<String, dynamic> result = {
-      "list": dd['result'],
+      "list": data['result'],
       'total': 20,
       'pageIndex': 0
     };
     return result;
   }
 
-  _submit() {
-    getIndexListData();
-  }
-
-  _getList() async {
-    var data = await keyValuesServices.getKeyValueList();
-  }
-
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return new Scaffold(
       appBar: new AppBar(
-        backgroundColor: Colors.blue,
+        automaticallyImplyLeading: false,
+        backgroundColor: Color(0xff1b82d2),
         //设置标题栏的背景颜色
         title: new Title(
           child: new Text(
-            '我的',
+            '动态',
             style: new TextStyle(
               fontSize: 20.0,
               color: Colors.white,
@@ -97,142 +97,20 @@ class AboutPageState extends State<AboutPage>
         actions: <Widget>[
           //设置显示在右边的控件
           new Padding(
-            child: new Icon(Icons.settings),
+            child: new Icon(Icons.menu),
             padding: EdgeInsets.all(10.0),
           ),
         ],
       ),
-      body: new Container(
-          padding: const EdgeInsets.all(30.0),
-          child: Column(
-            children: <Widget>[
-              Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Container(
-                      color: Colors.red,
-                      padding: EdgeInsets.all(5.0),
-                    ),
-                    flex: 1,
-                  ),
-                  Expanded(
-                    child: Container(
-                      color: Colors.yellow,
-                      padding: EdgeInsets.all(5.0),
-                    ),
-                    flex: 2,
-                  ),
-                  Expanded(
-                    child: Container(
-                      color: Colors.blue,
-                      padding: EdgeInsets.all(5.0),
-                    ),
-                    flex: 1,
-                  ),
-                ],
-              ),
-              new Container(
-                padding: const EdgeInsets.all(1.0),
-                decoration: new BoxDecoration(
-                    border: new Border(bottom: BorderSide(
-                        width: 1.0,
-                        color: Color(0xFFf2f2f2)
-                    ))
-                ),
-                child: ListTile(
-                  title: Text("title"),
-                  // item 标题
-                  leading: Icon(Icons.keyboard),
-                  // item 前置图标
-                  trailing: Icon(Icons.keyboard_arrow_right),
-                  // item 后置图标
-                  isThreeLine: false,
-                  // item 是否三行显示
-                  dense: true,
-                  // item 直观感受是整体大小
-                  contentPadding: EdgeInsets.all(3.0),
-                  // item 内容内边距
-                  enabled: true,
-                  onTap: () {
-                    print('点击:');
-                  },
-                  // item onTap 点击事件
-                  onLongPress: () {
-                    print('长按:');
-                  },
-                  // item onLongPress 长按事件
-                  selected: false, // item 是否选中状态
-                ),
-              ),
-              new Container(
-                padding: const EdgeInsets.all(1.0),
-                decoration: new BoxDecoration(
-                    border: new Border(bottom: BorderSide(color: Color(0xFFf2f2f2)))
-                ),
-                child: ListTile(
-                  title: Text("title123"),
-                  // item 标题
-                  leading: Icon(Icons.keyboard),
-                  // item 前置图标
-                  trailing: Icon(Icons.keyboard_arrow_right),
-                  // item 后置图标
-                  isThreeLine: false,
-                  // item 是否三行显示
-                  dense: true,
-                  // item 直观感受是整体大小
-                  contentPadding: EdgeInsets.all(3.0),
-                  // item 内容内边距
-                  enabled: true,
-                  onTap: () {
-                    print('点击:');
-                  },
-                  // item onTap 点击事件
-                  onLongPress: () {
-                    print('长按12312312:');
-                  },
-                  // item onLongPress 长按事件
-                  selected: false, // item 是否选中状态
-                ),
-              ),
-//              SizedBox(
-//                height: MediaQuery.of(context).size.height,
-//                child: ListView.separated(
-//                  scrollDirection: Axis.vertical,
-//                  itemCount: 10, // item 的个数
-//                  separatorBuilder: (BuildContext context, int index) =>
-//                      Divider(height: 1.0, color: Colors.black12), // 添加分割线
-//                  itemBuilder: (BuildContext context, int index) {
-//                    return ListTile(
-//                      title: Text("title $index"),
-//                      // item 标题
-//                      leading: Icon(Icons.keyboard),
-//                      // item 前置图标
-//                      trailing: Icon(Icons.keyboard_arrow_right),
-//                      // item 后置图标
-//                      isThreeLine: false,
-//                      // item 是否三行显示
-//                      dense: true,
-//                      // item 直观感受是整体大小
-//                      contentPadding: EdgeInsets.all(3.0),
-//                      // item 内容内边距
-//                      enabled: true,
-//                      onTap: () {
-//                        print('点击:$index');
-//                      },
-//                      // item onTap 点击事件
-//                      onLongPress: () {
-//                        print('长按:$index');
-//                      },
-//                      // item onLongPress 长按事件
-//                      selected: false, // item 是否选中状态
-//                    );
-//                  },
-//                ),
-//              )
-            ],
-          )),
-      bottomNavigationBar: new HomeBottomNavigationBar(
-          tabData: globals.myPageTabData, activeIndex: 2),
+      body: new Column(
+        children: <Widget>[
+          new Expanded(
+            //child: new List(),
+              child:new listComp.ListRefresh(getIndexListData,makeCard,headerView)
+          )
+        ],
+      ),
+      bottomNavigationBar: new HomeBottomNavigationBar(tabData:globals.homePageTabData,activeIndex:1),
     );
   }
 }

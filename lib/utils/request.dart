@@ -3,6 +3,9 @@ import 'package:dio/dio.dart';
 import 'dart:async';
 import 'package:cefcfco_app/utils/shared_preferences.dart';
 import 'package:cefcfco_app/utils/globals.dart' as globals;
+import 'package:cefcfco_app/utils/common.dart' as common;
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 Dio dio;
 
@@ -28,16 +31,32 @@ class Request {
     };
   }
 
-  static Future get(String url,Map<String, dynamic> params) async {
+  static Future get(String url,Map<String, dynamic> params,[GlobalKey<ScaffoldState> scaffoldKey]) async {
     setHttpsVerification();
     Response response;
     response = await dio.get(url, queryParameters: params);
+    try {
+      response = await dio.get(url, queryParameters: params);
+    } on DioError catch (e) {
+      if(e.response!=null && scaffoldKey !=null){
+        var code = common.getCatchErrCode(e.response,scaffoldKey);
+        return code;
+      }
+    }
     return response.data;
   }
 
-  static Future post(String url, Map<String, dynamic> params,Options options) async {
+  static Future post(String url, Map<String, dynamic> params,Options options,[GlobalKey<ScaffoldState> scaffoldKey]) async {
     setHttpsVerification();
-    var response = await dio.post(url, data: params,options:options);
+    Response response;
+    try {
+      response = await dio.post(url, data: params,options:options);
+    } on DioError catch (e) {
+      if(e.response!=null && scaffoldKey !=null){
+        var code = common.getCatchErrCode(e.response,scaffoldKey);
+        return code;
+      }
+    }
     return response.data;
   }
 
