@@ -6,7 +6,11 @@ import 'package:flutter/material.dart';
 class HomeBottomNavigationBar extends StatefulWidget {
   final List tabData;
   final num activeIndex;
-  const HomeBottomNavigationBar({Key key, this.tabData, this.activeIndex}) : super(key: key);
+  final Map msgTipInfo;
+  final TabController controller;
+
+  const HomeBottomNavigationBar({Key key, this.tabData, this.activeIndex, this.msgTipInfo, this.controller})
+      : super(key: key);
 
   @override
   HomeBottomNavigationBarState createState() {
@@ -14,7 +18,8 @@ class HomeBottomNavigationBar extends StatefulWidget {
   }
 }
 
-class HomeBottomNavigationBarState extends State<HomeBottomNavigationBar> with SingleTickerProviderStateMixin {
+class HomeBottomNavigationBarState extends State<HomeBottomNavigationBar>
+    with SingleTickerProviderStateMixin {
   TabController controller;
   List<Widget> myTabs = [];
 
@@ -23,41 +28,41 @@ class HomeBottomNavigationBarState extends State<HomeBottomNavigationBar> with S
     // TODO: implement initState
     super.initState();
     var tabDataLength = widget.tabData.length;
-    controller = new TabController(
-        initialIndex: widget.activeIndex, vsync: this, length: tabDataLength); // 这里的length 决定有多少个底导 submenus
+    controller = widget.controller;
     for (int i = 0; i < tabDataLength; i++) {
+      bool isShowMsgInfo = widget.msgTipInfo!=null&&widget.msgTipInfo['index']==i?true:false;
       myTabs.add(new Tab(
-//          text: widget.tabData[i]['text'],
           child: Stack(
-            overflow:Overflow.visible,
+        overflow: Overflow.visible,
+        children: <Widget>[
+          Column(
             children: <Widget>[
-              Column(
-                children: <Widget>[
-                  widget.tabData[i]['icon'],
-                  Text(widget.tabData[i]['text']),
-                ],
-              ),
-              Positioned(right: -3, top: -3,
-                  child: Container(
-//                    height: 8.0,
-//                    width: 8.0,
-                    child: Text('12',
-                        style: TextStyle(color: Colors.white,fontSize: 12.0)
-                    ),
-                    decoration: BoxDecoration(
-                        color: Colors.red,
-                        shape: BoxShape.rectangle,
-                        borderRadius: BorderRadius.all(Radius.circular(10))),
-                  )),
-
+              widget.tabData[i]['icon'],
+              Text(widget.tabData[i]['text']),
             ],
-          )
-      ));
+          ),
+          isShowMsgInfo?Positioned(
+              right: -5,
+              top: -5,
+              child: Container(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 3.0),
+                  child: Text('12',
+                      style: TextStyle(color: Colors.white, fontSize: 12.0)),
+                ),
+                decoration: BoxDecoration(
+                    color: Colors.red,
+                    shape: BoxShape.rectangle,
+                    borderRadius: BorderRadius.all(Radius.circular(10))),
+              )):Text(''),
+        ],
+      )));
     }
     controller.addListener(() {
       if (controller.indexIsChanging) {
-        Application.router
-            .navigateTo(context, '${widget.tabData[controller.index]['router']}', transition: TransitionType.fadeIn);
+//        Application.router.navigateTo(
+//            context, '${widget.tabData[controller.index]['router']}',
+//            transition: TransitionType.fadeIn);
       }
     });
   }

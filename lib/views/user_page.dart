@@ -1,4 +1,5 @@
 import 'package:cefcfco_app/components/homeBottomNavigationBar.dart';
+import 'package:cefcfco_app/utils/common.dart';
 import 'package:flutter/material.dart';
 import 'package:cefcfco_app/utils/globals.dart' as globals;
 import 'package:cefcfco_app/utils/shared_preferences.dart';
@@ -10,6 +11,8 @@ class UserPage extends StatefulWidget {
 
 class UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin{
   String _userName = '', _accessToken = '';
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
   @override
   bool get wantKeepAlive => true;
 
@@ -30,6 +33,7 @@ class UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin{
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
+      key: _scaffoldKey,
       appBar: new AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Color(0xff1b82d2),
@@ -156,7 +160,7 @@ class UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin{
                     // item 内容内边距
                     enabled: true,
                     onTap: () {
-                      print('点击:');
+                      showInSnackBar('2222',_scaffoldKey);
                     },
                     // item onTap 点击事件
                     onLongPress: () {
@@ -532,8 +536,7 @@ class UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin{
               ],
             )),
       ),
-      bottomNavigationBar: new HomeBottomNavigationBar(
-          tabData: globals.homePageTabData, activeIndex: 2),
+
     );
   }
 }

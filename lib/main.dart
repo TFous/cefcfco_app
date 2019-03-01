@@ -11,7 +11,7 @@ import 'package:cefcfco_app/utils/globals.dart' as globals;
 SpUtil sp;
 
 class MyApp extends StatelessWidget {
-  MyApp()  {
+  MyApp() {
     final router = new Router();
     Routes.configureRoutes(router);
     Application.router = router;
@@ -20,11 +20,17 @@ class MyApp extends StatelessWidget {
   showLoginPage() {
     bool isLogin = sp.getBool(globals.isLogin);
 //    if (isLogin == true) {
+//      refreshToken();
 //      return AppPage();
 //    } else {
 //      return LoginPage();
 //    }
     return LoginPage();
+  }
+
+  refreshToken() async {
+    //    设置 dio 的token
+    await Request.setDio();
   }
 
   @override
@@ -35,14 +41,11 @@ class MyApp extends StatelessWidget {
       theme: new ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: new Scaffold(
-          body: showLoginPage()
-      ),
+      home: new Scaffold(body: showLoginPage()),
       onGenerateRoute: Application.router.generator,
     );
   }
 }
-
 
 void main() async {
   sp = await SpUtil.getInstance();

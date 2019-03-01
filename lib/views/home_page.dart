@@ -1,5 +1,6 @@
 import 'package:cefcfco_app/components/homeBottomNavigationBar.dart';
 import 'package:cefcfco_app/components/search_input.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:cefcfco_app/routers/application.dart';
@@ -19,38 +20,31 @@ class AppPage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<AppPage>
-    with SingleTickerProviderStateMixin {
-  TabController controller;
+    with SingleTickerProviderStateMixin,AutomaticKeepAliveClientMixin {
   bool isSearch = false;
-  String data = '无';
-  String data2ThirdPage = '这是传给ThirdPage的值';
-  String appBarTitle = tabData[0]['text'];
-  static List tabData = [
-    {'text': '首页', 'icon': new Icon(Icons.language)},
-    {'text': '动态', 'icon': new Icon(Icons.extension)},
-    {'text': '我的', 'icon': new Icon(Icons.favorite)},
-  ];
-
+  TabController controller;
   List<Widget> myTabs = [];
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
+  Map msgTipInfo = {
+    'msgNum': 33,
+    'index': 0,
+    'right': -5,
+    'top': -5
+  };
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
     super.initState();
     controller = new TabController(
-        initialIndex: 1, vsync: this, length: 3); // 这里的length 决定有多少个底导 submenus
-    for (int i = 0; i < tabData.length; i++) {
-      myTabs.add(new Tab(text: tabData[i]['text'], icon: tabData[i]['icon']));
-    }
-    controller.addListener(() {
-      if (controller.indexIsChanging) {
-        _onTabChange();
-      }
-    });
-    Application.controller = controller;
+        initialIndex: 0, vsync: this, length: globals.homePageTabData.length); // 这里的length 决定有多少个底导 submenus
   }
 
   @override
   void dispose() {
+    controller.dispose();
     super.dispose();
   }
 
@@ -60,12 +54,11 @@ class _MyHomePageState extends State<AppPage>
         List list = [];
         return list
             .map((item) => new MaterialSearchResult<String>(
-          value: item.name,
-          icon:null,
-          text: 'widget',
-          onTap: () {
-          },
-        ))
+                  value: item.name,
+                  icon: null,
+                  text: 'widget',
+                  onTap: () {},
+                ))
             .toList();
       } else {
         return null;
@@ -76,21 +69,23 @@ class _MyHomePageState extends State<AppPage>
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      appBar: new AppBar(title: buildSearchInput(context),
+      appBar: new AppBar(
+        title: buildSearchInput(context),
         automaticallyImplyLeading: false,
       ),
-      body: new TabBarView(controller: controller, children: <Widget>[
+      body: new TabBarView(
+          physics: new NeverScrollableScrollPhysics(), // 警用滑动
+          controller: controller,
+          children: <Widget>[
         new FirstPage(),
+        new AboutPage(),
+        new UserPage(),
       ]),
-      bottomNavigationBar: new HomeBottomNavigationBar(tabData:globals.homePageTabData,activeIndex:0),
+      bottomNavigationBar: new HomeBottomNavigationBar(
+          tabData: globals.homePageTabData,
+          activeIndex: 0,
+          controller:controller,
+          msgTipInfo: msgTipInfo),
     );
-  }
-
-  void _onTabChange() {
-    if (this.mounted) {
-      this.setState(() {
-        appBarTitle = tabData[controller.index]['text'];
-      });
-    }
   }
 }

@@ -20,11 +20,14 @@ class AboutPageState extends State<AboutPage>
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   String _user = '',_accessToken='';
+
   @override
   bool get wantKeepAlive => true;
+
   @override
   void initState() {
     super.initState();
+    print(222222222222);
     _getUserName();
   }
   _getUserName() async {
@@ -113,7 +116,7 @@ class AboutPageState extends State<AboutPage>
           )
         ],
       ),
-      bottomNavigationBar: new HomeBottomNavigationBar(tabData:globals.homePageTabData,activeIndex:1),
+//      bottomNavigationBar: new HomeBottomNavigationBar(tabData:globals.homePageTabData,activeIndex:1),
     );
   }
 }
