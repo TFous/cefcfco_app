@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 Dio dio;
 
 class Request {
-  static void setDio () async {
+  static void setDio() async {
     var sp = await SpUtil.getInstance();
     String accessToken = sp.getString(globals.accessToken);
     dio = new Dio(new BaseOptions(
@@ -21,7 +21,7 @@ class Request {
     ));
   }
 
-  static void setHttpsVerification (){
+  static void setHttpsVerification() {
     (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
         (client) {
       client.badCertificateCallback =
@@ -31,33 +31,36 @@ class Request {
     };
   }
 
-  static Future get(String url,Map<String, dynamic> params,[GlobalKey<ScaffoldState> scaffoldKey]) async {
+  static Future get(String url,
+      {Map<String, dynamic> params,
+      GlobalKey<ScaffoldState> scaffoldKey}) async {
     setHttpsVerification();
     Response response;
     try {
       response = await dio.get(url, queryParameters: params);
     } on DioError catch (e) {
-      if(e.response!=null && scaffoldKey !=null){
-        var code = common.getCatchErrCode(e.response,scaffoldKey);
+      if (e.response != null && scaffoldKey != null) {
+        var code = common.getCatchErrCode(e.response, scaffoldKey);
         return code;
       }
     }
     return response.data;
   }
 
-  static Future post(String url, Map<String, dynamic> params,Options options,[GlobalKey<ScaffoldState> scaffoldKey]) async {
+  static Future post(String url,
+      {Map<String, dynamic> params,
+      Options options,
+      GlobalKey<ScaffoldState> scaffoldKey}) async {
     setHttpsVerification();
     Response response;
     try {
-      response = await dio.post(url, data: params,options:options);
+      response = await dio.post(url, data: params, options: options);
     } on DioError catch (e) {
-      if(e.response!=null && scaffoldKey !=null){
-        var code = common.getCatchErrCode(e.response,scaffoldKey);
+      if (e.response != null && scaffoldKey != null) {
+        var code = common.getCatchErrCode(e.response, scaffoldKey);
         return code;
       }
     }
     return response.data;
   }
-
-
 }

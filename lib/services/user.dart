@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 
 Dio dio = new Dio(); // 使用默认配置
 class UserServices {
-  static Future userLogin(String username, String password,[GlobalKey<ScaffoldState> scaffoldKey]) async {
+  static Future userLogin(String username, String password,{GlobalKey<ScaffoldState> scaffoldKey}) async {
     var url = '${globals.identityUrl}/connect/token';
     var data = {
       'username': username.toString().toLowerCase().trim(),
