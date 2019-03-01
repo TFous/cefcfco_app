@@ -34,7 +34,6 @@ class Request {
   static Future get(String url,Map<String, dynamic> params,[GlobalKey<ScaffoldState> scaffoldKey]) async {
     setHttpsVerification();
     Response response;
-    response = await dio.get(url, queryParameters: params);
     try {
       response = await dio.get(url, queryParameters: params);
     } on DioError catch (e) {

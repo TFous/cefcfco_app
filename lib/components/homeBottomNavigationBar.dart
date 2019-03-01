@@ -26,7 +26,33 @@ class HomeBottomNavigationBarState extends State<HomeBottomNavigationBar> with S
     controller = new TabController(
         initialIndex: widget.activeIndex, vsync: this, length: tabDataLength); // 这里的length 决定有多少个底导 submenus
     for (int i = 0; i < tabDataLength; i++) {
-      myTabs.add(new Tab(text: widget.tabData[i]['text'], icon: widget.tabData[i]['icon']));
+      myTabs.add(new Tab(
+//          text: widget.tabData[i]['text'],
+          child: Stack(
+            overflow:Overflow.visible,
+            children: <Widget>[
+              Column(
+                children: <Widget>[
+                  widget.tabData[i]['icon'],
+                  Text(widget.tabData[i]['text']),
+                ],
+              ),
+              Positioned(right: -3, top: -3,
+                  child: Container(
+//                    height: 8.0,
+//                    width: 8.0,
+                    child: Text('12',
+                        style: TextStyle(color: Colors.white,fontSize: 12.0)
+                    ),
+                    decoration: BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.rectangle,
+                        borderRadius: BorderRadius.all(Radius.circular(10))),
+                  )),
+
+            ],
+          )
+      ));
     }
     controller.addListener(() {
       if (controller.indexIsChanging) {

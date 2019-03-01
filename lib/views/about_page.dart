@@ -17,6 +17,8 @@ class AboutPage extends StatefulWidget {
 class AboutPageState extends State<AboutPage>
     with AutomaticKeepAliveClientMixin {
   final GlobalKey<AnimatedListState> _listKey = new GlobalKey<AnimatedListState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
   String _user = '',_accessToken='';
   @override
   bool get wantKeepAlive => true;
@@ -58,7 +60,7 @@ class AboutPageState extends State<AboutPage>
   }
 
   Future getIndexListData([Map<String, dynamic> params]) async {
-    var data = await keyValuesServices.getKeyValueList();
+    var data = await keyValuesServices.getKeyValueList(_scaffoldKey);
     Map<String, dynamic> result = {
       "list": data['result'],
       'total': 20,
@@ -71,6 +73,7 @@ class AboutPageState extends State<AboutPage>
   Widget build(BuildContext context) {
     super.build(context);
     return new Scaffold(
+      key: _scaffoldKey,
       appBar: new AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Color(0xff1b82d2),
