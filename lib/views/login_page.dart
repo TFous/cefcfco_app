@@ -114,7 +114,7 @@ class _LoginPageState extends State<LoginPage>
       Application.router
           .navigateTo(context, '/home', transition: TransitionType.fadeIn);
       await SpUtil.getInstance()
-        ..putString(globals.userName, user['username'])
+        ..putString(globals.userName, user['FullName'])
         ..putString(globals.accessToken, token['access_token'])
         ..putBool(globals.isLogin, true);
 //    设置 dio 的token

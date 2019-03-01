@@ -1,10 +1,7 @@
-import 'dart:async';
 import 'package:cefcfco_app/components/homeBottomNavigationBar.dart';
 import 'package:flutter/material.dart';
 import 'package:cefcfco_app/utils/globals.dart' as globals;
 import 'package:cefcfco_app/utils/shared_preferences.dart';
-import 'package:cefcfco_app/services/keyValue.dart';
-import 'package:cefcfco_app/components/list_view_item.dart';
 
 class UserPage extends StatefulWidget {
   @override
@@ -12,10 +9,7 @@ class UserPage extends StatefulWidget {
 }
 
 class UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin{
-  var _keyValueList = {};
-
   String _userName = '', _accessToken = '';
-
   @override
   bool get wantKeepAlive => true;
 
@@ -31,39 +25,6 @@ class UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin{
       _userName = sp.getString(globals.userName);
       _accessToken = sp.getString(globals.accessToken);
     });
-  }
-
-  headerView() {
-    return Column(
-      children: <Widget>[],
-    );
-  }
-
-  Widget makeCard(index, item) {
-    var myTitle = '${item['displayName']}';
-    var myUsername = '${'👲'}: ${item['keyName']} ';
-    return new ListViewItem(
-      itemTitle: myTitle,
-      data: myUsername,
-    );
-  }
-
-  Future getIndexListData([Map<String, dynamic> params]) async {
-    var dd = await keyValuesServices.getKeyValueList();
-    Map<String, dynamic> result = {
-      "list": dd['result'],
-      'total': 20,
-      'pageIndex': 0
-    };
-    return result;
-  }
-
-  _submit() {
-    getIndexListData();
-  }
-
-  _getList() async {
-    var data = await keyValuesServices.getKeyValueList();
   }
 
   @override
@@ -102,6 +63,9 @@ class UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin{
       ),
       body: SingleChildScrollView(
         child: new Container(
+            decoration: new BoxDecoration(
+              color: Colors.white,
+            ),
             child: Column(
               children: <Widget>[
                 Container(
@@ -174,10 +138,8 @@ class UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin{
                 new Container(
                   padding: EdgeInsets.symmetric(horizontal: globals.sidesDistance),
                   decoration: new BoxDecoration(
-                      border: new Border(bottom: BorderSide(
-                          width: 1.0,
-                          color: Color(0xFFf2f2f2)
-                      ))
+                    border: new Border(bottom: BorderSide(color: Color(0xFFf2f2f2))),
+                    color: Colors.white,
                   ),
                   child: ListTile(
                     title: Text("账单"),
@@ -207,7 +169,8 @@ class UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin{
                 new Container(
                   padding: EdgeInsets.symmetric(horizontal: globals.sidesDistance),
                   decoration: new BoxDecoration(
-                      border: new Border(bottom: BorderSide(color: Color(0xFFf2f2f2)))
+                    border: new Border(bottom: BorderSide(color: Color(0xFFf2f2f2))),
+                    color: Colors.white,
                   ),
                   child: ListTile(
                     title: Text("输入相关"),
@@ -237,7 +200,8 @@ class UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin{
                 new Container(
                   padding: EdgeInsets.symmetric(horizontal: globals.sidesDistance),
                   decoration: new BoxDecoration(
-                      border: new Border(bottom: BorderSide(color: Color(0xFFf2f2f2)))
+                    border: new Border(bottom: BorderSide(color: Color(0xFFf2f2f2))),
+                    color: Colors.white,
                   ),
                   child: ListTile(
                     title: Text("统计"),
@@ -267,8 +231,9 @@ class UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin{
                 new Container(
                   padding: EdgeInsets.symmetric(horizontal: globals.sidesDistance),
                   decoration: new BoxDecoration(
-                      border: new Border(bottom: BorderSide(color: Color(0xFFf2f2f2)))
-                  ),
+                      border: new Border(bottom: BorderSide(color: Color(0xFFf2f2f2))),
+                      color: Colors.white,
+                ),
                   child: ListTile(
                     title: Text("统计"),
                     // item 标题
