@@ -10,8 +10,10 @@ class HomeBottomNavigationBar extends StatefulWidget {
   final TabController controller;
   final IIndexIsChangingCallBack indexIsChangingCallBack;
 
-  const HomeBottomNavigationBar({Key key, this.tabData, this.controller, this.indexIsChangingCallBack})
-      : super(key: key);
+  HomeBottomNavigationBar(
+      {Key key, this.tabData, this.controller, this.indexIsChangingCallBack})
+      : assert(tabData.length > 0),
+        super(key: key);
 
   @override
   HomeBottomNavigationBarState createState() {
@@ -24,6 +26,7 @@ class HomeBottomNavigationBarState extends State<HomeBottomNavigationBar>
   TabController controller;
   List<Widget> myTabs = [];
   List newTabData = [];
+
   @override
   void initState() {
     // TODO: implement initState
@@ -42,43 +45,44 @@ class HomeBottomNavigationBarState extends State<HomeBottomNavigationBar>
     });
   }
 
-  setTabs(tabData){
-    myTabs=[];
+  setTabs(tabData) {
+    myTabs = [];
     newTabData = tabData;
     var tabDataLength = newTabData.length;
     for (int i = 0; i < tabDataLength; i++) {
       var node = newTabData[i];
-      bool isShowBadge = node['isShowBadge']??false;
+      bool isShowBadge = node['isShowBadge'] ?? false;
       myTabs.add(new Tab(
           child: Stack(
-            overflow: Overflow.visible,
+        overflow: Overflow.visible,
+        children: <Widget>[
+          Column(
             children: <Widget>[
-              Column(
-                children: <Widget>[
-                  node['icon'],
-                  Text(node['text']),
-                ],
-              ),
-              isShowBadge?Positioned(
-                  right: node['badgeData']['right']??-5,
-                  top: node['badgeData']['top']??-5,
+              node['icon'],
+              Text(node['text']),
+            ],
+          ),
+          isShowBadge
+              ? Positioned(
+                  right: node['badgeData']['right'] ?? -5,
+                  top: node['badgeData']['top'] ?? -5,
                   child: Container(
                     child: Padding(
                       padding: EdgeInsets.symmetric(horizontal: 3.0),
                       child: Text(node['badgeData']['num'].toString(),
-                          style: TextStyle(color: Colors.white, fontSize: 12.0)),
+                          style:
+                              TextStyle(color: Colors.white, fontSize: 12.0)),
                     ),
                     decoration: BoxDecoration(
                         color: Colors.red,
                         shape: BoxShape.rectangle,
                         borderRadius: BorderRadius.all(Radius.circular(10))),
-                  )):Text(''),
-            ],
-          )));
+                  ))
+              : Text(''),
+        ],
+      )));
     }
   }
-
-
 
   @override
   Widget build(BuildContext context) {

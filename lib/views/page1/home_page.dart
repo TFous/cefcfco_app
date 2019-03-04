@@ -1,14 +1,7 @@
 import 'package:cefcfco_app/components/homeBottomNavigationBar.dart';
-import 'package:cefcfco_app/components/search_input.dart';
-import 'package:cefcfco_app/views/list_page.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:cefcfco_app/routers/application.dart';
-import 'package:cefcfco_app/views/about_page.dart';
-import 'package:cefcfco_app/views/first_page.dart';
-import 'package:cefcfco_app/views/user_page.dart';
-
+import 'package:cefcfco_app/views/page1/list_page.dart';
+import 'package:cefcfco_app/views/page1/user_page.dart';
 import 'package:cefcfco_app/utils/globals.dart' as globals;
 
 const int ThemeColor = 0xFFC91B3A;
@@ -43,24 +36,12 @@ class _MyHomePageState extends State<AppPage>
   }
 
   refshTabState(setData){
-    var newTabData = [
-      {
-        'text': '首页',
-        'router':'/home',
-        'icon': new Icon(Icons.home),
-        'isShowBadge': true,
-        'badgeData':{
-            'right':-20.0,
-            'top':-5.0,
-          'num': 'new',
-        }
-      },
-      {'text': '动态', 'router':'/about','isShowBadge': false, 'icon': new Icon(Icons.filter_vintage)},
-      {'text': '列表', 'router':'/about','isShowBadge': false, 'icon': new Icon(Icons.list)},
-      {'text': '我的','router':'/user', 'isShowBadge': false,'icon': new Icon(Icons.person)},
+    List myPageTabData = [
+      {'text': '编辑','isShowBadge': false, 'icon': new Icon(Icons.edit)},
+      {'text': '列表','isShowBadge': false, 'icon': new Icon(Icons.dashboard)},
     ];
 
-    setData(newTabData);
+    setData(myPageTabData);
   }
 
   @override
@@ -70,13 +51,11 @@ class _MyHomePageState extends State<AppPage>
           physics: new NeverScrollableScrollPhysics(), // 禁用滑动
           controller: controller,
           children: <Widget>[
-        new FirstPage(),
-        new AboutPage(),
         new ListPage(),
         new UserPage(),
       ]),
       bottomNavigationBar: new HomeBottomNavigationBar(
-          tabData: globals.homePageTabData,
+          tabData: globals.myPageTabData,
           indexIsChangingCallBack: refshTabState,
           controller:controller),
     );

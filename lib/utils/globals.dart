@@ -20,23 +20,21 @@ String isLogin = 'no';
 List homePageTabData = [
   {
     'text': '首页',
-    'router':'/home',
     'icon': new Icon(Icons.home),
     'isShowBadge': true,
     'badgeData':{
-      'num': 33,
+      'num': 'new',
     }
   },
-  {'text': '动态', 'router':'/about','isShowBadge': false, 'icon': new Icon(Icons.filter_vintage)},
-  {'text': '列表', 'router':'/about','isShowBadge': false, 'icon': new Icon(Icons.list)},
-  {'text': '我的','router':'/user', 'isShowBadge': false,'icon': new Icon(Icons.person)},
+  {'text': '动态','isShowBadge': false, 'icon': new Icon(Icons.filter_vintage)},
+  {'text': '列表','isShowBadge': false, 'icon': new Icon(Icons.list)},
+  {'text': '我的', 'isShowBadge': false,'icon': new Icon(Icons.person)},
 ];
 
 
 List myPageTabData = [
-  {'text': '编辑', 'router':'/home','icon': new Icon(Icons.edit)},
-  {'text': '新增', 'router':'/home', 'icon': new Icon(Icons.add)},
-  {'text': '列表','router':'/about', 'icon': new Icon(Icons.dashboard)},
+  {'text': '新增','isShowBadge': false, 'icon': new Icon(Icons.add)},
+  {'text': '列表','isShowBadge': false, 'icon': new Icon(Icons.dashboard)},
 ];
 
 double sidesDistance = 10.0;

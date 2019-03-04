@@ -1,7 +1,5 @@
 import 'package:cefcfco_app/components/homeBottomNavigationBar.dart';
-import 'package:cefcfco_app/routers/application.dart';
 import 'package:cefcfco_app/utils/common.dart';
-import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:cefcfco_app/utils/globals.dart' as globals;
 import 'package:cefcfco_app/utils/shared_preferences.dart';
@@ -37,7 +35,17 @@ class UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin{
     return new Scaffold(
       key: _scaffoldKey,
       appBar: new AppBar(
-        automaticallyImplyLeading: false,
+//        automaticallyImplyLeading: false,
+        leading: Builder(
+          builder: (BuildContext context) {
+            return IconButton(
+              icon: const Icon(Icons.arrow_back_ios),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            );
+          },
+        ),
         backgroundColor: Color(0xff1b82d2),
         //设置标题栏的背景颜色
         title: new Title(
@@ -162,10 +170,7 @@ class UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin{
                     // item 内容内边距
                     enabled: true,
                     onTap: () {
-                              Application.router.navigateTo(
-                            context, '/page1',
-                            transition: TransitionType.fadeIn);
-//                      showInSnackBar('2222',_scaffoldKey);
+                      showInSnackBar('2222',_scaffoldKey);
                     },
                     // item onTap 点击事件
                     onLongPress: () {
