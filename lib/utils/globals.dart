@@ -18,10 +18,18 @@ String isLogin = 'no';
 
 
 List homePageTabData = [
-  {'text': '首页', 'router':'/home','icon': new Icon(Icons.home)},
-  {'text': '动态', 'router':'/about', 'icon': new Icon(Icons.filter_vintage)},
-  {'text': '列表', 'router':'/about', 'icon': new Icon(Icons.list)},
-  {'text': '我的','router':'/user', 'icon': new Icon(Icons.person)},
+  {
+    'text': '首页',
+    'router':'/home',
+    'icon': new Icon(Icons.home),
+    'isShowBadge': true,
+    'badgeData':{
+      'num': 33,
+    }
+  },
+  {'text': '动态', 'router':'/about','isShowBadge': false, 'icon': new Icon(Icons.filter_vintage)},
+  {'text': '列表', 'router':'/about','isShowBadge': false, 'icon': new Icon(Icons.list)},
+  {'text': '我的','router':'/user', 'isShowBadge': false,'icon': new Icon(Icons.person)},
 ];
 
 

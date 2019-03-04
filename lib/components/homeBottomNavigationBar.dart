@@ -3,13 +3,14 @@ import 'package:fluro/fluro.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+typedef void IIndexIsChangingCallBack(Function content);
+
 class HomeBottomNavigationBar extends StatefulWidget {
   final List tabData;
-  final num activeIndex;
-  final Map msgTipInfo;
   final TabController controller;
+  final IIndexIsChangingCallBack indexIsChangingCallBack;
 
-  const HomeBottomNavigationBar({Key key, this.tabData, this.activeIndex, this.msgTipInfo, this.controller})
+  const HomeBottomNavigationBar({Key key, this.tabData, this.controller, this.indexIsChangingCallBack})
       : super(key: key);
 
   @override
@@ -22,50 +23,62 @@ class HomeBottomNavigationBarState extends State<HomeBottomNavigationBar>
     with SingleTickerProviderStateMixin {
   TabController controller;
   List<Widget> myTabs = [];
-
+  List newTabData = [];
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    var tabDataLength = widget.tabData.length;
+    setTabs(widget.tabData);
     controller = widget.controller;
-    for (int i = 0; i < tabDataLength; i++) {
-      bool isShowMsgInfo = widget.msgTipInfo!=null&&widget.msgTipInfo['index']==i?true:false;
-      myTabs.add(new Tab(
-          child: Stack(
-        overflow: Overflow.visible,
-        children: <Widget>[
-          Column(
-            children: <Widget>[
-              widget.tabData[i]['icon'],
-              Text(widget.tabData[i]['text']),
-            ],
-          ),
-          isShowMsgInfo?Positioned(
-              right: -5,
-              top: -5,
-              child: Container(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 3.0),
-                  child: Text('12',
-                      style: TextStyle(color: Colors.white, fontSize: 12.0)),
-                ),
-                decoration: BoxDecoration(
-                    color: Colors.red,
-                    shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.all(Radius.circular(10))),
-              )):Text(''),
-        ],
-      )));
-    }
     controller.addListener(() {
       if (controller.indexIsChanging) {
+        setState(() {
+          widget.indexIsChangingCallBack(setTabs);
+        });
 //        Application.router.navigateTo(
-//            context, '${widget.tabData[controller.index]['router']}',
+//            context, '${newTabData[controller.index]['router']}',
 //            transition: TransitionType.fadeIn);
       }
     });
   }
+
+  setTabs(tabData){
+    myTabs=[];
+    newTabData = tabData;
+    var tabDataLength = newTabData.length;
+    for (int i = 0; i < tabDataLength; i++) {
+      var node = newTabData[i];
+      bool isShowBadge = node['isShowBadge']??false;
+      myTabs.add(new Tab(
+          child: Stack(
+            overflow: Overflow.visible,
+            children: <Widget>[
+              Column(
+                children: <Widget>[
+                  node['icon'],
+                  Text(node['text']),
+                ],
+              ),
+              isShowBadge?Positioned(
+                  right: node['badgeData']['right']??-5,
+                  top: node['badgeData']['top']??-5,
+                  child: Container(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 3.0),
+                      child: Text(node['badgeData']['num'].toString(),
+                          style: TextStyle(color: Colors.white, fontSize: 12.0)),
+                    ),
+                    decoration: BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.rectangle,
+                        borderRadius: BorderRadius.all(Radius.circular(10))),
+                  )):Text(''),
+            ],
+          )));
+    }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {

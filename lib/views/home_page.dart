@@ -27,7 +27,7 @@ class _MyHomePageState extends State<AppPage>
   List<Widget> myTabs = [];
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
-  Map msgTipInfo = {
+  Map badge = {
     'msgNum': 33,
     'index': 0,
     'right': -5,
@@ -49,11 +49,30 @@ class _MyHomePageState extends State<AppPage>
     super.dispose();
   }
 
+  refshTabState(setData){
+    var newTabData = [
+      {
+        'text': '首页',
+        'router':'/home',
+        'icon': new Icon(Icons.home),
+        'isShowBadge': true,
+        'badgeData':{
+          'num': 1,
+        }
+      },
+      {'text': '动态', 'router':'/about','isShowBadge': false, 'icon': new Icon(Icons.filter_vintage)},
+      {'text': '列表', 'router':'/about','isShowBadge': false, 'icon': new Icon(Icons.list)},
+      {'text': '我的','router':'/user', 'isShowBadge': false,'icon': new Icon(Icons.person)},
+    ];
+
+    setData(newTabData);
+  }
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
       body: new TabBarView(
-          physics: new NeverScrollableScrollPhysics(), // 警用滑动
+          physics: new NeverScrollableScrollPhysics(), // 禁用滑动
           controller: controller,
           children: <Widget>[
         new FirstPage(),
@@ -63,9 +82,8 @@ class _MyHomePageState extends State<AppPage>
       ]),
       bottomNavigationBar: new HomeBottomNavigationBar(
           tabData: globals.homePageTabData,
-          activeIndex: 0,
-          controller:controller,
-          msgTipInfo: msgTipInfo),
+          indexIsChangingCallBack: refshTabState,
+          controller:controller),
     );
   }
 }

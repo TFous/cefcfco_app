@@ -11,7 +11,18 @@ import 'package:flutter_test/flutter_test.dart';
 //import 'package:cefcfco_app/main.dart';
 class Aa{
     List dd = [{'dd':123}];
-
+    static Map node = {
+        'text': '首页',
+        'router':'/home',
+        'icon': new Icon(Icons.home),
+        'isShowBadge': true,
+        'badgeData':{
+            'num': 33,
+            'top': -5
+        }
+    };
 }
 void main() {
+    print(Aa.node['badgeData']['right']??-11);
+
 }
