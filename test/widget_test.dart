@@ -14,5 +14,4 @@ class Aa{
 
 }
 void main() {
-  print(TyAa.dd[0]);
 }

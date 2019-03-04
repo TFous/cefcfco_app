@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cefcfco_app/components/search_input.dart';
 import 'package:flutter/material.dart';
 import 'package:cefcfco_app/utils/globals.dart' as globals;
 import 'package:cefcfco_app/utils/request.dart';
@@ -14,7 +15,7 @@ class FirstPage extends StatefulWidget {
 }
 
 class FirstPageState extends State<FirstPage> with AutomaticKeepAliveClientMixin{
-  final GlobalKey<AnimatedListState> _listKey = new GlobalKey<AnimatedListState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   String _user = '',_accessToken='';
   @override
   bool get wantKeepAlive => true;
@@ -30,6 +31,26 @@ class FirstPageState extends State<FirstPage> with AutomaticKeepAliveClientMixin
       _accessToken = sp.getString(globals.accessToken);
     });
   }
+
+  Widget buildSearchInput(BuildContext context) {
+    return new SearchInput((value) async {
+      if (value != '') {
+        List list = [];
+        return list
+            .map((item) => new MaterialSearchResult<String>(
+          value: item.name,
+          icon: null,
+          text: 'widget',
+          onTap: () {},
+        ))
+            .toList();
+      } else {
+        return null;
+      }
+    }, (value) {}, () {});
+  }
+
+
   headerView(){
     return
       Column(
@@ -86,14 +107,23 @@ class FirstPageState extends State<FirstPage> with AutomaticKeepAliveClientMixin
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return new Column(
-      children: <Widget>[
-        new Expanded(
-          //child: new List(),
-            child: listComp.ListRefresh(getIndexListData,makeCard,headerView)
-        )
-      ],
+
+    return new Scaffold(
+      appBar: new AppBar(
+        title: buildSearchInput(context),
+        automaticallyImplyLeading: false,
+      ),
+      body: new Column(
+    children: <Widget>[
+    new Expanded(
+        //child: new List(),
+        child: listComp.ListRefresh(getIndexListData,makeCard,headerView)
+    )
+    ],
+    )
+
     );
+
   }
 }
 

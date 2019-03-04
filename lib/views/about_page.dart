@@ -27,7 +27,6 @@ class AboutPageState extends State<AboutPage>
   @override
   void initState() {
     super.initState();
-    print(222222222222);
     _getUserName();
   }
   _getUserName() async {

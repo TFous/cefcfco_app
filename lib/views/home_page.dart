@@ -1,5 +1,6 @@
 import 'package:cefcfco_app/components/homeBottomNavigationBar.dart';
 import 'package:cefcfco_app/components/search_input.dart';
+import 'package:cefcfco_app/views/list_page.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -48,37 +49,16 @@ class _MyHomePageState extends State<AppPage>
     super.dispose();
   }
 
-  Widget buildSearchInput(BuildContext context) {
-    return new SearchInput((value) async {
-      if (value != '') {
-        List list = [];
-        return list
-            .map((item) => new MaterialSearchResult<String>(
-                  value: item.name,
-                  icon: null,
-                  text: 'widget',
-                  onTap: () {},
-                ))
-            .toList();
-      } else {
-        return null;
-      }
-    }, (value) {}, () {});
-  }
-
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      appBar: new AppBar(
-        title: buildSearchInput(context),
-        automaticallyImplyLeading: false,
-      ),
       body: new TabBarView(
           physics: new NeverScrollableScrollPhysics(), // 警用滑动
           controller: controller,
           children: <Widget>[
         new FirstPage(),
         new AboutPage(),
+        new ListPage(),
         new UserPage(),
       ]),
       bottomNavigationBar: new HomeBottomNavigationBar(
