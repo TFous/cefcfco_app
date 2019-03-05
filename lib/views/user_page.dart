@@ -1,4 +1,6 @@
 import 'package:cefcfco_app/components/homeBottomNavigationBar.dart';
+import 'package:cefcfco_app/components/list_menus.dart';
+import 'package:cefcfco_app/components/list_menus_item.dart';
 import 'package:cefcfco_app/routers/application.dart';
 import 'package:cefcfco_app/utils/common.dart';
 import 'package:fluro/fluro.dart';
@@ -14,6 +16,92 @@ class UserPage extends StatefulWidget {
 class UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin{
   String _userName = '', _accessToken = '';
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  List<ListMenusItem> menusList = [];
+
+  final List list = [{
+    'title': '账单',
+    'icon': Icon(Icons.assignment, color: Color(0xfff49c2e)),
+    'onTapCallBack': (context) =>
+    {
+    Application.router.navigateTo(
+        context, '/page1',
+        transition: TransitionType.fadeIn)
+    },
+  }, {
+    'title': '输入相关',
+    'icon': Icon(Icons.keyboard,color: Color(0xff108ee9)),
+    'onTapCallBack': (context) =>
+    {
+    Application.router.navigateTo(
+        context, '/page1',
+        transition: TransitionType.fadeIn)
+    },
+  }, {
+    'title': '统计',
+    'icon': Icon(Icons.assessment,color: Color(0xff108ee9)),
+    'onTapCallBack': (context) =>
+    {
+    Application.router.navigateTo(
+        context, '/page1',
+        transition: TransitionType.fadeIn)
+    },
+  },{
+    'title': '账单',
+    'icon': Icon(Icons.assignment, color: Color(0xfff49c2e)),
+    'onTapCallBack': (context) =>
+    {
+    Application.router.navigateTo(
+        context, '/page1',
+        transition: TransitionType.fadeIn)
+    },
+  }, {
+    'title': '输入相关',
+    'icon': Icon(Icons.keyboard,color: Color(0xff108ee9)),
+    'onTapCallBack': (context) =>
+    {
+    Application.router.navigateTo(
+        context, '/page1',
+        transition: TransitionType.fadeIn)
+    },
+  }, {
+    'title': '统计',
+    'icon': Icon(Icons.assessment,color: Color(0xff108ee9)),
+    'onTapCallBack': (context) =>
+    {
+    Application.router.navigateTo(
+        context, '/page1',
+        transition: TransitionType.fadeIn)
+    },
+  },{
+    'title': '账单',
+    'icon': Icon(Icons.assignment, color: Color(0xfff49c2e)),
+    'onTapCallBack': (context) =>
+    {
+    Application.router.navigateTo(
+        context, '/page1',
+        transition: TransitionType.fadeIn)
+    },
+  }, {
+    'title': '输入相关',
+    'icon': Icon(Icons.keyboard,color: Color(0xff108ee9)),
+    'onTapCallBack': (context) =>
+    {
+    Application.router.navigateTo(
+        context, '/page1',
+        transition: TransitionType.fadeIn)
+    },
+  }, {
+    'title': '统计',
+    'icon': Icon(Icons.assessment,color: Color(0xff108ee9)),
+    'onTapCallBack': (context) =>
+    {
+    Application.router.navigateTo(
+        context, '/page1',
+        transition: TransitionType.fadeIn)
+    },
+  }];
+
+
 
   @override
   bool get wantKeepAlive => true;
@@ -22,6 +110,12 @@ class UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin{
   void initState() {
     super.initState();
     _getUserName();
+
+    for(var i=0;i<list.length;i++){
+      ListMenusItem cellData =new ListMenusItem.fromJson(list[i]);
+      menusList.add(cellData);
+    }
+
   }
 
   _getUserName() async {
@@ -141,403 +235,7 @@ class UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin{
                     ],
                   ),
                 ),
-                new Container(
-                  padding: EdgeInsets.symmetric(horizontal: globals.sidesDistance),
-                  decoration: new BoxDecoration(
-                    border: new Border(bottom: BorderSide(color: Color(0xFFf2f2f2))),
-                    color: Colors.white,
-                  ),
-                  child: ListTile(
-                    title: Text("账单"),
-                    // item 标题
-                    leading: Icon(Icons.assignment,color: Color(0xfff49c2e) ,),
-                    // item 前置图标
-                    trailing: Icon(Icons.keyboard_arrow_right),
-                    // item 后置图标
-                    isThreeLine: false,
-                    // item 是否三行显示
-                    dense: true,
-                    // item 直观感受是整体大小
-                    contentPadding: EdgeInsets.all(3.0),
-                    // item 内容内边距
-                    enabled: true,
-                    onTap: () {
-                              Application.router.navigateTo(
-                            context, '/page1',
-                            transition: TransitionType.fadeIn);
-//                      showInSnackBar('2222',_scaffoldKey);
-                    },
-                    // item onTap 点击事件
-                    onLongPress: () {
-                      print('长按:');
-                    },
-                    // item onLongPress 长按事件
-                    selected: false, // item 是否选中状态
-                  ),
-                ),
-                new Container(
-                  padding: EdgeInsets.symmetric(horizontal: globals.sidesDistance),
-                  decoration: new BoxDecoration(
-                    border: new Border(bottom: BorderSide(color: Color(0xFFf2f2f2))),
-                    color: Colors.white,
-                  ),
-                  child: ListTile(
-                    title: Text("输入相关"),
-                    // item 标题
-                    leading: Icon(Icons.keyboard,color: Color(0xff108ee9) ,),
-                    // item 前置图标
-                    trailing: Icon(Icons.keyboard_arrow_right),
-                    // item 后置图标
-                    isThreeLine: false,
-                    // item 是否三行显示
-                    dense: true,
-                    // item 直观感受是整体大小
-                    contentPadding: EdgeInsets.all(3.0),
-                    // item 内容内边距
-                    enabled: true,
-                    onTap: () {
-                      print('点击:');
-                    },
-                    // item onTap 点击事件
-                    onLongPress: () {
-                      print('长按12312312:');
-                    },
-                    // item onLongPress 长按事件
-                    selected: false, // item 是否选中状态
-                  ),
-                ),
-                new Container(
-                  padding: EdgeInsets.symmetric(horizontal: globals.sidesDistance),
-                  decoration: new BoxDecoration(
-                    border: new Border(bottom: BorderSide(color: Color(0xFFf2f2f2))),
-                    color: Colors.white,
-                  ),
-                  child: ListTile(
-                    title: Text("统计"),
-                    // item 标题
-                    leading: Icon(Icons.assessment,color: Color(0xff108ee9) ,),
-                    // item 前置图标
-                    trailing: Icon(Icons.keyboard_arrow_right),
-                    // item 后置图标
-                    isThreeLine: false,
-                    // item 是否三行显示
-                    dense: true,
-                    // item 直观感受是整体大小
-                    contentPadding: EdgeInsets.all(3.0),
-                    // item 内容内边距
-                    enabled: true,
-                    onTap: () {
-                      print('点击:');
-                    },
-                    // item onTap 点击事件
-                    onLongPress: () {
-                      print('长按12312312:');
-                    },
-                    // item onLongPress 长按事件
-                    selected: false, // item 是否选中状态
-                  ),
-                ),
-                new Container(
-                  padding: EdgeInsets.symmetric(horizontal: globals.sidesDistance),
-                  decoration: new BoxDecoration(
-                      border: new Border(bottom: BorderSide(color: Color(0xFFf2f2f2))),
-                      color: Colors.white,
-                ),
-                  child: ListTile(
-                    title: Text("统计"),
-                    // item 标题
-                    leading: Icon(Icons.assistant_photo,color: Color(0xff108ee9) ,),
-                    // item 前置图标
-                    trailing: Icon(Icons.keyboard_arrow_right),
-                    // item 后置图标
-                    isThreeLine: false,
-                    // item 是否三行显示
-                    dense: true,
-                    // item 直观感受是整体大小
-                    contentPadding: EdgeInsets.all(3.0),
-                    // item 内容内边距
-                    enabled: true,
-                    onTap: () {
-                      print('点击:');
-                    },
-                    // item onTap 点击事件
-                    onLongPress: () {
-                      print('长按12312312:');
-                    },
-                    // item onLongPress 长按事件
-                    selected: false, // item 是否选中状态
-                  ),
-                ),
-                new Container(
-                  padding: EdgeInsets.symmetric(horizontal: globals.sidesDistance),
-                  decoration: new BoxDecoration(
-                      border: new Border(bottom: BorderSide(color: Color(0xFFf2f2f2)))
-                  ),
-                  child: ListTile(
-                    title: Text("输入相关"),
-                    // item 标题
-                    leading: Icon(Icons.keyboard,color: Color(0xff108ee9) ,),
-                    // item 前置图标
-                    trailing: Icon(Icons.keyboard_arrow_right),
-                    // item 后置图标
-                    isThreeLine: false,
-                    // item 是否三行显示
-                    dense: true,
-                    // item 直观感受是整体大小
-                    contentPadding: EdgeInsets.all(3.0),
-                    // item 内容内边距
-                    enabled: true,
-                    onTap: () {
-                      print('点击:');
-                    },
-                    // item onTap 点击事件
-                    onLongPress: () {
-                      print('长按12312312:');
-                    },
-                    // item onLongPress 长按事件
-                    selected: false, // item 是否选中状态
-                  ),
-                ),
-                new Container(
-                  padding: EdgeInsets.symmetric(horizontal: globals.sidesDistance),
-                  decoration: new BoxDecoration(
-                      border: new Border(bottom: BorderSide(color: Color(0xFFf2f2f2)))
-                  ),
-                  child: ListTile(
-                    title: Text("统计"),
-                    // item 标题
-                    leading: Icon(Icons.assessment,color: Color(0xff108ee9) ,),
-                    // item 前置图标
-                    trailing: Icon(Icons.keyboard_arrow_right),
-                    // item 后置图标
-                    isThreeLine: false,
-                    // item 是否三行显示
-                    dense: true,
-                    // item 直观感受是整体大小
-                    contentPadding: EdgeInsets.all(3.0),
-                    // item 内容内边距
-                    enabled: true,
-                    onTap: () {
-                      print('点击:');
-                    },
-                    // item onTap 点击事件
-                    onLongPress: () {
-                      print('长按12312312:');
-                    },
-                    // item onLongPress 长按事件
-                    selected: false, // item 是否选中状态
-                  ),
-                ),
-                new Container(
-                  padding: EdgeInsets.symmetric(horizontal: globals.sidesDistance),
-                  decoration: new BoxDecoration(
-                      border: new Border(bottom: BorderSide(color: Color(0xFFf2f2f2)))
-                  ),
-                  child: ListTile(
-                    title: Text("统计"),
-                    // item 标题
-                    leading: Icon(Icons.assistant_photo,color: Color(0xff108ee9) ,),
-                    // item 前置图标
-                    trailing: Icon(Icons.keyboard_arrow_right),
-                    // item 后置图标
-                    isThreeLine: false,
-                    // item 是否三行显示
-                    dense: true,
-                    // item 直观感受是整体大小
-                    contentPadding: EdgeInsets.all(3.0),
-                    // item 内容内边距
-                    enabled: true,
-                    onTap: () {
-                      print('点击:');
-                    },
-                    // item onTap 点击事件
-                    onLongPress: () {
-                      print('长按12312312:');
-                    },
-                    // item onLongPress 长按事件
-                    selected: false, // item 是否选中状态
-                  ),
-                ),
-                new Container(
-                  padding: EdgeInsets.symmetric(horizontal: globals.sidesDistance),
-                  decoration: new BoxDecoration(
-                      border: new Border(bottom: BorderSide(color: Color(0xFFf2f2f2)))
-                  ),
-                  child: ListTile(
-                    title: Text("输入相关"),
-                    // item 标题
-                    leading: Icon(Icons.keyboard,color: Color(0xff108ee9) ,),
-                    // item 前置图标
-                    trailing: Icon(Icons.keyboard_arrow_right),
-                    // item 后置图标
-                    isThreeLine: false,
-                    // item 是否三行显示
-                    dense: true,
-                    // item 直观感受是整体大小
-                    contentPadding: EdgeInsets.all(3.0),
-                    // item 内容内边距
-                    enabled: true,
-                    onTap: () {
-                      print('点击:');
-                    },
-                    // item onTap 点击事件
-                    onLongPress: () {
-                      print('长按12312312:');
-                    },
-                    // item onLongPress 长按事件
-                    selected: false, // item 是否选中状态
-                  ),
-                ),
-                new Container(
-                  padding: EdgeInsets.symmetric(horizontal: globals.sidesDistance),
-                  decoration: new BoxDecoration(
-                      border: new Border(bottom: BorderSide(color: Color(0xFFf2f2f2)))
-                  ),
-                  child: ListTile(
-                    title: Text("统计"),
-                    // item 标题
-                    leading: Icon(Icons.assessment,color: Color(0xff108ee9) ,),
-                    // item 前置图标
-                    trailing: Icon(Icons.keyboard_arrow_right),
-                    // item 后置图标
-                    isThreeLine: false,
-                    // item 是否三行显示
-                    dense: true,
-                    // item 直观感受是整体大小
-                    contentPadding: EdgeInsets.all(3.0),
-                    // item 内容内边距
-                    enabled: true,
-                    onTap: () {
-                      print('点击:');
-                    },
-                    // item onTap 点击事件
-                    onLongPress: () {
-                      print('长按12312312:');
-                    },
-                    // item onLongPress 长按事件
-                    selected: false, // item 是否选中状态
-                  ),
-                ),
-                new Container(
-                  padding: EdgeInsets.symmetric(horizontal: globals.sidesDistance),
-                  decoration: new BoxDecoration(
-                      border: new Border(bottom: BorderSide(color: Color(0xFFf2f2f2)))
-                  ),
-                  child: ListTile(
-                    title: Text("统计"),
-                    // item 标题
-                    leading: Icon(Icons.assistant_photo,color: Color(0xff108ee9) ,),
-                    // item 前置图标
-                    trailing: Icon(Icons.keyboard_arrow_right),
-                    // item 后置图标
-                    isThreeLine: false,
-                    // item 是否三行显示
-                    dense: true,
-                    // item 直观感受是整体大小
-                    contentPadding: EdgeInsets.all(3.0),
-                    // item 内容内边距
-                    enabled: true,
-                    onTap: () {
-                      print('点击:');
-                    },
-                    // item onTap 点击事件
-                    onLongPress: () {
-                      print('长按12312312:');
-                    },
-                    // item onLongPress 长按事件
-                    selected: false, // item 是否选中状态
-                  ),
-                ),
-                new Container(
-                  padding: EdgeInsets.symmetric(horizontal: globals.sidesDistance),
-                  decoration: new BoxDecoration(
-                      border: new Border(bottom: BorderSide(color: Color(0xFFf2f2f2)))
-                  ),
-                  child: ListTile(
-                    title: Text("输入相关"),
-                    // item 标题
-                    leading: Icon(Icons.keyboard,color: Color(0xff108ee9) ,),
-                    // item 前置图标
-                    trailing: Icon(Icons.keyboard_arrow_right),
-                    // item 后置图标
-                    isThreeLine: false,
-                    // item 是否三行显示
-                    dense: true,
-                    // item 直观感受是整体大小
-                    contentPadding: EdgeInsets.all(3.0),
-                    // item 内容内边距
-                    enabled: true,
-                    onTap: () {
-                      print('点击:');
-                    },
-                    // item onTap 点击事件
-                    onLongPress: () {
-                      print('长按12312312:');
-                    },
-                    // item onLongPress 长按事件
-                    selected: false, // item 是否选中状态
-                  ),
-                ),
-                new Container(
-                  padding: EdgeInsets.symmetric(horizontal: globals.sidesDistance),
-                  decoration: new BoxDecoration(
-                      border: new Border(bottom: BorderSide(color: Color(0xFFf2f2f2)))
-                  ),
-                  child: ListTile(
-                    title: Text("统计"),
-                    // item 标题
-                    leading: Icon(Icons.assessment,color: Color(0xff108ee9) ,),
-                    // item 前置图标
-                    trailing: Icon(Icons.keyboard_arrow_right),
-                    // item 后置图标
-                    isThreeLine: false,
-                    // item 是否三行显示
-                    dense: true,
-                    // item 直观感受是整体大小
-                    contentPadding: EdgeInsets.all(3.0),
-                    // item 内容内边距
-                    enabled: true,
-                    onTap: () {
-                      print('点击:');
-                    },
-                    // item onTap 点击事件
-                    onLongPress: () {
-                      print('长按12312312:');
-                    },
-                    // item onLongPress 长按事件
-                    selected: false, // item 是否选中状态
-                  ),
-                ),
-                new Container(
-                  padding: EdgeInsets.symmetric(horizontal: globals.sidesDistance),
-                  decoration: new BoxDecoration(
-                      border: new Border(bottom: BorderSide(color: Color(0xFFf2f2f2)))
-                  ),
-                  child: ListTile(
-                    title: Text("统计"),
-                    // item 标题
-                    leading: Icon(Icons.assistant_photo,color: Color(0xff108ee9) ,),
-                    // item 前置图标
-                    trailing: Icon(Icons.keyboard_arrow_right),
-                    // item 后置图标
-                    isThreeLine: false,
-                    // item 是否三行显示
-                    dense: true,
-                    // item 直观感受是整体大小
-                    contentPadding: EdgeInsets.all(3.0),
-                    // item 内容内边距
-                    enabled: true,
-                    onTap: () {
-                      print('点击:');
-                    },
-                    // item onTap 点击事件
-                    onLongPress: () {
-                      print('长按12312312:');
-                    },
-                    // item onLongPress 长按事件
-                    selected: false, // item 是否选中状态
-                  ),
-                ),
+                ListMenus(menusList: menusList)
               ],
             )),
       ),

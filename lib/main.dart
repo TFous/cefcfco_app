@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
 //    } else {
 //      return LoginPage();
 //    }
-    return AppPage();
+    return LoginPage();
   }
 
   refreshToken() async {
