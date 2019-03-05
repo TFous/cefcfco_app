@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 
 String identityUrl = 'https://identity-wucc.apps.dev-cefcfco.com';
+String wuccUrl = 'https://admin-wucc.apps.dev-cefcfco.com';
 String keyValueUrl = 'https://api-platform.apps.dev-cefcfco.com';
 
 String scope = 'openid role ewip permission roledatapermission';

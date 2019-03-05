@@ -13,5 +13,6 @@ class Routes {
     router.define(routerConfig.home, handler: homeHandler);
     router.define(routerConfig.page1, handler: page1Handler);
     router.define(routerConfig.setting, handler: settingHandler);
+    router.define(routerConfig.changeSecondPassword, handler: changeSecondPasswordHandler);
   }
 }

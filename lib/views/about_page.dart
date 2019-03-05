@@ -62,7 +62,7 @@ class AboutPageState extends State<AboutPage>
   }
 
   Future getIndexListData([Map<String, dynamic> params]) async {
-    var data = await keyValuesServices.getKeyValueList(_scaffoldKey);
+    var data = await KeyValuesServices.getKeyValueList(_scaffoldKey);
     Map<String, dynamic> result = {
       "list": data['result'],
       'total': 20,

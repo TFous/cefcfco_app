@@ -1,4 +1,5 @@
 import 'package:cefcfco_app/views/about_page.dart';
+import 'package:cefcfco_app/views/changeSecondPassword_page.dart';
 import 'package:cefcfco_app/views/setting_page.dart';
 import 'package:flutter/material.dart';
 import 'package:fluro/fluro.dart';
@@ -32,5 +33,12 @@ var page1Handler = new Handler(
 var settingHandler = new Handler(
   handlerFunc: (BuildContext context, Map<String, List<String>> params) {
     return new SettingPage();
+  },
+);
+
+// 设置列表页
+var changeSecondPasswordHandler = new Handler(
+  handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+    return new ChangeSecondPasswordPage();
   },
 );

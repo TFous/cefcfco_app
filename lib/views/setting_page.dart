@@ -1,4 +1,3 @@
-import 'package:cefcfco_app/components/homeBottomNavigationBar.dart';
 import 'package:cefcfco_app/components/list_menus.dart';
 import 'package:cefcfco_app/components/list_menus_item.dart';
 import 'package:cefcfco_app/routers/application.dart';
@@ -8,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:cefcfco_app/utils/globals.dart' as globals;
 import 'package:cefcfco_app/utils/shared_preferences.dart';
 import 'package:cefcfco_app/utils/router_config.dart' as routerConfig;
+import 'package:cefcfco_app/services/setting.dart';
 
 class SettingPage extends StatefulWidget {
   @override
@@ -16,6 +16,8 @@ class SettingPage extends StatefulWidget {
 
 class SettingPageState extends State<SettingPage> with AutomaticKeepAliveClientMixin{
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  String oldSecondPassword = '';
+  String newSecondPassword = '';
   List<ListMenusItem> menusList = [];
   List<ListMenusItem> menusList2 = [];
   final List list = [
@@ -42,7 +44,7 @@ class SettingPageState extends State<SettingPage> with AutomaticKeepAliveClientM
     'onTapCallBack': (context) =>
     {
     Application.router.navigateTo(
-        context,routerConfig.page1,
+        context,routerConfig.changeSecondPassword,
         transition: TransitionType.fadeIn)
     },
   }];
@@ -124,6 +126,17 @@ class SettingPageState extends State<SettingPage> with AutomaticKeepAliveClientM
       menusList2.add(cellData);
     }
   }
+
+  changeAndSetSecondPassword(){
+    Map<String,String> secondPassword = {
+      'oldSecondPassword': oldSecondPassword,
+      'secondPassword': newSecondPassword
+    };
+    SettingServices.changeAndSetSecondPassword(secondPassword).then((result)=>{
+
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
