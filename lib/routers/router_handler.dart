@@ -1,4 +1,5 @@
 import 'package:cefcfco_app/views/about_page.dart';
+import 'package:cefcfco_app/views/setting_page.dart';
 import 'package:flutter/material.dart';
 import 'package:fluro/fluro.dart';
 import 'package:cefcfco_app/views/login_page.dart';
@@ -24,5 +25,12 @@ var homeHandler = new Handler(
 var page1Handler = new Handler(
   handlerFunc: (BuildContext context, Map<String, List<String>> params) {
     return new page1.AppPage();
+  },
+);
+
+// 设置列表页
+var settingHandler = new Handler(
+  handlerFunc: (BuildContext context, Map<String, List<String>> params) {
+    return new SettingPage();
   },
 );

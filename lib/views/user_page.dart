@@ -7,6 +7,7 @@ import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:cefcfco_app/utils/globals.dart' as globals;
 import 'package:cefcfco_app/utils/shared_preferences.dart';
+import 'package:cefcfco_app/utils/router_config.dart' as routerConfig;
 
 class UserPage extends StatefulWidget {
   @override
@@ -24,7 +25,7 @@ class UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin{
     'onTapCallBack': (context) =>
     {
     Application.router.navigateTo(
-        context, '/page1',
+        context,routerConfig.page1,
         transition: TransitionType.fadeIn)
     },
   }, {
@@ -33,7 +34,7 @@ class UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin{
     'onTapCallBack': (context) =>
     {
     Application.router.navigateTo(
-        context, '/page1',
+        context,routerConfig.page1,
         transition: TransitionType.fadeIn)
     },
   }, {
@@ -42,7 +43,7 @@ class UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin{
     'onTapCallBack': (context) =>
     {
     Application.router.navigateTo(
-        context, '/page1',
+        context,routerConfig.page1,
         transition: TransitionType.fadeIn)
     },
   },{
@@ -51,7 +52,7 @@ class UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin{
     'onTapCallBack': (context) =>
     {
     Application.router.navigateTo(
-        context, '/page1',
+        context,routerConfig.page1,
         transition: TransitionType.fadeIn)
     },
   }, {
@@ -60,7 +61,7 @@ class UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin{
     'onTapCallBack': (context) =>
     {
     Application.router.navigateTo(
-        context, '/page1',
+        context,routerConfig.page1,
         transition: TransitionType.fadeIn)
     },
   }, {
@@ -69,7 +70,7 @@ class UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin{
     'onTapCallBack': (context) =>
     {
     Application.router.navigateTo(
-        context, '/page1',
+        context,routerConfig.page1,
         transition: TransitionType.fadeIn)
     },
   },{
@@ -78,7 +79,7 @@ class UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin{
     'onTapCallBack': (context) =>
     {
     Application.router.navigateTo(
-        context, '/page1',
+        context,routerConfig.page1,
         transition: TransitionType.fadeIn)
     },
   }, {
@@ -87,7 +88,7 @@ class UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin{
     'onTapCallBack': (context) =>
     {
     Application.router.navigateTo(
-        context, '/page1',
+        context,routerConfig.page1,
         transition: TransitionType.fadeIn)
     },
   }, {
@@ -96,7 +97,7 @@ class UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin{
     'onTapCallBack': (context) =>
     {
     Application.router.navigateTo(
-        context, '/page1',
+        context,routerConfig.page1,
         transition: TransitionType.fadeIn)
     },
   }];
@@ -154,10 +155,14 @@ class UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin{
 //        flexibleSpace: ,//伸缩控件后面再看
 //        automaticallyImplyLeading: true,
         actions: <Widget>[
-          //设置显示在右边的控件
-          new Padding(
-            child: new Icon(Icons.settings),
-            padding: EdgeInsets.all(10.0),
+          IconButton(
+            icon: Icon(Icons.settings),
+            tooltip: '设置',
+            onPressed: ()=>{
+            Application.router.navigateTo(
+                context, routerConfig.setting,
+                transition: TransitionType.fadeIn)
+            },
           ),
         ],
       ),

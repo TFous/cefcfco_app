@@ -9,6 +9,8 @@ import 'package:cefcfco_app/utils/common.dart' as common;
 import 'package:cefcfco_app/utils/globals.dart' as globals;
 import 'package:cefcfco_app/utils/request.dart';
 import 'package:cefcfco_app/utils/shared_preferences.dart';
+import 'package:cefcfco_app/utils/router_config.dart' as routerConfig;
+
 
 class LoginPage extends StatefulWidget {
   LoginPage({Key key}) : super(key: key);
@@ -112,7 +114,7 @@ class _LoginPageState extends State<LoginPage>
     } else {
       var user = await UserServices.getUser(token,_scaffoldKey);
       Application.router
-          .navigateTo(context, '/home', transition: TransitionType.fadeIn);
+          .navigateTo(context, routerConfig.home, transition: TransitionType.fadeIn);
       await SpUtil.getInstance()
         ..putString(globals.userName, user['FullName'])
         ..putString(globals.accessToken, token['access_token'])

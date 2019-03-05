@@ -29,11 +29,20 @@ class _ListMenus extends State<ListMenus>{
               color: Colors.white,
             ),
             child: ListTile(
-              title: Text(item.title),
+              title: new Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Text(item.title, textAlign: TextAlign.left,style: TextStyle(color: Color(0xFF333333))),
+                    ),
+                    Expanded(
+                      child: Text(item.rightText, textAlign: TextAlign.right,style: TextStyle(fontSize: 13.0,color: Color(0xFF999999),fontWeight: null),),
+                    ),
+                  ]
+              ),
               // item 标题
               leading: item.icon,
               // item 前置图标
-              trailing: Icon(Icons.keyboard_arrow_right),
+              trailing: Icon(Icons.keyboard_arrow_right,color: Color(0xFFcccccc),),
               // item 后置图标
               isThreeLine: false,
               // item 是否三行显示
