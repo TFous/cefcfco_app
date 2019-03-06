@@ -21,7 +21,6 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage>
     with SingleTickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-
   final formKey = GlobalKey<FormState>();
   static String _userName='test123',_password='111111';
 
@@ -36,6 +35,7 @@ class _LoginPageState extends State<LoginPage>
       _userName = content;
     },
   );
+
   ITextField _authCode = new ITextField(
     keyboardType: ITextInputType.password,
     hintText: 'Password',
@@ -100,6 +100,7 @@ class _LoginPageState extends State<LoginPage>
   @override
   void initState() {
     super.initState();
+    Request.setDio();
 //     保持竖屏
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -108,19 +109,20 @@ class _LoginPageState extends State<LoginPage>
   }
 
   void loginFn() async {
-    var token = await UserServices.userLogin(_userName,_password);
+    var sp =await SpUtil.getInstance();
+    sp.clear();
+    var token = await LoginServices.userLogin(_userName,_password);
     if (token is num) {
       common.showInSnackBar('账号或密码错误！',_scaffoldKey);
     } else {
-      var user = await UserServices.getUser(token,_scaffoldKey);
+      var user = await LoginServices.getUser(token,_scaffoldKey);
       Application.router
           .navigateTo(context, routerConfig.home, transition: TransitionType.fadeIn);
-      await SpUtil.getInstance()
-        ..putString(globals.userName, user['FullName'])
-        ..putString(globals.accessToken, token['access_token'])
-        ..putBool(globals.isLogin, true);
+      sp.putString(globals.userName, user['FullName']);
+      sp.putString(globals.accessToken, token['access_token']);
+      sp.putBool(globals.isLogin, true);
 //    设置 dio 的token
-      await Request.setDio();
+      Request.setDio();
     }
   }
 

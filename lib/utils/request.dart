@@ -13,12 +13,16 @@ class Request {
   static void setDio() async {
     var sp = await SpUtil.getInstance();
     String accessToken = sp.getString(globals.accessToken);
-    dio = new Dio(new BaseOptions(
-      connectTimeout: 5000,
-      receiveTimeout: 100000,
-      // 5s
-      headers: {"Authorization": 'Bearer $accessToken'},
-    ));
+    print(accessToken);
+    if (accessToken!=null) {
+      dio = new Dio(new BaseOptions(
+        connectTimeout: 5000,
+        receiveTimeout: 100000,
+        headers: {"Authorization": 'Bearer $accessToken'},
+      ));
+    } else {
+      dio = new Dio();
+    }
   }
 
   static void setHttpsVerification() {
@@ -33,11 +37,12 @@ class Request {
 
   static Future get(String url,
       {Map<String, dynamic> params,
+        Options options,
       GlobalKey<ScaffoldState> scaffoldKey}) async {
     setHttpsVerification();
-    Response response;
+    var response;
     try {
-      response = await dio.get(url, queryParameters: params);
+      response = await dio.get(url,queryParameters: params,options:options);
     } on DioError catch (e) {
       if (e.response != null && scaffoldKey != null) {
         var code = common.getCatchErrCode(e.response, scaffoldKey);

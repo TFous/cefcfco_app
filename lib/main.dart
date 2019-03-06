@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
 
   refreshToken() async {
     //    设置 dio 的token
-    await Request.setDio();
+    Request.setDio();
   }
 
   @override

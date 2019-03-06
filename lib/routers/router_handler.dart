@@ -1,4 +1,3 @@
-import 'package:cefcfco_app/views/about_page.dart';
 import 'package:cefcfco_app/views/changeSecondPassword_page.dart';
 import 'package:cefcfco_app/views/setting_page.dart';
 import 'package:flutter/material.dart';

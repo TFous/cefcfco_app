@@ -4,9 +4,9 @@ import 'package:dio/dio.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:cefcfco_app/utils/request.dart';
 
-Dio dio = new Dio(); // 使用默认配置
-class UserServices {
+class LoginServices {
   static Future userLogin(String username, String password,{GlobalKey<ScaffoldState> scaffoldKey}) async {
     var url = '${globals.identityUrl}/connect/token';
     var data = {
@@ -17,43 +17,22 @@ class UserServices {
     };
     var bytes = utf8.encode('${globals.clientId}:${globals.clientSecret}');
     var base64Secret = base64.encode(bytes);
-    (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
-        (client) {
-      client.badCertificateCallback =
-          (X509Certificate cert, String host, int port) {
-        return true;
-      };
-    };
-    Response response;
-    try {
-      response = await dio.post(
-          url,
-          data:data,
-          options:new Options(
-              contentType: ContentType.parse("application/x-www-form-urlencoded"),
-              headers: {"Authorization": "Basic $base64Secret"}));
-    } on DioError catch (e) {
-      if(e.response!=null && scaffoldKey !=null){
-        var code = common.getCatchErrCode(e.response,scaffoldKey);
-        return code;
-      }
-    }
-    return response.data;
+    var response = await Request.post(
+        url,
+        params:data,
+        options:new Options(
+            contentType: ContentType.parse("application/x-www-form-urlencoded"),
+            headers: {"Authorization": "Basic $base64Secret"}));
+    print(response);
+    return response;
   }
 
   static Future getUser(Map<String, dynamic> params,[GlobalKey<ScaffoldState> scaffoldKey]) async {
     var url = '${globals.identityUrl}/connect/userinfo';
     var accessToken = params['access_token'];
-    Response response;
-    try {
-      response = await dio.get(
-          url, options:new Options(headers: {"Authorization": "Bearer $accessToken"}));
-    } on DioError catch (e) {
-      if(e.response!=null && scaffoldKey !=null){
-        var code = common.getCatchErrCode(e.response,scaffoldKey);
-        return code;
-      }
-    }
-    return response.data;
+    var response = await Request.get(
+        url, options: new Options(
+        headers: {"Authorization": "Bearer $accessToken"}));
+    return response;
   }
 }

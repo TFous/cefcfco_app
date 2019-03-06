@@ -1,13 +1,10 @@
 import 'dart:async';
-import 'package:cefcfco_app/components/homeBottomNavigationBar.dart';
 import 'package:flutter/material.dart';
 import 'package:cefcfco_app/utils/globals.dart' as globals;
-import 'package:cefcfco_app/utils/request.dart';
 import 'package:cefcfco_app/utils/shared_preferences.dart';
 import 'package:cefcfco_app/services/keyValue.dart';
 import 'package:cefcfco_app/components/list_view_item.dart';
 import 'package:cefcfco_app/components/list_refresh.dart' as listComp;
-import 'package:cefcfco_app/views/first_page_item.dart';
 
 class AboutPage extends StatefulWidget {
   @override
@@ -16,10 +13,7 @@ class AboutPage extends StatefulWidget {
 
 class AboutPageState extends State<AboutPage>
     with AutomaticKeepAliveClientMixin {
-  final GlobalKey<AnimatedListState> _listKey = new GlobalKey<AnimatedListState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-
-  String _user = '',_accessToken='';
 
   @override
   bool get wantKeepAlive => true;
@@ -27,15 +21,8 @@ class AboutPageState extends State<AboutPage>
   @override
   void initState() {
     super.initState();
-    _getUserName();
   }
-  _getUserName() async {
-    SpUtil sp = await SpUtil.getInstance();
-    setState(() {
-      _user = sp.getString(globals.userName);
-      _accessToken = sp.getString(globals.accessToken);
-    });
-  }
+
   headerView(){
     return
       Column(
