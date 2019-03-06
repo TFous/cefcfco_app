@@ -13,7 +13,6 @@ class Request {
   static void setDio() async {
     var sp = await SpUtil.getInstance();
     String accessToken = sp.getString(globals.accessToken);
-    print(accessToken);
     if (accessToken!=null) {
       dio = new Dio(new BaseOptions(
         connectTimeout: 5000,
