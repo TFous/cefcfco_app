@@ -9,6 +9,8 @@ import 'package:cefcfco_app/utils/globals.dart' as globals;
 import 'package:cefcfco_app/utils/shared_preferences.dart';
 import 'package:cefcfco_app/utils/router_config.dart' as routerConfig;
 import 'package:cefcfco_app/services/setting.dart';
+import 'package:cefcfco_app/utils/common.dart' as common;
+
 
 class ChangeSecondPasswordPage extends StatefulWidget {
   @override
@@ -30,16 +32,39 @@ class ChangeSecondPasswordPageState extends State<ChangeSecondPasswordPage>
     super.initState();
   }
 
-  changeAndSetSecondPassword() {
+  changeAndSetSecondPassword() async{
     Map<String, String> secondPassword = {
       'oldSecondPassword': oldSecondPassword,
       'secondPassword': newSecondPassword
     };
-    print(secondPassword);
-    SettingServices.changeAndSetSecondPassword(secondPassword).then((result) =>
-    {
-      print(result)
-    });
+    var result = await SettingServices.changeAndSetSecondPassword(secondPassword);
+    if(result['success']==true){
+//      common.showInSnackBar('修改成功', _scaffoldKey);
+      Navigator.pop(context);
+      showDialog<void>(
+        context: context,
+        barrierDismissible: false, // user must tap button!
+        builder: (BuildContext context) {
+          return Dialog(
+              child: Container(
+                height: 100,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: <Widget>[
+                    Text('设置成功'),
+                    RaisedButton(
+                      child: Text('确定'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    )
+                  ],
+                ),
+              )
+          );
+        },
+      );
+    }
   }
 
   ITextField _oldSecondPasswordInput = new ITextField(

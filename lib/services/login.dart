@@ -22,7 +22,6 @@ class LoginServices {
         options:new Options(
             contentType: ContentType.parse("application/x-www-form-urlencoded"),
             headers: {"Authorization": "Basic $base64Secret"}));
-    print(response);
     return response;
   }
 
