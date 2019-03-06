@@ -1,4 +1,3 @@
-import 'package:cefcfco_app/utils/common.dart' as common;
 import 'package:cefcfco_app/utils/globals.dart' as globals;
 import 'package:dio/dio.dart';
 import 'dart:convert';

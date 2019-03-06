@@ -20,11 +20,16 @@ Map<String, dynamic> codeMessage = {
   '504': '网关超时。',
 };
 
-void showInSnackBar(String value,GlobalKey<ScaffoldState> scaffoldKey) {
+/**
+ *  提示信息，
+ *  text 文字
+ *
+ */
+void showInSnackBar(String text,GlobalKey<ScaffoldState> scaffoldKey) {
   scaffoldKey.currentState?.removeCurrentSnackBar();
   scaffoldKey.currentState.showSnackBar(new SnackBar(
     content: new Text(
-      value,
+      text,
       textAlign: TextAlign.center,
       style: TextStyle(
           color: Colors.white,

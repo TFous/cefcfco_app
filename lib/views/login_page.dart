@@ -11,9 +11,9 @@ import 'package:cefcfco_app/utils/request.dart';
 import 'package:cefcfco_app/utils/shared_preferences.dart';
 import 'package:cefcfco_app/utils/router_config.dart' as routerConfig;
 
-
 class LoginPage extends StatefulWidget {
   LoginPage({Key key}) : super(key: key);
+
   @override
   _LoginPageState createState() => new _LoginPageState();
 }
@@ -22,26 +22,27 @@ class _LoginPageState extends State<LoginPage>
     with SingleTickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   final formKey = GlobalKey<FormState>();
-  static String _userName='test123',_password='111111';
+  static String _userName = 'test123', _password = '111111';
 
-  ITextField _phoneCode = new ITextField(
+  ITextField _userInput = new ITextField(
     keyboardType: ITextInputType.text,
     hintText: 'Username',
-    inputBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.lightGreenAccent)),
-    prefixIcon:Icon(Icons.person,color:Colors.white),
+    inputBorder: UnderlineInputBorder(
+        borderSide: BorderSide(color: Colors.lightGreenAccent)),
+    prefixIcon: Icon(Icons.person, color: Colors.white),
     hintStyle: TextStyle(color: Colors.white),
-    textStyle: TextStyle(fontSize:18,color: Colors.white),
+    textStyle: TextStyle(fontSize: 18, color: Colors.white),
     fieldCallBack: (content) {
       _userName = content;
     },
   );
 
-  ITextField _authCode = new ITextField(
+  ITextField _passwordInput = new ITextField(
     keyboardType: ITextInputType.password,
     hintText: 'Password',
-    prefixIcon:Icon(Icons.lock,color:Colors.white),
-    inputBorder: UnderlineInputBorder(
-        borderSide: BorderSide(color: Colors.white)),
+    prefixIcon: Icon(Icons.lock, color: Colors.white),
+    inputBorder:
+        UnderlineInputBorder(borderSide: BorderSide(color: Colors.white)),
     hintStyle: TextStyle(color: Colors.white),
     textStyle: TextStyle(color: Colors.white),
     fieldCallBack: (content) {
@@ -54,15 +55,12 @@ class _LoginPageState extends State<LoginPage>
     return new Scaffold(
       key: _scaffoldKey,
       body: SingleChildScrollView(
-        child:new  Container(
+        child: new Container(
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,
           decoration: new BoxDecoration(
             gradient: new LinearGradient(
-                colors: [
-                  Theme.loginGradientStart,
-                  Theme.loginGradientEnd
-                ],
+                colors: [Theme.loginGradientStart, Theme.loginGradientEnd],
                 begin: const FractionalOffset(0.0, 0.0),
                 end: const FractionalOffset(1.0, 1.0),
                 stops: [0.0, 1.0],
@@ -109,15 +107,15 @@ class _LoginPageState extends State<LoginPage>
   }
 
   void loginFn() async {
-    var sp =await SpUtil.getInstance();
+    var sp = await SpUtil.getInstance();
     sp.clear();
-    var token = await LoginServices.userLogin(_userName,_password);
+    var token = await LoginServices.userLogin(_userName, _password);
     if (token is num) {
-      common.showInSnackBar('账号或密码错误！',_scaffoldKey);
+      common.showInSnackBar('账号或密码错误！', _scaffoldKey);
     } else {
-      var user = await LoginServices.getUser(token,_scaffoldKey);
-      Application.router
-          .navigateTo(context, routerConfig.home, transition: TransitionType.fadeIn);
+      var user = await LoginServices.getUser(token, _scaffoldKey);
+      Application.router.navigateTo(context, routerConfig.home,
+          transition: TransitionType.fadeIn);
       sp.putString(globals.userName, user['FullName']);
       sp.putString(globals.accessToken, token['access_token']);
       sp.putBool(globals.isLogin, true);
@@ -126,37 +124,11 @@ class _LoginPageState extends State<LoginPage>
     }
   }
 
-  void showAlertDialog(BuildContext context) {
-    showDialog<void>(
-      context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (BuildContext context) {
-        return Dialog(
-            child: Container(
-              height: 100,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: <Widget>[
-                  Text('我是一个dialog'),
-                  RaisedButton(
-                    child: Text('取消'),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  )
-                ],
-              ),
-            )
-        );
-      },
-    );
-  }
-
   Future _submit() async {
-    if (_userName.isNotEmpty&&_password.isNotEmpty) {
+    if (_userName.isNotEmpty && _password.isNotEmpty) {
       loginFn();
-    }else{
-      common.showInSnackBar('账号或密码不能为空！',_scaffoldKey);
+    } else {
+      common.showInSnackBar('账号或密码不能为空！', _scaffoldKey);
     }
   }
 
@@ -174,12 +146,8 @@ class _LoginPageState extends State<LoginPage>
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    ListTile(
-                      title: _phoneCode
-                    ),
-                    ListTile(
-                        title: _authCode
-                    ),
+                    ListTile(title: _userInput),
+                    ListTile(title: _passwordInput),
                   ],
                 ),
               ),
