@@ -51,6 +51,16 @@ class SettingPageState extends State<SettingPage> with AutomaticKeepAliveClientM
 
   final List list2 = [
     {
+      'title': '切换主题',
+      'icon': null,
+      'onTapCallBack': (context) =>
+      {
+      Application.router.navigateTo(
+          context,routerConfig.page1,
+          transition: TransitionType.fadeIn)
+      },
+    },
+    {
       'title': '消息设置',
       'icon': null,
       'onTapCallBack': (context) =>
@@ -153,7 +163,7 @@ class SettingPageState extends State<SettingPage> with AutomaticKeepAliveClientM
             );
           },
         ),
-        backgroundColor: Color(0xff1b82d2),
+
         //设置标题栏的背景颜色
         title: new Title(
           child: new Text(

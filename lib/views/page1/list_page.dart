@@ -1,5 +1,9 @@
+import 'package:cefcfco_app/redux/AppState.dart';
+import 'package:cefcfco_app/redux/ThemeRedux.dart';
+import 'package:cefcfco_app/utils/common.dart';
 import 'package:flutter/material.dart';
 import 'package:cefcfco_app/utils/globals.dart' as globals;
+import 'package:flutter_redux/flutter_redux.dart';
 
 class ListPage extends StatefulWidget {
   @override
@@ -57,7 +61,7 @@ class ListPageState extends State<ListPage> with AutomaticKeepAliveClientMixin,S
             );
           },
         ),
-          backgroundColor: Color(0xff1b82d2),
+
           //设置标题栏的背景颜色
           title: new Title(
             child: new Text(
@@ -89,7 +93,7 @@ class ListPageState extends State<ListPage> with AutomaticKeepAliveClientMixin,S
       body: new Scaffold(
         appBar: new AppBar(
           automaticallyImplyLeading: false,
-          backgroundColor: Color(0xff1b82d2),
+
           //设置标题栏的背景颜色
           title: new TabBar(
             controller: _tabController,
@@ -104,7 +108,54 @@ class ListPageState extends State<ListPage> with AutomaticKeepAliveClientMixin,S
         body: new TabBarView(
           controller: _tabController,
           children: myTabs.map((Tab tab) {    //遍历List<Tab>类型的对象myTabs并提取其属性值作为子控件的内容
-            return new Center(child: new Text(tab.text)); //使用参数值
+            if (tab.text == 'Tab1') {
+              return new StoreBuilder<AppStates>(
+              builder: (context, store) {
+                return Builder(
+                  builder: (BuildContext context){
+                    var doms = <Widget>[];
+                    var items  = CommonUtils.getThemeListColor();
+                    for(var i = 0;i<items.length;i++){
+                      doms.add(Container(
+                        padding: EdgeInsets.symmetric(horizontal: globals.sidesDistance),
+                        decoration: new BoxDecoration(
+                          border: new Border(bottom: BorderSide(color: Color(0xFFf2f2f2))),
+                          color: Colors.white,
+                        ),
+                        child: ListTile(
+                          title: Text('点击切换主题'),
+                          // item 前置图标
+                          trailing: Icon(Icons.keyboard_arrow_right,color: Color(0xFFcccccc),),
+                          // item 后置图标
+                          isThreeLine: false,
+                          // item 是否三行显示
+                          dense: true,
+                          // item 直观感受是整体大小
+                          contentPadding: EdgeInsets.all(3.0),
+                          // item 内容内边距
+                          enabled: true,
+                          onTap: () {
+                            CommonUtils.pushTheme(store,i);
+//                            store.dispatch(new RefreshThemeDataAction(item));
+                          },
+                          // item onTap 点击事件
+                          onLongPress: () {
+                            print('长按:');
+                          },
+                          // item onLongPress 长按事件
+                          selected: false, // item 是否选中状态
+                        ),
+                      ));
+                    }
+                    return Column(children: doms);
+                  },
+                );
+              }
+              );
+            } else {
+              return new Center(child: new Text(tab.text)); //使用参数值
+
+            }
           }).toList(),
         ),
       )

@@ -6,6 +6,7 @@ import 'package:cefcfco_app/utils/globals.dart' as globals;
 import 'package:cefcfco_app/utils/common.dart' as common;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:connectivity/connectivity.dart';
 
 Dio dio;
 

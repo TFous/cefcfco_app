@@ -39,3 +39,5 @@ List myPageTabData = [
 ];
 
 double sidesDistance = 10.0;
+
+const DEBUG = true;

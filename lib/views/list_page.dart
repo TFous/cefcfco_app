@@ -47,7 +47,6 @@ class ListPageState extends State<ListPage> with AutomaticKeepAliveClientMixin,S
       key: _scaffoldKey,
       appBar: new AppBar(
           automaticallyImplyLeading: false,
-          backgroundColor: Color(0xff1b82d2),
           //设置标题栏的背景颜色
           title: new Title(
             child: new Text(
@@ -79,7 +78,6 @@ class ListPageState extends State<ListPage> with AutomaticKeepAliveClientMixin,S
       body: new Scaffold(
         appBar: new AppBar(
           automaticallyImplyLeading: false,
-          backgroundColor: Color(0xff1b82d2),
           //设置标题栏的背景颜色
           title: new TabBar(
             controller: _tabController,

@@ -65,7 +65,7 @@ class AboutPageState extends State<AboutPage>
       key: _scaffoldKey,
       appBar: new AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: Color(0xff1b82d2),
+
         //设置标题栏的背景颜色
         title: new Title(
           child: new Text(

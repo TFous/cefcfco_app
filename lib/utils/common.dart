@@ -1,6 +1,9 @@
 import 'dart:ui';
 
+import 'package:cefcfco_app/redux/ThemeRedux.dart';
+import 'package:cefcfco_app/style/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:redux/redux.dart';
 
 Map<String, dynamic> codeMessage = {
   '200': '服务器成功返回请求的数据。',
@@ -25,6 +28,34 @@ Map<String, dynamic> codeMessage = {
  *  text 文字
  *
  */
+
+class CommonUtils{
+  static getThemeData(Color color) {
+    return ThemeData(primarySwatch: color, platform: TargetPlatform.android);
+  }
+
+
+  static List<Color> getThemeListColor() {
+    return [
+      ThemeColors.primarySwatch,
+      Colors.brown,
+      Colors.blue,
+      Colors.teal,
+      Colors.amber,
+      Colors.blueGrey,
+      Colors.deepOrange,
+    ];
+  }
+  static pushTheme(Store store, int index) {
+    ThemeData themeData;
+    List<Color> colors = getThemeListColor();
+    themeData = getThemeData(colors[index]);
+    store.dispatch(new RefreshThemeDataAction(themeData));
+  }
+
+}
+
+
 void showInSnackBar(String text,GlobalKey<ScaffoldState> scaffoldKey) {
   scaffoldKey.currentState?.removeCurrentSnackBar();
   scaffoldKey.currentState.showSnackBar(new SnackBar(

@@ -1,28 +1,17 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility that Flutter provides. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
+class HttpErrorEvent {
+    final int code;
 
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
+    final String message;
 
-//import 'package:cefcfco_app/main.dart';
-class Aa{
-    List dd = [{'dd':123}];
-    static Map node = {
-        'text': '首页',
-        'router':'/home',
-        'icon': new Icon(Icons.home),
-        'isShowBadge': true,
-        'badgeData':{
-            'num': 33,
-            'top': -5
-        }
-    };
+    HttpErrorEvent(this.code, this.message);
+}
+class CustomException implements Exception {
+    String cause;
+    CustomException(this.cause);
 }
 void main() {
-    print(Aa.node['badgeData']['right']??-11);
-
+    print('Exception details:\n 123');
+}
+throwException() {
+    throw new CustomException('This is my first custom exception');
 }

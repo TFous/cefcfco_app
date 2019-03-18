@@ -98,7 +98,6 @@ class _LoginPageState extends State<LoginPage>
   @override
   void initState() {
     super.initState();
-    Request.setDio();
 //     保持竖屏
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -109,18 +108,18 @@ class _LoginPageState extends State<LoginPage>
   void loginFn() async {
     var sp = await SpUtil.getInstance();
     sp.clear();
-    var token = await LoginServices.userLogin(_userName, _password);
-    if (token is num) {
+    var result = await LoginServices.userLogin(_userName, _password);
+    print(result.code);
+    if (result.code !=200) {
       common.showInSnackBar('账号或密码错误！', _scaffoldKey);
     } else {
-      var user = await LoginServices.getUser(token, _scaffoldKey);
+      /// 存储 token
+      sp.putString(globals.accessToken, result.data['access_token']);
+      var userData = await LoginServices.getUser(scaffoldKey:_scaffoldKey);
       Application.router.navigateTo(context, routerConfig.home,
           transition: TransitionType.fadeIn);
-      sp.putString(globals.userName, user['FullName']);
-      sp.putString(globals.accessToken, token['access_token']);
+      sp.putString(globals.userName, userData.data['FullName']);
       sp.putBool(globals.isLogin, true);
-//    设置 dio 的token
-      Request.setDio();
     }
   }
 

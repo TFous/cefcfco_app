@@ -107,7 +107,7 @@ class ChangeSecondPasswordPageState extends State<ChangeSecondPasswordPage>
             );
           },
         ),
-        backgroundColor: Color(0xff1b82d2),
+
         //设置标题栏的背景颜色
         title: new Title(
           child: new Text(
