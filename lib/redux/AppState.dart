@@ -7,6 +7,8 @@ class AppStates {
 
   ///语言
   Locale locale;
+  ///当前手机平台默认语言
+  Locale platformLocale;
 
   AppStates({this.themeData, this.locale});
 }

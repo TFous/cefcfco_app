@@ -15,7 +15,6 @@ import 'package:cefcfco_app/views/home_page.dart';
 import 'package:cefcfco_app/views/login_page.dart';
 import 'package:cefcfco_app/utils/globals.dart' as globals;
 import 'package:flutter_jpush/flutter_jpush.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:cefcfco_app/localization/LanguageLocalizationsDelegate.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -51,7 +50,6 @@ class _MyAppState extends State<MyApp>{
 
   _MyAppState();
 
-
   @override
   void initState() {
     super.initState();
@@ -75,13 +73,9 @@ class _MyAppState extends State<MyApp>{
     bool isLogin = sp.getBool(globals.isLogin);
 //    if (isLogin == true) {
 //      refreshToken();
-//    return new AppWrap(
-//      child: new AppPage(),
-//    );
+//    return new AppPage();
 //    } else {
-//    return new AppWrap(
-//      child: new LoginPage(),
-//    );
+//    return new LoginPage();
 //    }
     return LoginPage();
   }
@@ -110,56 +104,5 @@ class _MyAppState extends State<MyApp>{
             );
       }),
     );
-
-  }
-
-}
-
-class AppWrap extends StatefulWidget {
-  final Widget child;
-
-  AppWrap({Key key, this.child}) : super(key: key);
-
-  @override
-  State<AppWrap> createState() {
-    return new _AppWrap();
-  }
-}
-
-class _AppWrap extends State<AppWrap>{
-  StreamSubscription stream;
-
-  @override
-  Widget build(BuildContext context) {
-    // TODO: implement build
-    return new StoreBuilder<AppStates>(builder: (context, store) {
-      ///通过 StoreBuilder 和 Localizations 实现实时多语言切换
-      return new Localizations.override(
-        context: context,
-        locale: store.state.locale,
-        child: widget.child,
-      );
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    stream =  Code.eventBus.on<HttpErrorEvent>().listen((event) {
-      errorHandleFunction(event.code, event.message);
-    });
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    if(stream != null) {
-      stream.cancel();
-      stream = null;
-    }
-  }
-
-  errorHandleFunction(int code, message) {
-
   }
 }

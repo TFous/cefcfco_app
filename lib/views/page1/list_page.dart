@@ -1,3 +1,4 @@
+import 'package:cefcfco_app/net/Code.dart';
 import 'package:cefcfco_app/redux/AppState.dart';
 import 'package:cefcfco_app/redux/ThemeRedux.dart';
 import 'package:cefcfco_app/utils/common.dart';
@@ -65,7 +66,7 @@ class ListPageState extends State<ListPage> with AutomaticKeepAliveClientMixin,S
           //设置标题栏的背景颜色
           title: new Title(
             child: new Text(
-              '列表',
+              CommonUtils.getLocale(context).dongtai,
               style: new TextStyle(
                 fontSize: 20.0,
                 color: Colors.white,
@@ -136,6 +137,8 @@ class ListPageState extends State<ListPage> with AutomaticKeepAliveClientMixin,S
                           enabled: true,
                           onTap: () {
                             CommonUtils.pushTheme(store,i);
+                            CommonUtils.changeLocale(store,i);
+                            Code.errorHandleFunction(1,'123',false);
 //                            store.dispatch(new RefreshThemeDataAction(item));
                           },
                           // item onTap 点击事件

@@ -19,6 +19,7 @@ class Code {
     if(noTip) {
       return message;
     }
+    print(code);
     eventBus.fire(new HttpErrorEvent(code, message));
     return message;
   }

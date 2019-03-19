@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cefcfco_app/utils/common.dart';
 import 'package:flutter/material.dart';
 import 'package:cefcfco_app/utils/globals.dart' as globals;
 import 'package:cefcfco_app/utils/shared_preferences.dart';
@@ -68,8 +69,7 @@ class AboutPageState extends State<AboutPage>
 
         //设置标题栏的背景颜色
         title: new Title(
-          child: new Text(
-            '动态',
+          child: new Text(CommonUtils.getLocale(context).dongtai,
             style: new TextStyle(
               fontSize: 20.0,
               color: Colors.white,

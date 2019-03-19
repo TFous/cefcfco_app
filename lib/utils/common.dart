@@ -1,5 +1,8 @@
 import 'dart:ui';
 
+import 'package:cefcfco_app/language/AppLanguageBase.dart';
+import 'package:cefcfco_app/localization/DefaultLocalizations.dart';
+import 'package:cefcfco_app/redux/LocaleRedux.dart';
 import 'package:cefcfco_app/redux/ThemeRedux.dart';
 import 'package:cefcfco_app/style/theme.dart';
 import 'package:flutter/material.dart';
@@ -34,6 +37,22 @@ class CommonUtils{
     return ThemeData(primarySwatch: color, platform: TargetPlatform.android);
   }
 
+  /**
+   * 切换语言
+   *
+   */
+  static changeLocale(Store store, int index) {
+    Locale locale = store.state.platformLocale;
+    switch (index) {
+      case 1:
+        locale = Locale('zh', 'CH');
+        break;
+      case 2:
+        locale = Locale('en', 'US');
+        break;
+    }
+    store.dispatch(RefreshLocaleAction(locale));
+  }
 
   static List<Color> getThemeListColor() {
     return [
@@ -51,6 +70,10 @@ class CommonUtils{
     List<Color> colors = getThemeListColor();
     themeData = getThemeData(colors[index]);
     store.dispatch(new RefreshThemeDataAction(themeData));
+  }
+
+  static AppLanguageBase getLocale(BuildContext context) {
+    return LanguageLocalizations.of(context).currentLocalized;
   }
 
 }

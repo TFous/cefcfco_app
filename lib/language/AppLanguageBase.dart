@@ -1,6 +1,4 @@
-abstract class AppLanguageBase{
-  static String welcomeMessage;
-
-
-
+abstract class AppLanguageBase {
+  String welcomeMessage;
+  String dongtai;
 }
