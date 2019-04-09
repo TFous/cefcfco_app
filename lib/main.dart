@@ -1,13 +1,13 @@
-import 'package:cefcfco_app/utils/common.dart';
+import 'package:cefcfco_app/common/utils/common.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:cefcfco_app/routers/application.dart';
 import 'package:cefcfco_app/routers/routers.dart';
-import 'package:cefcfco_app/utils/request.dart';
-import 'package:cefcfco_app/utils/shared_preferences.dart';
+import 'package:cefcfco_app/common/utils/request.dart';
+import 'package:cefcfco_app/common/utils/shared_preferences.dart';
 import 'package:cefcfco_app/views/home_page.dart';
 import 'package:cefcfco_app/views/login_page.dart';
-import 'package:cefcfco_app/utils/globals.dart' as globals;
+import 'package:cefcfco_app/common/utils/globals.dart' as globals;
 import 'package:flutter_jpush/flutter_jpush.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:cefcfco_app/common/localization/LanguageLocalizationsDelegate.dart';

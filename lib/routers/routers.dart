@@ -2,7 +2,7 @@ import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import './router_handler.dart';
 
-import 'package:cefcfco_app/utils/router_config.dart' as routerConfig;
+import 'package:cefcfco_app/common/utils/router_config.dart' as routerConfig;
 
 class Routes {
   static void configureRoutes(Router router) {

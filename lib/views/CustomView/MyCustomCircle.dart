@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:cefcfco_app/utils/mockData.dart' as mockData;
+import 'package:cefcfco_app/common/utils/mockData.dart' as mockData;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'PieData.dart';

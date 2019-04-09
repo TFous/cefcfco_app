@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cefcfco_app/utils/globals.dart' as globals;
+import 'package:cefcfco_app/common/utils/globals.dart' as globals;
 
 class ListPage extends StatefulWidget {
   @override

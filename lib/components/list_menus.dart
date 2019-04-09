@@ -1,7 +1,7 @@
 import 'package:cefcfco_app/components/list_menus_item.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:cefcfco_app/utils/globals.dart' as globals;
+import 'package:cefcfco_app/common/utils/globals.dart' as globals;
 
 
 class ListMenus extends StatefulWidget{

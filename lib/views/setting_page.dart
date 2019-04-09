@@ -1,12 +1,12 @@
 import 'package:cefcfco_app/components/list_menus.dart';
 import 'package:cefcfco_app/components/list_menus_item.dart';
 import 'package:cefcfco_app/routers/application.dart';
-import 'package:cefcfco_app/utils/common.dart';
+import 'package:cefcfco_app/common/utils/common.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
-import 'package:cefcfco_app/utils/globals.dart' as globals;
-import 'package:cefcfco_app/utils/shared_preferences.dart';
-import 'package:cefcfco_app/utils/router_config.dart' as routerConfig;
+import 'package:cefcfco_app/common/utils/globals.dart' as globals;
+import 'package:cefcfco_app/common/utils/shared_preferences.dart';
+import 'package:cefcfco_app/common/utils/router_config.dart' as routerConfig;
 import 'package:cefcfco_app/services/setting.dart';
 
 class SettingPage extends StatefulWidget {

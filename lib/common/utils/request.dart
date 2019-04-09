@@ -1,9 +1,9 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'dart:async';
-import 'package:cefcfco_app/utils/shared_preferences.dart';
-import 'package:cefcfco_app/utils/globals.dart' as globals;
-import 'package:cefcfco_app/utils/common.dart' as common;
+import 'package:cefcfco_app/common/utils/shared_preferences.dart';
+import 'package:cefcfco_app/common/utils/globals.dart' as globals;
+import 'package:cefcfco_app/common/utils/common.dart' as common;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:connectivity/connectivity.dart';

@@ -5,11 +5,11 @@ import 'package:flutter/services.dart';
 import 'package:cefcfco_app/routers/application.dart';
 import 'package:cefcfco_app/common/style/theme.dart' as Theme;
 import 'package:cefcfco_app/services/login.dart';
-import 'package:cefcfco_app/utils/common.dart' as common;
-import 'package:cefcfco_app/utils/globals.dart' as globals;
-import 'package:cefcfco_app/utils/request.dart';
-import 'package:cefcfco_app/utils/shared_preferences.dart';
-import 'package:cefcfco_app/utils/router_config.dart' as routerConfig;
+import 'package:cefcfco_app/common/utils/common.dart' as common;
+import 'package:cefcfco_app/common/utils/globals.dart' as globals;
+import 'package:cefcfco_app/common/utils/request.dart';
+import 'package:cefcfco_app/common/utils/shared_preferences.dart';
+import 'package:cefcfco_app/common/utils/router_config.dart' as routerConfig;
 
 class LoginPage extends StatefulWidget {
   LoginPage({Key key}) : super(key: key);
@@ -109,8 +109,10 @@ class _LoginPageState extends State<LoginPage>
     var sp = await SpUtil.getInstance();
     sp.clear();
     var result = await LoginServices.userLogin(_userName, _password);
+    // todo 先跳过登录直接进入主页
     Application.router.navigateTo(context, routerConfig.home,
         transition: TransitionType.fadeIn);
+
     if (result.code !=200) {
       common.showInSnackBar('账号或密码错误！', _scaffoldKey);
     } else {

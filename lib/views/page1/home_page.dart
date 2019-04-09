@@ -2,7 +2,7 @@ import 'package:cefcfco_app/components/homeBottomNavigationBar.dart';
 import 'package:flutter/material.dart';
 import 'package:cefcfco_app/views/page1/list_page.dart';
 import 'package:cefcfco_app/views/page1/user_page.dart';
-import 'package:cefcfco_app/utils/globals.dart' as globals;
+import 'package:cefcfco_app/common/utils/globals.dart' as globals;
 
 const int ThemeColor = 0xFFC91B3A;
 

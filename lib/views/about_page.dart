@@ -1,8 +1,8 @@
 import 'dart:async';
-import 'package:cefcfco_app/utils/common.dart';
+import 'package:cefcfco_app/common/utils/common.dart';
 import 'package:flutter/material.dart';
-import 'package:cefcfco_app/utils/globals.dart' as globals;
-import 'package:cefcfco_app/utils/shared_preferences.dart';
+import 'package:cefcfco_app/common/utils/globals.dart' as globals;
+import 'package:cefcfco_app/common/utils/shared_preferences.dart';
 import 'package:cefcfco_app/services/keyValue.dart';
 import 'package:cefcfco_app/components/list_view_item.dart';
 import 'package:cefcfco_app/components/list_refresh.dart' as listComp;

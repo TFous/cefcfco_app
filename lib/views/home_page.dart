@@ -10,7 +10,7 @@ import 'package:cefcfco_app/views/first_page.dart';
 import 'package:cefcfco_app/views/user_page.dart';
 import 'package:cefcfco_app/views/CustomView/DemoPage.dart';
 
-import 'package:cefcfco_app/utils/globals.dart' as globals;
+import 'package:cefcfco_app/common/utils/globals.dart' as globals;
 
 const int ThemeColor = 0xFFC91B3A;
 

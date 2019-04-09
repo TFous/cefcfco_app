@@ -1,9 +1,9 @@
 import 'package:cefcfco_app/common/net/Code.dart';
 import 'package:cefcfco_app/redux/AppState.dart';
 import 'package:cefcfco_app/redux/ThemeRedux.dart';
-import 'package:cefcfco_app/utils/common.dart';
+import 'package:cefcfco_app/common/utils/common.dart';
 import 'package:flutter/material.dart';
-import 'package:cefcfco_app/utils/globals.dart' as globals;
+import 'package:cefcfco_app/common/utils/globals.dart' as globals;
 import 'package:flutter_redux/flutter_redux.dart';
 
 class ListPage extends StatefulWidget {

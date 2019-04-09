@@ -1,6 +1,6 @@
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
-import 'package:cefcfco_app/utils/shared_preferences.dart';
+import 'package:cefcfco_app/common/utils/shared_preferences.dart';
 class Application {
   static Router router;
   static TabController controller;

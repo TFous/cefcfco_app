@@ -1,8 +1,8 @@
 import 'package:cefcfco_app/components/homeBottomNavigationBar.dart';
-import 'package:cefcfco_app/utils/common.dart';
+import 'package:cefcfco_app/common/utils/common.dart';
 import 'package:flutter/material.dart';
-import 'package:cefcfco_app/utils/globals.dart' as globals;
-import 'package:cefcfco_app/utils/shared_preferences.dart';
+import 'package:cefcfco_app/common/utils/globals.dart' as globals;
+import 'package:cefcfco_app/common/utils/shared_preferences.dart';
 
 class UserPage extends StatefulWidget {
   @override
