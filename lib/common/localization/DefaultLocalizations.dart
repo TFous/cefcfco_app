@@ -1,9 +1,9 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:cefcfco_app/language/AppLanguageBase.dart';
-import 'package:cefcfco_app/language/AppLanguageEn.dart';
-import 'package:cefcfco_app/language/AppLanguageZh.dart';
+import 'package:cefcfco_app/common/language/AppLanguageBase.dart';
+import 'package:cefcfco_app/common/language/AppLanguageEn.dart';
+import 'package:cefcfco_app/common/language/AppLanguageZh.dart';
 
 ///自定义多语言实现
 class LanguageLocalizations {

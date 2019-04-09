@@ -1,10 +1,10 @@
 import 'dart:ui';
 
-import 'package:cefcfco_app/language/AppLanguageBase.dart';
-import 'package:cefcfco_app/localization/DefaultLocalizations.dart';
+import 'package:cefcfco_app/common/language/AppLanguageBase.dart';
+import 'package:cefcfco_app/common/localization/DefaultLocalizations.dart';
 import 'package:cefcfco_app/redux/LocaleRedux.dart';
 import 'package:cefcfco_app/redux/ThemeRedux.dart';
-import 'package:cefcfco_app/style/theme.dart';
+import 'package:cefcfco_app/common/style/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
 

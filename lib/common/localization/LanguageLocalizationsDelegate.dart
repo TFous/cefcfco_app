@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:cefcfco_app/localization/DefaultLocalizations.dart';
+import 'package:cefcfco_app/common/localization/DefaultLocalizations.dart';
 
 
 class LanguageLocalizationsDelegate extends LocalizationsDelegate<LanguageLocalizations> {

@@ -19,7 +19,8 @@ class UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin{
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   List<ListMenusItem> menusList = [];
 
-  final List list = [{
+  final List list = [
+    {
     'title': '账单',
     'icon': Icon(Icons.assignment, color: Color(0xfff49c2e)),
     'onTapCallBack': (context) =>

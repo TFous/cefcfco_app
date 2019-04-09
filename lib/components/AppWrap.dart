@@ -1,8 +1,8 @@
 
 import 'dart:async';
 
-import 'package:cefcfco_app/net/Code.dart';
-import 'package:cefcfco_app/net/HttpErrorEvent.dart';
+import 'package:cefcfco_app/common/net/Code.dart';
+import 'package:cefcfco_app/common/net/HttpErrorEvent.dart';
 import 'package:cefcfco_app/redux/AppState.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -53,7 +53,6 @@ class _AppWrap extends State<AppWrap>{
   }
 
   errorHandleFunction(int code, message) {
-    print(111111);
     Fluttertoast.showToast(msg: '我勒个去');
   }
 }

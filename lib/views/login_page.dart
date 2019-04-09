@@ -3,7 +3,7 @@ import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:cefcfco_app/routers/application.dart';
-import 'package:cefcfco_app/style/theme.dart' as Theme;
+import 'package:cefcfco_app/common/style/theme.dart' as Theme;
 import 'package:cefcfco_app/services/login.dart';
 import 'package:cefcfco_app/utils/common.dart' as common;
 import 'package:cefcfco_app/utils/globals.dart' as globals;
@@ -109,7 +109,8 @@ class _LoginPageState extends State<LoginPage>
     var sp = await SpUtil.getInstance();
     sp.clear();
     var result = await LoginServices.userLogin(_userName, _password);
-    print(result.code);
+    Application.router.navigateTo(context, routerConfig.home,
+        transition: TransitionType.fadeIn);
     if (result.code !=200) {
       common.showInSnackBar('账号或密码错误！', _scaffoldKey);
     } else {

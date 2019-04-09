@@ -1,10 +1,4 @@
-import 'dart:async';
-
-import 'package:cefcfco_app/net/Code.dart';
-import 'package:cefcfco_app/net/HttpErrorEvent.dart';
-import 'package:cefcfco_app/style/theme.dart';
 import 'package:cefcfco_app/utils/common.dart';
-import 'package:event_bus/event_bus.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:cefcfco_app/routers/application.dart';
@@ -16,17 +10,15 @@ import 'package:cefcfco_app/views/login_page.dart';
 import 'package:cefcfco_app/utils/globals.dart' as globals;
 import 'package:flutter_jpush/flutter_jpush.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:cefcfco_app/localization/LanguageLocalizationsDelegate.dart';
+import 'package:cefcfco_app/common/localization/LanguageLocalizationsDelegate.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:cefcfco_app/redux/AppState.dart';
 import 'package:redux/redux.dart';
-
 
 void main() async {
   sp = await SpUtil.getInstance();
   runApp(new MyApp());
 }
-
 
 SpUtil sp;
 

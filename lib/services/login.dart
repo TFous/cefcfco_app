@@ -3,7 +3,7 @@ import 'package:dio/dio.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:cefcfco_app/net/request.dart';
+import 'package:cefcfco_app/common/net/request.dart';
 
 class LoginServices {
   static Future userLogin(String username, String password,{GlobalKey<ScaffoldState> scaffoldKey}) async {

@@ -8,6 +8,7 @@ import 'package:cefcfco_app/routers/application.dart';
 import 'package:cefcfco_app/views/about_page.dart';
 import 'package:cefcfco_app/views/first_page.dart';
 import 'package:cefcfco_app/views/user_page.dart';
+import 'package:cefcfco_app/views/CustomView/DemoPage.dart';
 
 import 'package:cefcfco_app/utils/globals.dart' as globals;
 
@@ -70,7 +71,7 @@ class _MyHomePageState extends State<AppPage>
           physics: new NeverScrollableScrollPhysics(), // 禁用滑动
           controller: controller,
           children: <Widget>[
-        new FirstPage(),
+        new GridAnimation(),
         new AboutPage(),
         new ListPage(),
         new UserPage(),

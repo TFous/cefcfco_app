@@ -1,5 +1,5 @@
 import 'package:event_bus/event_bus.dart';
-import 'package:cefcfco_app/net/HttpErrorEvent.dart';
+import 'package:cefcfco_app/common/net/HttpErrorEvent.dart';
 ///错误编码
 class Code {
   ///网络错误
