@@ -164,6 +164,7 @@ class MyView extends CustomPainter{
       }else{
         _linePaint..color = Colors.green;
       }
+
       Rect kLineReact;
       if(top==bottom){ /// 如果开始价格等于结束价格，显示的是一条横线
         kLineReact =Rect.fromLTRB(left, top+1, right, bottom-1);

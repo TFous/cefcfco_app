@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:cefcfco_app/common/provider/SqlProvider.dart';
 import 'package:cefcfco_app/common/model/Repository.dart';
+import 'package:cefcfco_app/common/config/Config.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:cefcfco_app/common/utils/CodeUtils.dart';
 
@@ -11,23 +12,40 @@ import 'package:cefcfco_app/common/utils/CodeUtils.dart';
  * Created by guoshuyu
  * Date: 2018-08-07
  */
-
+/// 如果是分钟图，则分别是 时间，
+/// 当前分钟开盘价格，
+/// 当前分钟收盘价格，
+/// 当前分钟最高价格，
+/// 当前分钟最低价格，
 class ReadHistoryDbProvider extends BaseDbProvider {
-  final String name = 'ReadHistory';
-  final String columnId = "_id";
-  final String columnFullName = "fullName";
-  final String columnReadDate = "readDate";
-  final String columnData = "data";
+  final String name = 'KLineHistory';
+  final String columnId = "id";
+  final String columnDateTime = "kLineDate";
+  final String columnStartPrice = "startPrice";
+  final String columnEndPrice = "endPrice";
+  final String columnMaxPrice = "maxPrice";
+  final String columnMinPrice = "minPrice";
 
   int id;
-  String fullName;
+  String kLineDate;
+  double startPrice;
+  double endPrice;
+  double maxPrice;
+  double minPrice;
+
   int readDate;
   String data;
 
   ReadHistoryDbProvider();
 
-  Map<String, dynamic> toMap(String fullName, DateTime readDate, String data) {
-    Map<String, dynamic> map = {columnFullName: fullName, columnReadDate: readDate.millisecondsSinceEpoch, columnData: data};
+  Map<String, dynamic> toMap(String kLineDate, double startPrice, double endPrice,double maxPrice,double minPrice) {
+    Map<String, dynamic> map = {
+      columnDateTime: kLineDate,
+      columnStartPrice: startPrice,
+      columnEndPrice: endPrice,
+      columnMaxPrice: maxPrice,
+      columnMinPrice: minPrice
+    };
     if (id != null) {
       map[columnId] = id;
     }
@@ -36,18 +54,22 @@ class ReadHistoryDbProvider extends BaseDbProvider {
 
   ReadHistoryDbProvider.fromMap(Map map) {
     id = map[columnId];
-    fullName = map[columnFullName];
-    readDate = map[columnReadDate];
-    data = map[columnData];
+    kLineDate = map[columnDateTime];
+    startPrice = map[columnStartPrice];
+    endPrice = map[columnEndPrice];
+    maxPrice = map[columnMaxPrice];
+    minPrice = map[columnMinPrice];
   }
 
   @override
   tableSqlString() {
     return tableBaseString(name, columnId) +
         '''
-        $columnFullName text not null,
-        $columnReadDate int not null,
-        $columnData text not null)
+        $columnDateTime text not null,
+        $columnMinPrice REAL not null,
+        $columnMaxPrice REAL not null,
+        $columnStartPrice REAL not null,
+        $columnEndPrice REAL not null)
       ''';
   }
 
@@ -58,22 +80,22 @@ class ReadHistoryDbProvider extends BaseDbProvider {
 
   Future _getProvider(Database db, int page) async {
     List<Map<String, dynamic>> maps = await db.query(name,
-        columns: [columnId, columnFullName, columnReadDate, columnData],
-//        limit: Config.PAGE_SIZE,
-//        offset: (page - 1) * Config.PAGE_SIZE,
-        orderBy: "$columnReadDate DESC");
+        columns: [columnId, columnDateTime, columnStartPrice, columnEndPrice, columnMaxPrice, columnMinPrice],
+        limit: Config.PAGE_SIZE,
+        offset: (page - 1) * Config.PAGE_SIZE,
+        orderBy: "$columnDateTime DESC");
     if (maps.length > 0) {
       return maps;
     }
     return null;
   }
 
-  Future _getProviderInsert(Database db, String fullName) async {
+  Future _getProviderInsert(Database db, String kLineDate) async {
     List<Map<String, dynamic>> maps = await db.query(
       name,
-      columns: [columnId, columnFullName, columnReadDate, columnData],
-      where: "$columnFullName = ?",
-      whereArgs: [fullName],
+      columns: [columnId, columnDateTime, columnStartPrice, columnEndPrice, columnMaxPrice, columnMinPrice],
+      where: "$columnDateTime = ?",
+      whereArgs: [kLineDate],
     );
     if (maps.length > 0) {
       ReadHistoryDbProvider provider = ReadHistoryDbProvider.fromMap(maps.first);
@@ -82,14 +104,33 @@ class ReadHistoryDbProvider extends BaseDbProvider {
     return null;
   }
 
-  ///插入到数据库
-  Future insert(String fullName, DateTime dateTime, String dataMapString) async {
+  Future dropTable()async{
     Database db = await getDataBase();
-    var provider = await _getProviderInsert(db, fullName);
+    return await db.execute('drop table $name');
+  }
+
+  ///插入到数据库
+  Future insert(String kLineDate, double startPrice, double endPrice,double maxPrice,double minPrice) async {
+    Database db = await getDataBase();
+    var provider = await _getProviderInsert(db, kLineDate);
     if (provider != null) {
-      await db.delete(name, where: "$columnFullName = ?", whereArgs: [fullName]);
+      await db.delete(name, where: "$columnDateTime = ?", whereArgs: [kLineDate]);
     }
-    return await db.insert(name, toMap(fullName, dateTime, dataMapString));
+    return await db.insert(name, toMap(kLineDate, startPrice, endPrice, maxPrice, minPrice));
+  }
+
+
+  Future<List<Repository>> getAllData() async {
+    Database db = await getDataBase();
+    var provider = await db.rawQuery('SELECT * FROM $name ORDER BY $columnDateTime ASC' );
+    if (provider != null) {
+      List<Repository> list = new List();
+      for (var providerMap in provider) {
+        list.add(Repository.fromJson(providerMap));
+      }
+      return list;
+    }
+    return null;
   }
 
   ///获取事件数据
@@ -99,12 +140,7 @@ class ReadHistoryDbProvider extends BaseDbProvider {
     if (provider != null) {
       List<Repository> list = new List();
       for (var providerMap in provider) {
-        ReadHistoryDbProvider provider = ReadHistoryDbProvider.fromMap(providerMap);
-
-        ///使用 compute 的 Isolate 优化 json decode
-        var mapData = await compute(CodeUtils.decodeMapResult, provider.data);
-
-        list.add(Repository.fromJson(mapData));
+        list.add(Repository.fromJson(providerMap));
       }
       return list;
     }

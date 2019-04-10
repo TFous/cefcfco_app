@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:cefcfco_app/common/provider/repos/ReadHistoryDbProvider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cefcfco_app/views/CustomView/MyCustomCircle.dart';
@@ -15,6 +16,7 @@ class GridAnimation extends StatefulWidget {
 }
 
 class GridAnimationState extends State<GridAnimation> {
+
   List<String> lists = [
     "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1542212557760&di=2c0ccc64ab23eb9baa5f6582e0e4f52d&imgtype=0&src=http%3A%2F%2Fpic.feizl.com%2Fupload%2Fallimg%2F170725%2F43998m3qcnyxwxck.jpg",
     "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1542212557760&di=37d5107e6f7277bc4bfd323845a2ef32&imgtype=0&src=http%3A%2F%2Fn1.itc.cn%2Fimg8%2Fwb%2Fsmccloud%2Ffetch%2F2015%2F06%2F05%2F79697840747611479.JPEG",
@@ -92,7 +94,7 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
   double onHorizontalDragDistance;
 
   List mockDatas = mockData.mockDatas(100, 60.71, 49.67);
-
+  var historyData;
   //数据源
   List mData = [
     [
@@ -127,6 +129,17 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
         _offset = _animation.value;
       });
     });
+  }
+
+  dropTable()async{
+    ReadHistoryDbProvider provider = new ReadHistoryDbProvider();
+    await provider.dropTable();
+    print('删除成功');
+  }
+
+  getHistoryData()async{
+    ReadHistoryDbProvider provider = new ReadHistoryDbProvider();
+    return await provider.getAllData();
   }
 
   @override
@@ -181,10 +194,13 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
     onHorizontalDragDistance = 0;
   }
 
-  void _handleOnHorizontalDragUpdate(details){
+
+
+
+  Future _handleOnHorizontalDragUpdate(details) async {
     var maxKlinNum = 31; /// 当前klin最大容量个数
 
-    print('_handleOnHorizontalDragUpdate ${details.delta.dx}');
+//    print('_handleOnHorizontalDragUpdate ${details.delta.dx}');
     onHorizontalDragDistance += details.delta.dx;
     /// 向右滑动，历史数据
     if(onHorizontalDragDistance>0){
@@ -198,21 +214,31 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
           });
           print('removeAt===============$klinNum');
         }
-
+        var item = mockDatas[index];
+        var d = await inserData(item);
         setState(() {
-          mData.add(mockDatas[index]);
+          mData.add(item);
           index++;
         });
 
       }
     }else{  /// 向左滑动，最新数据
-
-
+      /// 获取存在本地的历史数据
+      historyData = await getHistoryData();
+      print('向左滑动');
+      print(historyData[0]);
+      print(historyData[0].toString());
 
 
     }
 
   }
+
+  static inserData(item)async{
+    ReadHistoryDbProvider provider = new ReadHistoryDbProvider();
+    return provider.insert(item[0],item[1],item[2],item[3],item[4]);
+  }
+
 
   void _handleOnHorizontalDragEnd(details){
     print('_handleOnHorizontalDragEnd $details');

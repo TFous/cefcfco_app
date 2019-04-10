@@ -9,121 +9,38 @@ part 'Repository.g.dart';
 
 @JsonSerializable()
 class Repository {
+
   int id;
 
-  int size;
+//  @JsonKey(name: "k_line_date")
+  String kLineDate;
 
-  String name;
+//  @JsonKey(name: "start_price")
+  double startPrice;
 
-  @JsonKey(name: "full_name")
-  String fullName;
+//  @JsonKey(name: "end_price")
+  double endPrice;
 
-  @JsonKey(name: "html_url")
-  String htmlUrl;
+//  @JsonKey(name: "max_price")
+  double maxPrice;
 
-  String description;
+//  @JsonKey(name: "min_price")
+  double minPrice;
 
-  String language;
-
-  @JsonKey(name: "default_branch")
-  String defaultBranch;
-
-  @JsonKey(name: "created_at")
-  DateTime createdAt;
-
-  @JsonKey(name: "updated_at")
-  DateTime updatedAt;
-
-  @JsonKey(name: "pushed_at")
-  DateTime pushedAt;
-
-  @JsonKey(name: "git_url")
-  String gitUrl;
-
-  @JsonKey(name: "ssh_url")
-  String sshUrl;
-
-  @JsonKey(name: "clone_url")
-  String cloneUrl;
-
-  @JsonKey(name: "svn_url")
-  String svnUrl;
-
-  @JsonKey(name: "stargazers_count")
-  int stargazersCount;
-
-  @JsonKey(name: "watchers_count")
-  int watchersCount;
-
-  @JsonKey(name: "forks_count")
-  int forksCount;
-
-  @JsonKey(name: "open_issues_count")
-  int openIssuesCount;
-
-  @JsonKey(name: "subscribers_count")
-  int subscribersCount;
-
-  @JsonKey(name: "private")
-  bool private;
-
-  bool fork;
-  @JsonKey(name: "has_issues")
-  bool hasIssues;
-  @JsonKey(name: "has_projects")
-  bool hasProjects;
-
-  @JsonKey(name: "has_downloads")
-  bool hasDownloads;
-
-  @JsonKey(name: "has_wiki")
-  bool hasWiki;
-
-  @JsonKey(name: "has_pages")
-  bool hasPages;
-
-  Repository parent;
-
-  List<String> topics;
-
-  ///issue总数，不参加序列化
-  int allIssueCount;
+  @override
+  toString(){
+    return 'id:$id,kLineDate:$kLineDate';
+  }
 
   Repository(
     this.id,
-    this.size,
-    this.name,
-    this.fullName,
-    this.htmlUrl,
-    this.description,
-    this.language,
-    this.defaultBranch,
-    this.createdAt,
-    this.updatedAt,
-    this.pushedAt,
-    this.gitUrl,
-    this.sshUrl,
-    this.cloneUrl,
-    this.svnUrl,
-    this.stargazersCount,
-    this.watchersCount,
-    this.forksCount,
-    this.openIssuesCount,
-    this.subscribersCount,
-    this.private,
-    this.fork,
-    this.hasIssues,
-    this.hasProjects,
-    this.hasDownloads,
-    this.hasWiki,
-    this.hasPages,
-    this.parent,
-    this.topics,
+    this.kLineDate,
+    this.startPrice,
+    this.endPrice,
+    this.maxPrice,
+    this.minPrice
   );
 
-  /// A necessary factory constructor for creating a new User instance
-  /// from a map. We pass the map to the generated _$UserFromJson constructor.
-  /// The constructor is named after the source class, in this case User.
   factory Repository.fromJson(Map<String, dynamic> json) => _$RepositoryFromJson(json);
 
   Map<String, dynamic> toJson() => _$RepositoryToJson(this);
