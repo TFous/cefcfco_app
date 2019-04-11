@@ -72,7 +72,7 @@ class DemoPageState extends State<DemoPage> {
                   width: 190.0,
                   height: 190.0,
                   padding: const EdgeInsets.only(bottom: 20.0),
-                  child: new MyCustomCircle(mData),
+                  child: Text('123'),
                 ),
               ],
             ),

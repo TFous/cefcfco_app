@@ -19,15 +19,99 @@ List mockDatas(num, max, min) {
     List item = [];
     var minute = getRandom(0, 59).toStringAsFixed(0);
     var second = getRandom(0, 59).toStringAsFixed(0);
-    item.add("2019-04-08 09:${minute.length==2?minute:"0"+minute}:${second.length==2?second:"0"+second}");
+    item.add(
+        "2019-04-08 09:${minute.length == 2 ? minute : "0" + minute}:${second.length == 2 ? second : "0" + second}");
     var num1 = getRandom(max, min);
     var num2 = getRandom(max, min);
     item.add(num1);
     item.add(num2);
-    item.add(num1*1.1);
-    item.add(num2*1.1);
+    item.add(num1 * 1.1);
+    item.add(num2 * 1.1);
     list.add(item);
   }
+  return list;
+}
+
+/// 如果是分钟图，则分别是 时间，
+/// 当前分钟开盘价格，
+/// 当前分钟收盘价格，
+/// 当前分钟最高价格，
+/// 当前分钟最低价格，
+/// 55.19 ==> initPrice
+/// 行情数据
+/// "2019-04-08 09:31:00",
+List mockKLineData(date, initPrice) {
+  double dayMaxPrice = initPrice * 1.1;
+  double dayMinPrice = initPrice * 0.9;
+
+  List list = [];
+  var minutes = [];
+  var hours = ['09', 10, 11, 13, 14];
+
+  for (var i = 0; i < 60; i++) {
+    var minute = i.toString().length == 1 ? '0$i' : '$i';
+    minutes.add(minute);
+  }
+
+  hours.forEach((hour) {
+    if (hour == '09') {
+      minutes.forEach((minute) {
+        if (int.parse(minute) < 30) {
+          return;
+        }
+        var num1 = getRandom(dayMaxPrice, dayMinPrice);
+        var num2 = getRandom(dayMaxPrice, dayMinPrice);
+        var maxNum = num1 > num2 ? num1 : num2;
+        var minNum = num1 > num2 ? num2 : num1;
+        var max = maxNum * 1.1 > dayMaxPrice ? dayMaxPrice:maxNum * 1.1;
+        var min = minNum * 0.9 < dayMinPrice ? dayMinPrice:minNum * 0.9;
+        var item = [];
+        item.add('$date $hour:$minute:59');
+        item.add(num1);
+        item.add(num2);
+        item.add(max);
+        item.add(min);
+        list.add(item);
+      });
+    } else if (hour == 11) {
+      minutes.forEach((minute) {
+        if (int.parse(minute) > 29) {
+          return;
+        }
+        var num1 = getRandom(dayMaxPrice, dayMinPrice);
+        var num2 = getRandom(dayMaxPrice, dayMinPrice);
+        var maxNum = num1 > num2 ? num1 : num2;
+        var minNum = num1 > num2 ? num2 : num1;
+        var max = maxNum * 1.2 > dayMaxPrice ? maxNum * 1.2 : dayMaxPrice;
+        var min = minNum * 0.9 > dayMaxPrice ? minNum * 0.9 : dayMaxPrice;
+        var item = [];
+        item.add('$date $hour:$minute:59');
+        item.add(num1);
+        item.add(num2);
+        item.add(max);
+        item.add(min);
+        list.add(item);
+      });
+    } else {
+      minutes.forEach((minute) {
+        var num1 = getRandom(dayMaxPrice, dayMinPrice);
+        var num2 = getRandom(dayMaxPrice, dayMinPrice);
+        var maxNum = num1 > num2 ? num1 : num2;
+        var minNum = num1 > num2 ? num2 : num1;
+        var max = maxNum * 1.2 > dayMaxPrice ? maxNum * 1.2 : dayMaxPrice;
+        var min = minNum * 0.9 > dayMaxPrice ? minNum * 0.9 : dayMaxPrice;
+        var item = [];
+        item.add('$date $hour:$minute:59');
+        item.add(num1);
+        item.add(num2);
+        item.add(max);
+        item.add(min);
+        list.add(item);
+      });
+    }
+  });
+
+  print(list);
   return list;
 }
 

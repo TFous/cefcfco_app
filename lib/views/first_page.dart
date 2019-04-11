@@ -4,7 +4,6 @@ import 'package:cefcfco_app/common/provider/repos/ReadHistoryDbProvider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cefcfco_app/views/CustomView/MyCustomCircle.dart';
-import 'package:cefcfco_app/views/CustomView/PieData.dart';
 import 'package:cefcfco_app/common/utils/globals.dart' as globals;
 import 'package:cefcfco_app/common/utils/mockData.dart' as mockData;
 
@@ -92,25 +91,21 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
   int subscript = 0;
   int index = 0;
   double onHorizontalDragDistance;
+  double initPrice = 55.19;
+  double kLineWidth = 8;
+  double kLineMargin = 2;
+  double canvasWidth;  /// 画布长度，用于计算渲染数据条数
+  double sideWidth = 48.0;
+  int maxKlinNum; /// 当前klin最大容量个数
+  double dragDistance = 8.0; /// 滑动距离，用于判断多长距离请求一次
+  ReadHistoryDbProvider provider = new ReadHistoryDbProvider();
 
-  List mockDatas = mockData.mockDatas(100, 60.71, 49.67);
+  List mockDatas =[];
+//  List mockDatas = mockData.mockDatas(100, 60.71, 49.67);
   var historyData;
   //数据源
-  List mData = [
-    [
-      "2019-04-08 09:31:00",
-      49.67,
-      60.71,
-      60.00,
-      55.19,
-    ],
-  ];
+  List showKLineData = [];
 
-  //传递值
-  PieData pieData;
-
-  //当前选中
-  var currentSelect = 0;
 
   AnimationController _controller;
   Animation<Offset> _animation;
@@ -124,6 +119,14 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
     _controller = AnimationController(vsync: this);
+    mockDatas = mockData.mockKLineData('2019-04-10', initPrice);
+
+//    dropTable();
+//    mockDatas.forEach((item) async {
+//      await inserData(item);
+//    });
+
+
     _controller.addListener(() {
       setState(() {
         _offset = _animation.value;
@@ -137,9 +140,13 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
     print('删除成功');
   }
 
-  getHistoryData()async{
+  getAllData()async{
     ReadHistoryDbProvider provider = new ReadHistoryDbProvider();
     return await provider.getAllData();
+  }
+
+  getLimitData(limit,offset)async{
+    return await provider.getInitData(limit,offset);
   }
 
   @override
@@ -193,46 +200,72 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
     print('_handleOnHorizontalDragStart $details');
     onHorizontalDragDistance = 0;
   }
+  /// 获取初始化 画布数据
+  initCanvasData(width) async{
+    var kLineDistance = kLineWidth+kLineMargin;
+    var minLeve = width~/kLineDistance;
+    var datas = await provider.getAllData();
+    var length= datas.length;
+    print('length-------$length');
+//    List subList = mockDatas.sublist(length-minLeve);
+    List subList = await getLimitData(minLeve,length-minLeve);
+    print('last item ===> ${subList[minLeve-1]}');
+    setState(() {
+      canvasWidth = width;
+      maxKlinNum = minLeve;
+      showKLineData = subList;
+    });
+  }
 
 
 
 
   Future _handleOnHorizontalDragUpdate(details) async {
-    var maxKlinNum = 31; /// 当前klin最大容量个数
-
 //    print('_handleOnHorizontalDragUpdate ${details.delta.dx}');
+
     onHorizontalDragDistance += details.delta.dx;
-    /// 向右滑动，历史数据
-    if(onHorizontalDragDistance>0){
-      if(onHorizontalDragDistance/12>0){
-        onHorizontalDragDistance -= 12;
-        var klinNum = mData.length;
-        ///超过最大数目，需要减去历史数据
-        if(klinNum>=maxKlinNum){
-          setState(() {
-            mData.removeAt(0);
-          });
-          print('removeAt===============$klinNum');
+
+    if(details.delta.dx < 0){  /// 向<----滑动，历史数据
+//      print('<------  ${details.delta.dx}');
+//      print('<------onHorizontalDragDistance  $onHorizontalDragDistance');
+//      print('<------  ${(onHorizontalDragDistance/dragDistance).abs()}');
+
+      if((onHorizontalDragDistance/dragDistance).abs()>1){
+        onHorizontalDragDistance += dragDistance;
+
+        /// 如果是最后时间则没有数据
+        if(showKLineData.last.kLineDate.split(' ')[1] == "14:59:59"){
+          return;
         }
-        var item = mockDatas[index];
-        var d = await inserData(item);
+
+        var time = showKLineData.first.kLineDate;
+        var newList = await provider.getDataByTime(time,maxKlinNum,direction:'left');
         setState(() {
-          mData.add(item);
-          index++;
+          showKLineData = newList;
         });
-
       }
-    }else{  /// 向左滑动，最新数据
-      /// 获取存在本地的历史数据
-      historyData = await getHistoryData();
-      print('向左滑动');
-      print(historyData[0]);
-      print(historyData[0].toString());
 
-
+//      print('向左滑动');
+    }else{  /// 向--->滑动，最新数据
+      print('firsttime-------${showKLineData.first.kLineDate}');
+      if(showKLineData.first.kLineDate.split(' ')[1] == "09:30:59"){
+        return;
+      }
+      if((onHorizontalDragDistance/dragDistance).abs()>1){
+        onHorizontalDragDistance -= dragDistance;
+        var time = showKLineData[showKLineData.length-1].kLineDate;
+        var newList = await provider.getDataByTime(time,maxKlinNum,direction:'right');
+        setState(() {
+          showKLineData = newList;
+        });
+      }
     }
-
   }
+
+
+
+
+
 
   static inserData(item)async{
     ReadHistoryDbProvider provider = new ReadHistoryDbProvider();
@@ -240,13 +273,17 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
   }
 
 
-  void _handleOnHorizontalDragEnd(details){
-    print('_handleOnHorizontalDragEnd $details');
+  void _handleOnHorizontalDragEnd(details)async{
     onHorizontalDragDistance = 0;
   }
 
   @override
   Widget build(BuildContext context) {
+    var width = MediaQuery.of(context).size.width - sideWidth;
+    if(canvasWidth != width){
+      initCanvasData(width);
+    }
+
     return Container(
       child: Column(
         children: <Widget>[
@@ -268,7 +305,7 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
                           transform: Matrix4.identity()
                             ..translate(_offset.dx, _offset.dy)
                             ..scale(_scale),
-                          child:new MyCustomCircle(mData)
+                          child:new MyCustomCircle(showKLineData,initPrice,kLineWidth,kLineMargin)
                       ),
                       // child: Image.network(widget.url,fit: BoxFit.cover,),
                     ),
@@ -276,7 +313,7 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
                 ),
                 Container(
                   /// 此组件在主轴方向占据48.0逻辑像素
-                  width: 48.0,
+                  width: sideWidth,
                   height: 200,
                   color: Colors.green,
                   child: Text('33333'),

@@ -12,18 +12,20 @@ class MyCustomCircle extends StatelessWidget{
 
   //数据源
   List datas;
-
+  double initPrice;
+  double kLineWidth;
+  double kLineMargin;
   //当前选中
   var currentSelect;
 
-  MyCustomCircle(this.datas);
+  MyCustomCircle(this.datas,this.initPrice,this.kLineWidth,this.kLineMargin);
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 200,
       child: CustomPaint(
-          painter: MyView(datas)
+          painter: MyView(datas,initPrice,kLineWidth,kLineMargin)
       ),
     );
   }
@@ -46,10 +48,13 @@ class MyView extends CustomPainter{
   int mWidth, mHeight;
   Rect mOval,mBigOval;
   List mData;
+  double initPrice;
+  double kLineWidth;
+  double kLineMargin;
 
   var startAngles=[];
 
-  MyView(this.mData);
+  MyView(this.mData,this.initPrice,this.kLineWidth,this.kLineMargin);
 
 
   @override
@@ -62,11 +67,10 @@ class MyView extends CustomPainter{
     /// 当前分钟最低价格，
     /// 55.19 ==> initPrice
 
-
-    var kLineWidth = 8.0;
-    var kLineMargin = 2.0;
+//    var kLineWidth = 8.0;
+//    var kLineMargin = 2.0;
     var kLineDistance = kLineWidth + kLineMargin;
-    double initPrice = 55.19;
+//    double initPrice = 55.19;
     double dayMaxPrice = initPrice*1.1;
     double dayMinPrice = initPrice*0.9;//.toStringAsFixed(2)
 
@@ -137,19 +141,14 @@ class MyView extends CustomPainter{
     canvas.drawLine(new Offset(0, _EqualHeight/4*3),
         new Offset(cavansWidth, _EqualHeight/4*3), _EqualLinePaint);
 
-    var minLeve = cavansWidth~/10;
-    print('minLeve $minLeve');
+
     mData.asMap().forEach((i, line) {
-
-      var time = line[0];
-
+      var time = line.kLineDate;
       var now = DateTime.parse(time);
-
-      double startPrice = line[1];
-      double endPrice = line[2];
-      double maxPrice = line[3];
-      double minPrice = line[4];
-
+      double startPrice = line.startPrice;
+      double endPrice = line.endPrice;
+      double maxPrice = line.maxPrice;
+      double minPrice = line.minPrice;
 
       _linePaint..strokeWidth =1.3;
       var top;

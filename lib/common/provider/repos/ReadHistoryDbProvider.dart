@@ -78,6 +78,10 @@ class ReadHistoryDbProvider extends BaseDbProvider {
     return name;
   }
 
+
+
+
+
   Future _getProvider(Database db, int page) async {
     List<Map<String, dynamic>> maps = await db.query(name,
         columns: [columnId, columnDateTime, columnStartPrice, columnEndPrice, columnMaxPrice, columnMinPrice],
@@ -132,6 +136,41 @@ class ReadHistoryDbProvider extends BaseDbProvider {
     }
     return null;
   }
+
+
+  Future<List<Repository>> getInitData(limit,offset) async {
+    Database db = await getDataBase();
+    var provider = await db.rawQuery('SELECT * FROM $name ORDER BY $columnDateTime ASC LIMIT $limit OFFSET $offset');
+    if (provider != null) {
+      List<Repository> list = new List();
+      for (var providerMap in provider) {
+        list.add(Repository.fromJson(providerMap));
+      }
+      return list;
+    }
+    return null;
+  }
+
+  Future<List<Repository>> getDataByTime(time,limit,{direction:'right'}) async {
+    Database db = await getDataBase();
+    var provider;
+    var _symbol = direction=='right'?'<':'>';
+    if(direction=='right'){
+      provider = await db.rawQuery("select * from (SELECT * FROM $name WHERE $columnDateTime < '$time' ORDER BY $columnDateTime desc LIMIT $limit) ORDER BY $columnDateTime ASC");
+
+    }else{
+      provider = await db.rawQuery("select * from (SELECT * FROM $name WHERE $columnDateTime > '$time' ORDER BY $columnDateTime ASC LIMIT $limit) ORDER BY $columnDateTime ASC");
+    }
+    if (provider != null) {
+      List<Repository> list = new List();
+      for (var providerMap in provider) {
+        list.add(Repository.fromJson(providerMap));
+      }
+      return list;
+    }
+    return null;
+  }
+
 
   ///获取事件数据
   Future<List<Repository>> geData(int page) async {
