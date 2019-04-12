@@ -98,7 +98,9 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
   double sideWidth = 48.0;
   int maxKlinNum; /// 当前klin最大容量个数
   double dragDistance = 8.0; /// 滑动距离，用于判断多长距离请求一次
+  Offset onTapDownDtails; /// 点击坐标
   ReadHistoryDbProvider provider = new ReadHistoryDbProvider();
+  GlobalKey anchorKey = GlobalKey();
 
   List mockDatas =[];
 //  List mockDatas = mockData.mockDatas(100, 60.71, 49.67);
@@ -110,6 +112,7 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
   AnimationController _controller;
   Animation<Offset> _animation;
   Offset _offset = Offset.zero;
+  Offset _canvasOffset = Offset.zero;
   double _scale = 1.0;
   Offset _normalizedOffset;
   double _previousScale;
@@ -277,6 +280,36 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
     onHorizontalDragDistance = 0;
   }
 
+//  void _handleOnTapDown(TapDownDetails details)async{
+//    setState(() {
+//      onTapDownDtails = details;
+//    });
+//  }
+//
+  void _handleOnPanDown(DragDownDetails details)async{
+    setState(() {
+
+      /// 元素位置
+      RenderBox renderBox = anchorKey.currentContext.findRenderObject();
+      _canvasOffset =  renderBox.localToGlobal(Offset.zero);
+
+      onTapDownDtails = details.globalPosition - _canvasOffset;
+    });
+  }
+  void _handleOnPanStart(DragStartDetails details)async{
+//    setState(() {
+//      onTapDownDtails = details.globalPosition - _canvasOffset;
+//    });
+  }
+  void _handleOnPanUpdate(DragUpdateDetails details)async{
+    setState(() {
+      onTapDownDtails = details.globalPosition - _canvasOffset;
+    });
+  }
+  void _handleOnPanEnd(DragEndDetails details)async{
+
+  }
+
   @override
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width - sideWidth;
@@ -294,18 +327,23 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
               children: <Widget>[
                 Expanded(
                   child: GestureDetector(
-                    onScaleStart: _handleOnScaleStart,
-                    onScaleUpdate: _handleOnScaleUpdate,
-                    onScaleEnd: _handleOnScaleEnd,
+                    onPanDown: _handleOnPanDown,
+                    onPanStart: _handleOnPanStart,
+                    onPanUpdate: _handleOnPanUpdate,
+                    onPanEnd: _handleOnPanEnd,
+//                    onScaleStart: _handleOnScaleStart,
+//                    onScaleUpdate: _handleOnScaleUpdate,
+//                    onScaleEnd: _handleOnScaleEnd,
                     onHorizontalDragStart:_handleOnHorizontalDragStart,
                     onHorizontalDragUpdate:_handleOnHorizontalDragUpdate,
                     onHorizontalDragEnd:_handleOnHorizontalDragEnd,
                     child: ClipRect(
+                      key: anchorKey,
                       child: Transform(
                           transform: Matrix4.identity()
                             ..translate(_offset.dx, _offset.dy)
                             ..scale(_scale),
-                          child:new MyCustomCircle(showKLineData,initPrice,kLineWidth,kLineMargin)
+                          child:new MyCustomCircle(showKLineData,initPrice,kLineWidth,kLineMargin,onTapDownDtails)
                       ),
                       // child: Image.network(widget.url,fit: BoxFit.cover,),
                     ),

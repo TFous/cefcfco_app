@@ -154,7 +154,7 @@ class ReadHistoryDbProvider extends BaseDbProvider {
   Future<List<Repository>> getDataByTime(time,limit,{direction:'right'}) async {
     Database db = await getDataBase();
     var provider;
-    var _symbol = direction=='right'?'<':'>';
+//    var _symbol = direction=='right'?'<':'>';
     if(direction=='right'){
       provider = await db.rawQuery("select * from (SELECT * FROM $name WHERE $columnDateTime < '$time' ORDER BY $columnDateTime desc LIMIT $limit) ORDER BY $columnDateTime ASC");
 

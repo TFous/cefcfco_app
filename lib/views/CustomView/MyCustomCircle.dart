@@ -3,29 +3,29 @@ import 'dart:ui';
 import 'package:cefcfco_app/common/utils/mockData.dart' as mockData;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'PieData.dart';
 import 'dart:math';
 
 ///自定义  饼状图
 /// @author yinl
 class MyCustomCircle extends StatelessWidget{
-
   //数据源
   List datas;
   double initPrice;
   double kLineWidth;
+  Offset onTapDownDtails;
   double kLineMargin;
-  //当前选中
-  var currentSelect;
 
-  MyCustomCircle(this.datas,this.initPrice,this.kLineWidth,this.kLineMargin);
+
+  MyCustomCircle(this.datas,this.initPrice,this.kLineWidth,this.kLineMargin,this.onTapDownDtails);
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 200,
       child: CustomPaint(
-          painter: MyView(datas,initPrice,kLineWidth,kLineMargin)
+          painter: MyView(datas,initPrice,kLineWidth,kLineMargin,onTapDownDtails)
       ),
     );
   }
@@ -33,29 +33,22 @@ class MyCustomCircle extends StatelessWidget{
 }
 
 class MyView extends CustomPainter{
-
-  //中间文字
-  var text='111';
-  bool isChange=false;
-  //当前选中的扇形
-  var currentSelect=0;
-
   double animValue;
   Paint _mPaint;
   Paint _linePaint;
   Paint TextPaint;
   Paint _EqualLinePaint;
-  int mWidth, mHeight;
-  Rect mOval,mBigOval;
   List mData;
   double initPrice;
   double kLineWidth;
   double kLineMargin;
+  List kLineOffsets = []; /// k线位置[[dx,dy]]
+  double lineWidth = 1.4;/// 线的宽度  譬如十字坐标
+  Offset onTapDownDtails;
 
   var startAngles=[];
 
-  MyView(this.mData,this.initPrice,this.kLineWidth,this.kLineMargin);
-
+  MyView(this.mData,this.initPrice,this.kLineWidth,this.kLineMargin,this.onTapDownDtails);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -67,8 +60,7 @@ class MyView extends CustomPainter{
     /// 当前分钟最低价格，
     /// 55.19 ==> initPrice
 
-//    var kLineWidth = 8.0;
-//    var kLineMargin = 2.0;
+
     var kLineDistance = kLineWidth + kLineMargin;
 //    double initPrice = 55.19;
     double dayMaxPrice = initPrice*1.1;
@@ -88,7 +80,6 @@ class MyView extends CustomPainter{
 
     Rect rect2 = Rect.fromLTRB(0,0,cavansWidth,cavansHeight);
     canvas.drawRect(rect2, TextPaint);
-
 
 
     _linePaint = new Paint();
@@ -141,6 +132,7 @@ class MyView extends CustomPainter{
     canvas.drawLine(new Offset(0, _EqualHeight/4*3),
         new Offset(cavansWidth, _EqualHeight/4*3), _EqualLinePaint);
 
+    _linePaint..strokeWidth =1.3;
 
     mData.asMap().forEach((i, line) {
       var time = line.kLineDate;
@@ -150,7 +142,6 @@ class MyView extends CustomPainter{
       double maxPrice = line.maxPrice;
       double minPrice = line.minPrice;
 
-      _linePaint..strokeWidth =1.3;
       var top;
       var bottom;
       var left = kLineDistance*i+kLineMargin;
@@ -165,21 +156,78 @@ class MyView extends CustomPainter{
       }
 
       Rect kLineReact;
-      if(top==bottom){ /// 如果开始价格等于结束价格，显示的是一条横线
-        kLineReact =Rect.fromLTRB(left, top+1, right, bottom-1);
-      }else{
-        kLineReact =Rect.fromLTRB(left, top, right, bottom);
+      if (top == bottom) {
+        /// 如果开始价格等于结束价格，显示的是一条横线
+        kLineReact = Rect.fromLTRB(left, top + 1, right, bottom - 1);
+      } else {
+        kLineReact = Rect.fromLTRB(left, top, right, bottom);
       }
+      kLineOffsets.add([left,right,line]);
 
-//      print(kLineReact);
       canvas.drawRect(kLineReact, _linePaint);
 
-        var maxTop = cavansHeight/2-((maxPrice-initPrice)/(dayMaxPrice-initPrice) * cavansHeight/2);
-        var minBottom = cavansHeight/2-((minPrice-initPrice)/(dayMaxPrice-initPrice) * cavansHeight/2);
-    canvas.drawLine(new Offset((left+right)/2, maxTop),
-        new Offset((left+right)/2, minBottom), _linePaint);
+      var maxTop = cavansHeight / 2 -
+          ((maxPrice - initPrice) / (dayMaxPrice - initPrice) * cavansHeight /
+              2);
+      var minBottom = cavansHeight / 2 -
+          ((minPrice - initPrice) / (dayMaxPrice - initPrice) * cavansHeight /
+              2);
+
+      canvas.drawLine(
+          new Offset((left + right) / 2, maxTop),
+          new Offset((left + right) / 2, minBottom),
+          _linePaint);
     });
 
+
+
+    /// 点击后画的十字
+    if(onTapDownDtails!=null){
+      _linePaint..strokeWidth = lineWidth;
+      _linePaint..color = Colors.blueAccent;
+      double lineDy;
+      double lineDx;
+      /// 修正dy 上下边界
+      if(onTapDownDtails.dy<0){
+        lineDy = 0.0;
+      }else if(onTapDownDtails.dy>cavansHeight){
+        lineDy = cavansHeight;
+      }else{
+        lineDy = onTapDownDtails.dy;
+      }
+
+      /// 竖线
+      canvas.drawLine(
+          new Offset(0, lineDy),
+          new Offset(cavansWidth,lineDy), _linePaint);
+
+      /// 修正dx 为每个klin 的中心
+      var kLineLength = kLineOffsets.length;
+      var i = 0;
+      for(;i<kLineLength;i++){
+        var dx = kLineOffsets[i][0];
+        lineDx = dx+kLineWidth/2;
+        if(dx>onTapDownDtails.dx){
+          if(dx>kLineOffsets[kLineLength-1][0]){
+            dx = kLineOffsets[kLineLength-2][0];
+          }
+          /// 横线
+          canvas.drawLine(
+              new Offset(lineDx, 0),
+              new Offset(lineDx,cavansHeight ), _linePaint);
+
+          return;
+        }else if(onTapDownDtails.dx>kLineOffsets[kLineLength-1][0]){
+          /// 最后的一个线
+          lineDx = kLineOffsets[kLineLength-1][0]+kLineWidth/2;
+          /// 横线
+          canvas.drawLine(
+              new Offset(lineDx, 0),
+              new Offset(lineDx,cavansHeight ), _linePaint);
+          return ;
+        }
+      }
+    }
 
     ///绘制逻辑与Android差不多
     canvas.save();
