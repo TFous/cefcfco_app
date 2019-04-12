@@ -1,5 +1,8 @@
 import 'dart:ui';
 
+import 'package:cefcfco_app/common/model/Repository.dart';
+import 'package:cefcfco_app/common/net/Code.dart';
+import 'package:cefcfco_app/common/utils/KLineDataInEvent.dart';
 import 'package:cefcfco_app/common/utils/mockData.dart' as mockData;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -62,9 +65,8 @@ class MyView extends CustomPainter{
 
 
     var kLineDistance = kLineWidth + kLineMargin;
-//    double initPrice = 55.19;
     double dayMaxPrice = initPrice*1.1;
-    double dayMinPrice = initPrice*0.9;//.toStringAsFixed(2)
+    double dayMinPrice = initPrice*0.9;
 
     TextPaint = new Paint()
     ..color = Colors.black
@@ -100,16 +102,6 @@ class MyView extends CustomPainter{
           ),
         );
     }
-
-    var initPriceText = _newVerticalAxisTextPainter(initPrice.toStringAsFixed(2))..layout();
-
-    initPriceText.paint(canvas, Offset(0, cavansHeight/2- initPriceText.height / 2));
-
-    var dayMinPriceText = _newVerticalAxisTextPainter(dayMinPrice.toStringAsFixed(2))..layout();
-    dayMinPriceText.paint(canvas, Offset(0, cavansHeight-dayMinPriceText.height));
-
-    var dayMaxPriceText = _newVerticalAxisTextPainter(dayMaxPrice.toStringAsFixed(2))..layout();
-    dayMaxPriceText.paint(canvas, Offset(0, 0));
 
     _EqualLinePaint = new Paint()
       ..color = Colors.black12
@@ -179,7 +171,14 @@ class MyView extends CustomPainter{
           _linePaint);
     });
 
+    var initPriceText = _newVerticalAxisTextPainter(initPrice.toStringAsFixed(2))..layout();
+    initPriceText.paint(canvas, Offset(0, cavansHeight/2- initPriceText.height / 2));
 
+    var dayMinPriceText = _newVerticalAxisTextPainter(dayMinPrice.toStringAsFixed(2))..layout();
+    dayMinPriceText.paint(canvas, Offset(0, cavansHeight-dayMinPriceText.height));
+
+    var dayMaxPriceText = _newVerticalAxisTextPainter(dayMaxPrice.toStringAsFixed(2))..layout();
+    dayMaxPriceText.paint(canvas, Offset(0, 0));
 
     /// 点击后画的十字
     if(onTapDownDtails!=null){
@@ -216,6 +215,10 @@ class MyView extends CustomPainter{
               new Offset(lineDx, 0),
               new Offset(lineDx,cavansHeight ), _linePaint);
 
+          var a = kLineOffsets[i][2];
+
+          Code.eventBus.fire(KLineDataInEvent(a));
+
           return;
         }else if(onTapDownDtails.dx>kLineOffsets[kLineLength-1][0]){
           /// 最后的一个线
@@ -228,6 +231,7 @@ class MyView extends CustomPainter{
         }
       }
     }
+
 
     ///绘制逻辑与Android差不多
     canvas.save();

@@ -1,11 +1,21 @@
+import 'dart:async';
 import 'dart:math';
 
+import 'package:cefcfco_app/common/model/Repository.dart';
+import 'package:cefcfco_app/common/net/Code.dart';
 import 'package:cefcfco_app/common/provider/repos/ReadHistoryDbProvider.dart';
+import 'package:cefcfco_app/common/utils/KLineDataInEvent.dart';
+import 'package:cefcfco_app/components/list_menus.dart';
+import 'package:cefcfco_app/components/list_menus_item.dart';
+import 'package:cefcfco_app/routers/application.dart';
+import 'package:event_bus/event_bus.dart';
+import 'package:fluro/fluro.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cefcfco_app/views/CustomView/MyCustomCircle.dart';
 import 'package:cefcfco_app/common/utils/globals.dart' as globals;
 import 'package:cefcfco_app/common/utils/mockData.dart' as mockData;
+import 'package:cefcfco_app/common/utils/router_config.dart' as routerConfig;
 
 class GridAnimation extends StatefulWidget {
   @override
@@ -117,6 +127,10 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
   Offset _normalizedOffset;
   double _previousScale;
   double _kMinFlingVelocity = 600.0;
+  StreamSubscription stream;
+
+  Repository repository;
+
 
   @override
   void initState() {
@@ -129,6 +143,11 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
 //      await inserData(item);
 //    });
 
+    stream = Code.eventBus.on<KLineDataInEvent>().listen((event) {
+      setState(() {
+        repository = event.repository;
+      });
+    });
 
     _controller.addListener(() {
       setState(() {
@@ -155,8 +174,15 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
   @override
   void dispose() {
     super.dispose();
+    if(stream != null) {
+      stream.cancel();
+      stream = null;
+    }
+
     _controller.dispose();
   }
+
+
 
   Offset _clampOffset(Offset offset) {
     final Size size = context.size;
@@ -250,7 +276,6 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
 
 //      print('向左滑动');
     }else{  /// 向--->滑动，最新数据
-      print('firsttime-------${showKLineData.first.kLineDate}');
       if(showKLineData.first.kLineDate.split(' ')[1] == "09:30:59"){
         return;
       }
@@ -359,6 +384,102 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
               ],
             ),
           ),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: globals.sidesDistance),
+            decoration: new BoxDecoration(
+              border: new Border(bottom: BorderSide(color: Color(0xFFf2f2f2))),
+              color: Colors.white,
+            ),
+            child: ListTile(
+              title: new Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Text(repository!=null?repository.kLineDate.toString().split(' ')[1]:'00', textAlign: TextAlign.left,style: TextStyle(color: Color(0xFF333333))),
+                    ),
+                    Expanded(
+                      child: Text("时间", textAlign: TextAlign.right,style: TextStyle(fontSize: 13.0,color: Color(0xFF999999),fontWeight: null),),
+                    ),
+                  ]
+              ),
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: globals.sidesDistance),
+            decoration: new BoxDecoration(
+              border: new Border(bottom: BorderSide(color: Color(0xFFf2f2f2))),
+              color: Colors.white,
+            ),
+            child: ListTile(
+              title: new Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Text(repository!=null?repository.startPrice.toStringAsFixed(2):'00', textAlign: TextAlign.left,style: TextStyle(color: Color(0xFF333333))),
+                    ),
+                    Expanded(
+                      child: Text("当前分钟开盘价格", textAlign: TextAlign.right,style: TextStyle(fontSize: 13.0,color: Color(0xFF999999),fontWeight: null),),
+                    ),
+                  ]
+              ),
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: globals.sidesDistance),
+            decoration: new BoxDecoration(
+              border: new Border(bottom: BorderSide(color: Color(0xFFf2f2f2))),
+              color: Colors.white,
+            ),
+            child: ListTile(
+              title: new Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Text(repository!=null?repository.endPrice.toStringAsFixed(2):'00', textAlign: TextAlign.left,style: TextStyle(color: Color(0xFF333333))),
+                    ),
+                    Expanded(
+                      child: Text("当前分钟收盘价格", textAlign: TextAlign.right,style: TextStyle(fontSize: 13.0,color: Color(0xFF999999),fontWeight: null),),
+                    ),
+                  ]
+              ),
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: globals.sidesDistance),
+            decoration: new BoxDecoration(
+              border: new Border(bottom: BorderSide(color: Color(0xFFf2f2f2))),
+              color: Colors.white,
+            ),
+            child: ListTile(
+              title: new Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Text(repository!=null?repository.maxPrice.toStringAsFixed(2):'00', textAlign: TextAlign.left,style: TextStyle(color: Color(0xFF333333))),
+                    ),
+                    Expanded(
+                      child: Text("当前分钟最高价格", textAlign: TextAlign.right,style: TextStyle(fontSize: 13.0,color: Color(0xFF999999),fontWeight: null),),
+                    ),
+                  ]
+              ),
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: globals.sidesDistance),
+            decoration: new BoxDecoration(
+              border: new Border(bottom: BorderSide(color: Color(0xFFf2f2f2))),
+              color: Colors.white,
+            ),
+            child: ListTile(
+              title: new Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Text(repository!=null?repository.minPrice.toStringAsFixed(2):'00', textAlign: TextAlign.left,style: TextStyle(color: Color(0xFF333333))),
+                    ),
+                    Expanded(
+                      child: Text("当前分钟最低价格", textAlign: TextAlign.right,style: TextStyle(fontSize: 13.0,color: Color(0xFF999999),fontWeight: null),),
+                    ),
+                  ]
+              ),
+            ),
+          ),
+//          ListMenus(menusList: menusList)
         ],
       ),
     );
