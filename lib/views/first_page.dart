@@ -397,7 +397,7 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
                       child: Text(repository!=null?repository.kLineDate.toString().split(' ')[1]:'00', textAlign: TextAlign.left,style: TextStyle(color: Color(0xFF333333))),
                     ),
                     Expanded(
-                      child: Text("时间", textAlign: TextAlign.right,style: TextStyle(fontSize: 13.0,color: Color(0xFF999999),fontWeight: null),),
+                      child: Text(repository!=null?repository.kLineDate.toString().split(' ')[0]:'时间', textAlign: TextAlign.right,style: TextStyle(fontSize: 13.0,color: Color(0xFF999999),fontWeight: null),),
                     ),
                   ]
               ),

@@ -79,6 +79,10 @@ class MyView extends CustomPainter{
       ..color = Colors.blueAccent; //背景为纸黄色
     var cavansWidth = size.width;
     var cavansHeight = size.height;
+    double lineDyPrice;  //横线指的价格
+    double copyLineDyPrice; // 判断是否一样，防止不不停刷新
+    double lineDy;
+    double lineDx;
 
     Rect rect2 = Rect.fromLTRB(0,0,cavansWidth,cavansHeight);
     canvas.drawRect(rect2, TextPaint);
@@ -98,6 +102,17 @@ class MyView extends CustomPainter{
           text: text,
           style: new TextStyle(
             color: Colors.black,
+            fontSize: 13.0,
+          ),
+        );
+    }
+
+    TextPainter _priceVerticalAxisTextPainter(String text) {
+      return textPainter
+        ..text = TextSpan(
+          text: text,
+          style: new TextStyle(
+            color: Colors.white,
             fontSize: 13.0,
           ),
         );
@@ -125,7 +140,6 @@ class MyView extends CustomPainter{
         new Offset(cavansWidth, _EqualHeight/4*3), _EqualLinePaint);
 
     _linePaint..strokeWidth =1.3;
-
     mData.asMap().forEach((i, line) {
       var time = line.kLineDate;
       var now = DateTime.parse(time);
@@ -184,8 +198,7 @@ class MyView extends CustomPainter{
     if(onTapDownDtails!=null){
       _linePaint..strokeWidth = lineWidth;
       _linePaint..color = Colors.blueAccent;
-      double lineDy;
-      double lineDx;
+
       /// 修正dy 上下边界
       if(onTapDownDtails.dy<0){
         lineDy = 0.0;
@@ -194,6 +207,8 @@ class MyView extends CustomPainter{
       }else{
         lineDy = onTapDownDtails.dy;
       }
+
+
 
       /// 竖线
       canvas.drawLine(
@@ -219,6 +234,21 @@ class MyView extends CustomPainter{
 
           Code.eventBus.fire(KLineDataInEvent(a));
 
+          /// 横线的价格
+          lineDyPrice = (dayMaxPrice-dayMinPrice)*((cavansHeight-lineDy)/cavansHeight)+dayMinPrice;
+          if(lineDyPrice!=copyLineDyPrice){
+            copyLineDyPrice = lineDyPrice;
+            print('lineDyPrice------${lineDyPrice}');
+
+            var initPriceText = _priceVerticalAxisTextPainter(lineDyPrice.toStringAsFixed(2))..layout();
+
+            var lineDyPriceReact = Rect.fromLTRB(0, lineDy - initPriceText.height / 2, initPriceText.width+1, lineDy + initPriceText.height / 2);
+            canvas.drawRect(lineDyPriceReact, _linePaint);
+
+            initPriceText.paint(canvas, Offset(0, lineDy - initPriceText.height / 2));
+
+          }
+
           return;
         }else if(onTapDownDtails.dx>kLineOffsets[kLineLength-1][0]){
           /// 最后的一个线
@@ -230,6 +260,8 @@ class MyView extends CustomPainter{
           return ;
         }
       }
+
+
     }
 
 
