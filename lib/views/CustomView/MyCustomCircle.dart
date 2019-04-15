@@ -53,6 +53,42 @@ class MyView extends CustomPainter{
 
   MyView(this.mData,this.initPrice,this.kLineWidth,this.kLineMargin,this.onTapDownDtails);
 
+
+  /// 当前横线位置的价格
+  void drawPrice(Canvas canvas,lineDyPrice,initPriceText,lineDx,lineDy,canvasWidth,canvasHeight){
+    double copyLineDyPrice; // 判断是否一样，防止不不停刷新
+    if(lineDyPrice!=copyLineDyPrice){
+      copyLineDyPrice = lineDyPrice;
+      var initPriceTextHeight = initPriceText.height/2;
+
+      var left = 0.0;
+      var right = initPriceText.width;
+      var top = lineDy - initPriceTextHeight;
+      var bottom = lineDy + initPriceTextHeight;
+      /// 上下边界价格显示
+      if(lineDy<initPriceTextHeight){
+        top = 0.0;
+        bottom = initPriceText.height;
+      }else if(lineDy>canvasHeight-initPriceText.height){
+        top = canvasHeight-initPriceText.height;
+        bottom = canvasHeight;
+      }
+
+      /// 价格显示在左还是右边 ，canvas 一半
+      if(lineDx>canvasWidth/2){
+        right = canvasWidth;
+        left = canvasWidth - initPriceText.width;
+
+      }
+
+      var lineDyPriceReact = Rect.fromLTRB(left, top, right, bottom);
+      canvas.drawRect(lineDyPriceReact, _linePaint);
+      initPriceText.paint(canvas, Offset(left, top));
+    }
+  }
+
+
+
   @override
   void paint(Canvas canvas, Size size) {
     var nowTime;
@@ -77,14 +113,13 @@ class MyView extends CustomPainter{
       ..isAntiAlias = true
       ..style = PaintingStyle.fill //填充
       ..color = Colors.blueAccent; //背景为纸黄色
-    var cavansWidth = size.width;
-    var cavansHeight = size.height;
+    var canvasWidth = size.width;
+    var canvasHeight = size.height;
     double lineDyPrice;  //横线指的价格
-    double copyLineDyPrice; // 判断是否一样，防止不不停刷新
     double lineDy;
     double lineDx;
 
-    Rect rect2 = Rect.fromLTRB(0,0,cavansWidth,cavansHeight);
+    Rect rect2 = Rect.fromLTRB(0,0,canvasWidth,canvasHeight);
     canvas.drawRect(rect2, TextPaint);
 
 
@@ -123,21 +158,21 @@ class MyView extends CustomPainter{
       ..style=PaintingStyle.stroke
       ..strokeWidth =1.0;
 
-    var _EqualWidth = cavansWidth;
-    var _EqualHeight = cavansHeight;
+    var _EqualWidth = canvasWidth;
+    var _EqualHeight = canvasHeight;
     canvas.drawLine(new Offset(_EqualWidth/4, 0),
-        new Offset(_EqualWidth/4, cavansHeight), _EqualLinePaint);
+        new Offset(_EqualWidth/4, canvasHeight), _EqualLinePaint);
     canvas.drawLine(new Offset(_EqualWidth/4*2, 0),
-        new Offset(_EqualWidth/4*2, cavansHeight), _EqualLinePaint);
+        new Offset(_EqualWidth/4*2, canvasHeight), _EqualLinePaint);
     canvas.drawLine(new Offset(_EqualWidth/4*3, 0),
-        new Offset(_EqualWidth/4*3, cavansHeight), _EqualLinePaint);
+        new Offset(_EqualWidth/4*3, canvasHeight), _EqualLinePaint);
 
     canvas.drawLine(new Offset(0, _EqualHeight/4),
-        new Offset(cavansWidth, _EqualHeight/4), _EqualLinePaint);
+        new Offset(canvasWidth, _EqualHeight/4), _EqualLinePaint);
     canvas.drawLine(new Offset(0, _EqualHeight/4*2),
-        new Offset(cavansWidth, _EqualHeight/4*2), _EqualLinePaint);
+        new Offset(canvasWidth, _EqualHeight/4*2), _EqualLinePaint);
     canvas.drawLine(new Offset(0, _EqualHeight/4*3),
-        new Offset(cavansWidth, _EqualHeight/4*3), _EqualLinePaint);
+        new Offset(canvasWidth, _EqualHeight/4*3), _EqualLinePaint);
 
     _linePaint..strokeWidth =1.3;
     mData.asMap().forEach((i, line) {
@@ -153,8 +188,8 @@ class MyView extends CustomPainter{
       var left = kLineDistance*i+kLineMargin;
       var right = kLineDistance*i+kLineDistance;
 
-      top = cavansHeight/2-(startPrice-initPrice)/(dayMaxPrice-initPrice) * cavansHeight/2;
-      bottom = cavansHeight/2-((endPrice-initPrice)/(dayMaxPrice-initPrice) * cavansHeight/2);
+      top = canvasHeight/2-(startPrice-initPrice)/(dayMaxPrice-initPrice) * canvasHeight/2;
+      bottom = canvasHeight/2-((endPrice-initPrice)/(dayMaxPrice-initPrice) * canvasHeight/2);
       if(endPrice>startPrice){
         _linePaint..color = Colors.red;
       }else{
@@ -172,11 +207,11 @@ class MyView extends CustomPainter{
 
       canvas.drawRect(kLineReact, _linePaint);
 
-      var maxTop = cavansHeight / 2 -
-          ((maxPrice - initPrice) / (dayMaxPrice - initPrice) * cavansHeight /
+      var maxTop = canvasHeight / 2 -
+          ((maxPrice - initPrice) / (dayMaxPrice - initPrice) * canvasHeight /
               2);
-      var minBottom = cavansHeight / 2 -
-          ((minPrice - initPrice) / (dayMaxPrice - initPrice) * cavansHeight /
+      var minBottom = canvasHeight / 2 -
+          ((minPrice - initPrice) / (dayMaxPrice - initPrice) * canvasHeight /
               2);
 
       canvas.drawLine(
@@ -186,10 +221,10 @@ class MyView extends CustomPainter{
     });
 
     var initPriceText = _newVerticalAxisTextPainter(initPrice.toStringAsFixed(2))..layout();
-    initPriceText.paint(canvas, Offset(0, cavansHeight/2- initPriceText.height / 2));
+    initPriceText.paint(canvas, Offset(0, canvasHeight/2- initPriceText.height / 2));
 
     var dayMinPriceText = _newVerticalAxisTextPainter(dayMinPrice.toStringAsFixed(2))..layout();
-    dayMinPriceText.paint(canvas, Offset(0, cavansHeight-dayMinPriceText.height));
+    dayMinPriceText.paint(canvas, Offset(0, canvasHeight-dayMinPriceText.height));
 
     var dayMaxPriceText = _newVerticalAxisTextPainter(dayMaxPrice.toStringAsFixed(2))..layout();
     dayMaxPriceText.paint(canvas, Offset(0, 0));
@@ -202,8 +237,8 @@ class MyView extends CustomPainter{
       /// 修正dy 上下边界
       if(onTapDownDtails.dy<0){
         lineDy = 0.0;
-      }else if(onTapDownDtails.dy>cavansHeight){
-        lineDy = cavansHeight;
+      }else if(onTapDownDtails.dy>canvasHeight){
+        lineDy = canvasHeight;
       }else{
         lineDy = onTapDownDtails.dy;
       }
@@ -213,7 +248,7 @@ class MyView extends CustomPainter{
       /// 竖线
       canvas.drawLine(
           new Offset(0, lineDy),
-          new Offset(cavansWidth,lineDy), _linePaint);
+          new Offset(canvasWidth,lineDy), _linePaint);
 
       /// 修正dx 为每个klin 的中心
       var kLineLength = kLineOffsets.length;
@@ -221,52 +256,33 @@ class MyView extends CustomPainter{
       for(;i<kLineLength;i++){
         var dx = kLineOffsets[i][0];
         lineDx = dx+kLineWidth/2;
+
         if(dx>onTapDownDtails.dx){
-          if(dx>kLineOffsets[kLineLength-1][0]){
-            dx = kLineOffsets[kLineLength-2][0];
-          }
           /// 横线
           canvas.drawLine(
               new Offset(lineDx, 0),
-              new Offset(lineDx,cavansHeight ), _linePaint);
+              new Offset(lineDx,canvasHeight ), _linePaint);
 
-          var a = kLineOffsets[i][2];
+          var data = kLineOffsets[i][2];
 
-          Code.eventBus.fire(KLineDataInEvent(a));
+          Code.eventBus.fire(KLineDataInEvent(data));
 
-          /// 当前横线位置的价格
-          lineDyPrice = (dayMaxPrice-dayMinPrice)*((cavansHeight-lineDy)/cavansHeight)+dayMinPrice;
-          if(lineDyPrice!=copyLineDyPrice){
-            copyLineDyPrice = lineDyPrice;
-            var initPriceText = _priceVerticalAxisTextPainter(lineDyPrice.toStringAsFixed(2))..layout();
-            var initPriceTextHeight = initPriceText.height/2;
-
-            var top = lineDy - initPriceTextHeight;
-            var bottom = lineDy + initPriceTextHeight;
-            print('lineDyPrice------${top}');
-            /// 上下边界价格显示
-            if(lineDy<initPriceTextHeight){
-              top = 0;
-              bottom = initPriceText.height;
-            }
-
-            if(lineDy>cavansHeight-initPriceText.height){
-              top = cavansHeight-initPriceText.height;
-              bottom = cavansHeight;
-            }
-            var lineDyPriceReact = Rect.fromLTRB(0, top, initPriceText.width, bottom);
-            canvas.drawRect(lineDyPriceReact, _linePaint);
-            initPriceText.paint(canvas, Offset(0, top));
-          }
-
+          lineDyPrice = (dayMaxPrice-dayMinPrice)*((canvasHeight-lineDy)/canvasHeight)+dayMinPrice;
+          var initPriceText = _priceVerticalAxisTextPainter(lineDyPrice.toStringAsFixed(2))..layout();
+          drawPrice(canvas,lineDyPrice,initPriceText,lineDx,lineDy,canvasWidth,canvasHeight);
           return;
-        }else if(onTapDownDtails.dx>kLineOffsets[kLineLength-1][0]){
+        }
+        else if(onTapDownDtails.dx>kLineOffsets[kLineLength-1][0]){
           /// 最后的一个线
           lineDx = kLineOffsets[kLineLength-1][0]+kLineWidth/2;
           /// 横线
           canvas.drawLine(
               new Offset(lineDx, 0),
-              new Offset(lineDx,cavansHeight ), _linePaint);
+              new Offset(lineDx,canvasHeight ), _linePaint);
+
+          lineDyPrice = (dayMaxPrice-dayMinPrice)*((canvasHeight-lineDy)/canvasHeight)+dayMinPrice;
+          var initPriceText = _priceVerticalAxisTextPainter(lineDyPrice.toStringAsFixed(2))..layout();
+          drawPrice(canvas,lineDyPrice,initPriceText,lineDx,lineDy,canvasWidth,canvasHeight);
           return ;
         }
       }

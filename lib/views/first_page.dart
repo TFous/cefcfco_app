@@ -335,6 +335,14 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
 
   }
 
+  void _handleOnLongPress()async{
+    print("_handleOnLongPress-----details");
+  }
+
+  void _handleOnLongPressUp()async{
+
+  }
+
   @override
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width - sideWidth;
@@ -352,6 +360,8 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
               children: <Widget>[
                 Expanded(
                   child: GestureDetector(
+//                    onLongPress: _handleOnLongPress,
+//                    onLongPressUp: _handleOnLongPressUp,
                     onPanDown: _handleOnPanDown,
                     onPanStart: _handleOnPanStart,
                     onPanUpdate: _handleOnPanUpdate,
