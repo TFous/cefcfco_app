@@ -234,19 +234,29 @@ class MyView extends CustomPainter{
 
           Code.eventBus.fire(KLineDataInEvent(a));
 
-          /// 横线的价格
+          /// 当前横线位置的价格
           lineDyPrice = (dayMaxPrice-dayMinPrice)*((cavansHeight-lineDy)/cavansHeight)+dayMinPrice;
           if(lineDyPrice!=copyLineDyPrice){
             copyLineDyPrice = lineDyPrice;
-            print('lineDyPrice------${lineDyPrice}');
-
             var initPriceText = _priceVerticalAxisTextPainter(lineDyPrice.toStringAsFixed(2))..layout();
+            var initPriceTextHeight = initPriceText.height/2;
 
-            var lineDyPriceReact = Rect.fromLTRB(0, lineDy - initPriceText.height / 2, initPriceText.width+1, lineDy + initPriceText.height / 2);
+            var top = lineDy - initPriceTextHeight;
+            var bottom = lineDy + initPriceTextHeight;
+            print('lineDyPrice------${top}');
+            /// 上下边界价格显示
+            if(lineDy<initPriceTextHeight){
+              top = 0;
+              bottom = initPriceText.height;
+            }
+
+            if(lineDy>cavansHeight-initPriceText.height){
+              top = cavansHeight-initPriceText.height;
+              bottom = cavansHeight;
+            }
+            var lineDyPriceReact = Rect.fromLTRB(0, top, initPriceText.width, bottom);
             canvas.drawRect(lineDyPriceReact, _linePaint);
-
-            initPriceText.paint(canvas, Offset(0, lineDy - initPriceText.height / 2));
-
+            initPriceText.paint(canvas, Offset(0, top));
           }
 
           return;
