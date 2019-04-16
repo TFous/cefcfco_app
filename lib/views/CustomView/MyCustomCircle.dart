@@ -19,16 +19,16 @@ class MyCustomCircle extends StatelessWidget{
   double kLineWidth;
   Offset onTapDownDtails;
   double kLineMargin;
+  bool isShowCross;
 
-
-  MyCustomCircle(this.datas,this.initPrice,this.kLineWidth,this.kLineMargin,this.onTapDownDtails);
+  MyCustomCircle(this.datas,this.initPrice,this.kLineWidth,this.kLineMargin,this.onTapDownDtails,this.isShowCross);
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 200,
       child: CustomPaint(
-          painter: MyView(datas,initPrice,kLineWidth,kLineMargin,onTapDownDtails)
+          painter: MyView(datas,initPrice,kLineWidth,kLineMargin,onTapDownDtails,isShowCross)
       ),
     );
   }
@@ -42,6 +42,7 @@ class MyView extends CustomPainter{
   Paint TextPaint;
   Paint _EqualLinePaint;
   List mData;
+  bool isShowCross;
   double initPrice;
   double kLineWidth;
   double kLineMargin;
@@ -51,7 +52,7 @@ class MyView extends CustomPainter{
 
   var startAngles=[];
 
-  MyView(this.mData,this.initPrice,this.kLineWidth,this.kLineMargin,this.onTapDownDtails);
+  MyView(this.mData,this.initPrice,this.kLineWidth,this.kLineMargin,this.onTapDownDtails,this.isShowCross);
 
 
   /// 当前横线位置的价格
@@ -75,7 +76,7 @@ class MyView extends CustomPainter{
       }
 
       /// 价格显示在左还是右边 ，canvas 一半
-      if(lineDx>canvasWidth/2){
+      if(lineDx<canvasWidth/2){
         right = canvasWidth;
         left = canvasWidth - initPriceText.width;
 
@@ -230,7 +231,7 @@ class MyView extends CustomPainter{
     dayMaxPriceText.paint(canvas, Offset(0, 0));
 
     /// 点击后画的十字
-    if(onTapDownDtails!=null){
+    if(onTapDownDtails!=null && isShowCross){
       _linePaint..strokeWidth = lineWidth;
       _linePaint..color = Colors.blueAccent;
 
