@@ -119,7 +119,7 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
   double initPrice = 55.19;
   double kLineWidth = 8;
   double minKLineWidth = 4.0;
-  double maxKLineWidth = 12.0;
+  double maxKLineWidth = 10.0;
   double kLineMargin = 2;
   double canvasWidth;  /// 画布长度，用于计算渲染数据条数
   double sideWidth = 48.0;
@@ -196,24 +196,7 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
 
 
   /// 获取初始化 画布数据
-  /// type 1:缩放 2：放大 3：初始化
-  initCanvasData(width,{type:3}) async{
-    if(type == 1){
-      if(kLineWidth<=minKLineWidth){
-        return ;
-      }
-      dragDistance-=1;
-      kLineWidth = kLineWidth * _scale;
-      kLineMargin = kLineMargin * _scale;
-    }else if(type == 2){
-      if(kLineWidth>=maxKLineWidth){
-        return ;
-      }
-      dragDistance+=1;
-      kLineWidth = kLineWidth * (2-_scale);
-      kLineMargin = kLineMargin * (2-_scale);
-    }
-
+  initCanvasData(width) async{
     var kLineDistance = kLineWidth+kLineMargin;
     var minLeve = width~/kLineDistance;
     var datas = await provider.getAllData();
@@ -226,12 +209,48 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
     });
   }
 
+  /// type 1:缩放 2：放大
+  scaleGetData(width, type) async {
+    var skipDistance = 0.5;
+    if (type == 1) {
+      if (kLineWidth <= minKLineWidth) {
+        return;
+      }
+      dragDistance -= skipDistance;
+      if(dragDistance<skipDistance){
+        dragDistance = skipDistance;
+      }
+
+      kLineWidth = kLineWidth * _scale;
+      kLineMargin = kLineMargin * _scale;
+    } else if (type == 2) {
+      if (kLineWidth >= maxKLineWidth) {
+        return;
+      }
+      dragDistance += skipDistance;
+      kLineWidth = kLineWidth * (2 - _scale);
+      kLineMargin = kLineMargin * (2 - _scale);
+    }
+
+    var kLineDistance = kLineWidth + kLineMargin;
+    var minLeve = width ~/ kLineDistance;
+    print('width-------$width');
+    print('minLeve-------$minLeve');
+    var lastItemTime = showKLineData.last.kLineDate;
+    List subList = await provider.getScaleDataByTime(lastItemTime, minLeve);
+    setState(() {
+      maxKlinNum = minLeve;
+      showKLineData = subList;
+    });
+  }
+
+
 
   Future moveKLine(details) async {
     onHorizontalDragDistance += details.delta.dx;
-    print('onHorizontalDragDistanceonHorizontalDragDistance --- $onHorizontalDragDistance ------- $dragDistance');
+//    print('onHorizontalDragDistanceonHorizontalDragDistance --- $onHorizontalDragDistance ------- $dragDistance');
     if(details.delta.dx < 0){  /// 向<----滑动，历史数据
-      if((onHorizontalDragDistance/dragDistance).abs()>1){
+      if(onHorizontalDragDistance.abs()>dragDistance){
         onHorizontalDragDistance = 0 ;
         /// 如果是最后时间则没有数据
         if(showKLineData.last.kLineDate.split(' ')[1] == "14:59:59"){
@@ -248,7 +267,7 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
       if(showKLineData.first.kLineDate.split(' ')[1] == "09:30:59"){
         return;
       }
-      if((onHorizontalDragDistance/dragDistance).abs()>1){
+      if(onHorizontalDragDistance.abs()>dragDistance){
         onHorizontalDragDistance = 0 ;
         var time = showKLineData[showKLineData.length-1].kLineDate;
         var newList = await provider.getDataByTime(time,maxKlinNum,direction:'right');
@@ -319,49 +338,46 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
     /// 缩放动作
     if(isScale){
       if(details.delta.dx!=0 && details.delta.dy!=0){
-        pointerMovePositions[details.pointer] = details;
-        if(pointerMovePositions.length==2){
-          List<Offset> pointerMovePositionsOffsets = [];
-          List<Offset> pointerDownPositionsOffsets = [];
-          for(var item in pointerMovePositions.values){
-            pointerMovePositionsOffsets.add(item.position);
+        var pointerKey = details.pointer;
+        var otherOpinterKey;
+        pointerMovePositions[pointerKey] = details;
+        for(var key in pointerDownPositions.keys){
+          if(key != pointerKey){
+            otherOpinterKey = key;
           }
+        }
+        var px,py; /// 初始的时候一个手指动，就和另外一个初始点比较距离
+        if(pointerMovePositions[otherOpinterKey] == null){
+          px = pointerDownPositions[otherOpinterKey].position.dx;
+          py = pointerDownPositions[otherOpinterKey].position.dy;
+        }else{
+          px = pointerMovePositions[otherOpinterKey].position.dx;
+          py = pointerMovePositions[otherOpinterKey].position.dy;
+        }
 
-          for(var item in pointerDownPositions.values){
-            pointerDownPositionsOffsets.add(item.position);
+        var a = (pointerMovePositions[pointerKey].position.dx-px).abs();
+        var b = (pointerMovePositions[pointerKey].position.dy-py).abs();
+        var pointerMovePositionsDistance = a + b;  // 距离直角三角形斜边
+
+        var a1 = (pointerDownPositions[pointerKey].position.dx-pointerDownPositions[otherOpinterKey].position.dx).abs();
+        var b1 = (pointerDownPositions[pointerKey].position.dy-pointerDownPositions[otherOpinterKey].position.dy).abs();
+        var pointerDownPositionsDistance = a1+b1;
+
+        if(pointerDownPositionsDistance<pointerMovePositionsDistance){
+          if((pointerDownPositionsDistance-pointerMovePositionsDistance).abs()>scaleDistance){
+              print('放大 ---------${pointerMovePositionsDistance - pointerDownPositionsDistance}');
+            pointerDownPositions[pointerKey] = pointerMovePositions[pointerKey];
+            scaleGetData(canvasWidth,2);
           }
-
-          var a = (pointerMovePositionsOffsets[0].dx-pointerMovePositionsOffsets[1].dx).abs();
-          var b = (pointerMovePositionsOffsets[0].dy-pointerMovePositionsOffsets[1].dy).abs();
-          var pointerMovePositionsDistance = a + b;  // 距离直角三角形斜边
-
-          var a1 = (pointerDownPositionsOffsets[0].dx-pointerDownPositionsOffsets[1].dx).abs();
-          var b1 = (pointerDownPositionsOffsets[0].dy-pointerDownPositionsOffsets[1].dy).abs();
-          var pointerDownPositionsDistance = a1+b1;
-
-
-          if(pointerDownPositionsDistance<pointerMovePositionsDistance){
-            if((pointerDownPositionsDistance-pointerMovePositionsDistance).abs()>scaleDistance){
-//              print('放大 ---------${pointerMovePositionsDistance - pointerDownPositionsDistance}');
-              pointerDownPositions = pointerMovePositions;
-              pointerMovePositions = {};
-              initCanvasData(canvasWidth,type: 2);
-            }
-
-          }else{
-            if((pointerDownPositionsDistance-pointerMovePositionsDistance).abs()>scaleDistance){
-//              print('缩放 ---------${pointerMovePositionsDistance - pointerDownPositionsDistance}');
-              pointerDownPositions = pointerMovePositions;
-              pointerMovePositions = {};
-              initCanvasData(canvasWidth,type: 1);
-            }
+        }else{
+          if((pointerDownPositionsDistance-pointerMovePositionsDistance).abs()>scaleDistance){
+              print('缩放 ---------${pointerMovePositionsDistance - pointerDownPositionsDistance}');
+            pointerDownPositions[pointerKey] = pointerMovePositions[pointerKey];
+            scaleGetData(canvasWidth,1);
           }
-
         }
       }
     }
-
-
   }
 
   /// 结束触摸

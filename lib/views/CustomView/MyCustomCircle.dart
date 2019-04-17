@@ -177,8 +177,8 @@ class MyView extends CustomPainter{
 
     _linePaint..strokeWidth =1.3;
     mData.asMap().forEach((i, line) {
-      var time = line.kLineDate;
-      var now = DateTime.parse(time);
+//      var time = line.kLineDate;
+//      var now = DateTime.parse(time);
       double startPrice = line.startPrice;
       double endPrice = line.endPrice;
       double maxPrice = line.maxPrice;

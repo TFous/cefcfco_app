@@ -151,6 +151,36 @@ class ReadHistoryDbProvider extends BaseDbProvider {
     return null;
   }
 
+
+
+  Future<List<Repository>> getScaleDataByTime(time,limit) async {
+    Database db = await getDataBase();
+    List provider = [];
+    List otherItem =[];
+    int providerLength;
+    provider = await db.rawQuery("select * from (SELECT * FROM $name WHERE $columnDateTime < '$time' ORDER BY $columnDateTime desc LIMIT $limit) ORDER BY $columnDateTime ASC");
+    providerLength =  provider.length;
+    if(provider.length<limit){
+      otherItem = await db.rawQuery("select * from (SELECT * FROM $name WHERE $columnDateTime > '$time' ORDER BY $columnDateTime desc LIMIT ${limit-providerLength}) ORDER BY $columnDateTime ASC");
+      print('provider======limit ${limit} --- providerLength ${providerLength}');
+      print('provider======${otherItem}');
+    }
+    if (provider != null) {
+      List<Repository> list = new List();
+      for (var providerMap in provider) {
+        list.add(Repository.fromJson(providerMap));
+      }
+      for(var item in otherItem){
+        list.add(Repository.fromJson(item));
+      }
+
+      return list;
+    }
+    return null;
+  }
+
+
+
   Future<List<Repository>> getDataByTime(time,limit,{direction:'right'}) async {
     Database db = await getDataBase();
     var provider;
