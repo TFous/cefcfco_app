@@ -118,11 +118,13 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
   double onHorizontalDragDistance = 0.0; /// 滑动距离
   double initPrice = 55.19;
   double kLineWidth = 8;
+  double minKLineWidth = 4.0;
+  double maxKLineWidth = 12.0;
   double kLineMargin = 2;
   double canvasWidth;  /// 画布长度，用于计算渲染数据条数
   double sideWidth = 48.0;
   int maxKlinNum; /// 当前klin最大容量个数
-  double dragDistance = 8.0; /// 滑动距离，用于判断多长距离请求一次
+  double dragDistance = 3.0; /// 滑动距离，用于判断多长距离请求一次
   double scaleDistance = 18.0; /// 滑动距离，用于判断多长距离请求一次
   Offset onTapDownDtails; /// 点击坐标
   ReadHistoryDbProvider provider = new ReadHistoryDbProvider();
@@ -134,15 +136,8 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
   //数据源
   List showKLineData = [];
 
-
-  AnimationController _controller;
-  Animation<Offset> _animation;
-  Offset _offset = Offset.zero;
   Offset _canvasOffset = Offset.zero;
-  double _scale = 0.9;
-  Offset _normalizedOffset;
-  double _previousScale;
-  double _kMinFlingVelocity = 600.0;
+  double _scale = 0.90;
   StreamSubscription stream;
 
   Repository repository;
@@ -155,7 +150,6 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
   bool isShowCross = false;  // 是否显示十字坐标
   bool isMoveKLin = false;  // 是否在移动klin
   bool isScale = false;  // 是否缩放
-//  List<PointerDownEvent> pointersPosition = [];
   Map<num,dynamic> pointerDownPositions = {};
   Map<num,dynamic> pointerMovePositions = {};
   int pointerNum = 0; // 手指数量
@@ -163,9 +157,7 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this);
     mockDatas = mockData.mockKLineData('2019-04-10', initPrice);
-
 //    dropTable();
 //    mockDatas.forEach((item) async {
 //      await inserData(item);
@@ -174,12 +166,6 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
     stream = Code.eventBus.on<KLineDataInEvent>().listen((event) {
       setState(() {
         repository = event.repository;
-      });
-    });
-
-    _controller.addListener(() {
-      setState(() {
-        _offset = _animation.value;
       });
     });
   }
@@ -206,8 +192,6 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
       stream.cancel();
       stream = null;
     }
-
-    _controller.dispose();
   }
 
 
@@ -215,25 +199,23 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
   /// type 1:缩放 2：放大 3：初始化
   initCanvasData(width,{type:3}) async{
     if(type == 1){
-      setState(() {
-        kLineWidth = kLineWidth * _scale;
-        kLineMargin = kLineMargin * _scale;
-      });
+      if(kLineWidth<=minKLineWidth){
+        return ;
+      }
+      dragDistance-=1;
+      kLineWidth = kLineWidth * _scale;
+      kLineMargin = kLineMargin * _scale;
     }else if(type == 2){
-      setState(() {
-        kLineWidth = kLineWidth * (1+_scale);
-        kLineMargin = kLineMargin * (1+_scale);
-      });
+      if(kLineWidth>=maxKLineWidth){
+        return ;
+      }
+      dragDistance+=1;
+      kLineWidth = kLineWidth * (2-_scale);
+      kLineMargin = kLineMargin * (2-_scale);
     }
 
     var kLineDistance = kLineWidth+kLineMargin;
     var minLeve = width~/kLineDistance;
-    print('minLeveminLeveminLeve-----$minLeve');
-    if(minLeve<10){
-      return ;
-    }
-
-
     var datas = await provider.getAllData();
     var length= datas.length;
     List subList = await getLimitData(minLeve,length-minLeve);
@@ -247,9 +229,10 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
 
   Future moveKLine(details) async {
     onHorizontalDragDistance += details.delta.dx;
+    print('onHorizontalDragDistanceonHorizontalDragDistance --- $onHorizontalDragDistance ------- $dragDistance');
     if(details.delta.dx < 0){  /// 向<----滑动，历史数据
       if((onHorizontalDragDistance/dragDistance).abs()>1){
-        onHorizontalDragDistance += dragDistance;
+        onHorizontalDragDistance = 0 ;
         /// 如果是最后时间则没有数据
         if(showKLineData.last.kLineDate.split(' ')[1] == "14:59:59"){
           return;
@@ -266,7 +249,7 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
         return;
       }
       if((onHorizontalDragDistance/dragDistance).abs()>1){
-        onHorizontalDragDistance -= dragDistance;
+        onHorizontalDragDistance = 0 ;
         var time = showKLineData[showKLineData.length-1].kLineDate;
         var newList = await provider.getDataByTime(time,maxKlinNum,direction:'right');
         setState(() {
@@ -275,8 +258,6 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
       }
     }
   }
-
-
 
   /**
    *  PointerEvent  timeStamp  4:45:05.708000
@@ -309,7 +290,6 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
     startTouchTime = getSecond(details.timeStamp);
 
     startPosition = details.position;
-    print(details);
     pointerNum++;
     pointerDownPositions[details.pointer] = details;
 
@@ -362,7 +342,7 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
 
           if(pointerDownPositionsDistance<pointerMovePositionsDistance){
             if((pointerDownPositionsDistance-pointerMovePositionsDistance).abs()>scaleDistance){
-              print('放大 ---------${pointerMovePositionsDistance - pointerDownPositionsDistance}');
+//              print('放大 ---------${pointerMovePositionsDistance - pointerDownPositionsDistance}');
               pointerDownPositions = pointerMovePositions;
               pointerMovePositions = {};
               initCanvasData(canvasWidth,type: 2);
@@ -370,7 +350,7 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
 
           }else{
             if((pointerDownPositionsDistance-pointerMovePositionsDistance).abs()>scaleDistance){
-              print('缩放 ---------${pointerMovePositionsDistance - pointerDownPositionsDistance}');
+//              print('缩放 ---------${pointerMovePositionsDistance - pointerDownPositionsDistance}');
               pointerDownPositions = pointerMovePositions;
               pointerMovePositions = {};
               initCanvasData(canvasWidth,type: 1);
