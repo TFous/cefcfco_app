@@ -234,10 +234,16 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
 
     var kLineDistance = kLineWidth + kLineMargin;
     var minLeve = width ~/ kLineDistance;
-    print('width-------$width');
-    print('minLeve-------$minLeve');
+
+
+
+
+
+
     var lastItemTime = showKLineData.last.kLineDate;
     List subList = await provider.getScaleDataByTime(lastItemTime, minLeve);
+    print('subList.length === ${subList.length} ----- $minLeve');
+    print('lastItemTime === ${subList.last.kLineDate} ----- $lastItemTime');
     setState(() {
       maxKlinNum = minLeve;
       showKLineData = subList;
@@ -365,13 +371,13 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
 
         if(pointerDownPositionsDistance<pointerMovePositionsDistance){
           if((pointerDownPositionsDistance-pointerMovePositionsDistance).abs()>scaleDistance){
-              print('放大 ---------${pointerMovePositionsDistance - pointerDownPositionsDistance}');
+//              print('放大 ---------${pointerMovePositionsDistance - pointerDownPositionsDistance}');
             pointerDownPositions[pointerKey] = pointerMovePositions[pointerKey];
             scaleGetData(canvasWidth,2);
           }
         }else{
           if((pointerDownPositionsDistance-pointerMovePositionsDistance).abs()>scaleDistance){
-              print('缩放 ---------${pointerMovePositionsDistance - pointerDownPositionsDistance}');
+//              print('缩放 ---------${pointerMovePositionsDistance - pointerDownPositionsDistance}');
             pointerDownPositions[pointerKey] = pointerMovePositions[pointerKey];
             scaleGetData(canvasWidth,1);
           }

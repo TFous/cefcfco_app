@@ -158,12 +158,10 @@ class ReadHistoryDbProvider extends BaseDbProvider {
     List provider = [];
     List otherItem =[];
     int providerLength;
-    provider = await db.rawQuery("select * from (SELECT * FROM $name WHERE $columnDateTime < '$time' ORDER BY $columnDateTime desc LIMIT $limit) ORDER BY $columnDateTime ASC");
+    provider = await db.rawQuery("select * from (SELECT * FROM $name WHERE $columnDateTime <= '$time' ORDER BY $columnDateTime desc LIMIT $limit) ORDER BY $columnDateTime ASC");
     providerLength =  provider.length;
     if(provider.length<limit){
-      otherItem = await db.rawQuery("select * from (SELECT * FROM $name WHERE $columnDateTime > '$time' ORDER BY $columnDateTime desc LIMIT ${limit-providerLength}) ORDER BY $columnDateTime ASC");
-      print('provider======limit ${limit} --- providerLength ${providerLength}');
-      print('provider======${otherItem}');
+      otherItem = await db.rawQuery("SELECT * FROM $name WHERE $columnDateTime > '$time' ORDER BY $columnDateTime ASC LIMIT ${limit-providerLength}");
     }
     if (provider != null) {
       List<Repository> list = new List();
