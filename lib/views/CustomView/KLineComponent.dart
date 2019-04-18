@@ -22,8 +22,10 @@ class KLineComponent extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
     return Container(
-      height: 200,
+      height: size.height,
+      width: size.width,
       child: CustomPaint(
           painter: MyView(datas,initPrice,kLineWidth,kLineMargin,onTapDownDtails,isShowCross)
       ),

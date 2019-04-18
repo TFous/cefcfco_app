@@ -19,9 +19,6 @@ import 'package:cefcfco_app/common/model/Repository.dart';
 import 'package:cefcfco_app/common/net/Code.dart';
 import 'package:cefcfco_app/common/provider/repos/ReadHistoryDbProvider.dart';
 import 'package:cefcfco_app/common/utils/KLineDataInEvent.dart';
-import 'package:cefcfco_app/components/list_menus.dart';
-import 'package:cefcfco_app/components/list_menus_item.dart';
-import 'package:cefcfco_app/routers/application.dart';
 import 'package:event_bus/event_bus.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/cupertino.dart';
@@ -30,89 +27,15 @@ import 'package:flutter/material.dart';
 import 'package:cefcfco_app/views/CustomView/KLineComponent.dart';
 import 'package:cefcfco_app/common/utils/globals.dart' as globals;
 import 'package:cefcfco_app/common/utils/mockData.dart' as mockData;
-import 'package:cefcfco_app/common/utils/router_config.dart' as routerConfig;
 
-class GridAnimation extends StatefulWidget {
+class MinKLine extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    return GridAnimationState();
+    return MinKLineState();
   }
 }
 
-class GridAnimationState extends State<GridAnimation> {
-
-  List<String> lists = [
-    "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1542212557760&di=2c0ccc64ab23eb9baa5f6582e0e4f52d&imgtype=0&src=http%3A%2F%2Fpic.feizl.com%2Fupload%2Fallimg%2F170725%2F43998m3qcnyxwxck.jpg",
-    "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1542212557760&di=37d5107e6f7277bc4bfd323845a2ef32&imgtype=0&src=http%3A%2F%2Fn1.itc.cn%2Fimg8%2Fwb%2Fsmccloud%2Ffetch%2F2015%2F06%2F05%2F79697840747611479.JPEG",
-  ];
-
-  void showPhoto(BuildContext context, f, index) {
-    Navigator.push(context,
-        MaterialPageRoute<void>(builder: (BuildContext context) {
-          return Scaffold(
-            appBar: AppBar(title: Text('行情图')),
-            body: SizedBox.expand(
-              child: Hero(
-                tag: index,
-                child: new Photo(url: f),
-              ),
-            ),
-          );
-        }));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return new Scaffold(
-        appBar: AppBar(
-          title: Text('GridAnimation'),
-        ),
-        body: new Column(
-          children: <Widget>[
-            new Expanded(
-              child: new SafeArea(
-                top: false,
-                bottom: false,
-                child: new GridView.count(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 10.0,
-                  crossAxisSpacing: 4.0,
-                  padding: const EdgeInsets.all(4.0),
-                  childAspectRatio: 1.5,
-                  children: lists.map((f) {
-                    return new GestureDetector(
-                      onTap: () {
-                        var index;
-                        if (lists.contains(f)) {
-                          index = lists.indexOf(f);
-                        }
-                        showPhoto(context, f, index);
-                      },
-                      child: Image.network(
-                        f,
-                        fit: BoxFit.cover,
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
-            )
-          ],
-        ));
-  }
-}
-
-class Photo extends StatefulWidget {
-  const Photo({Key key, this.url}) : super(key: key);
-  final url;
-
-  @override
-  State<StatefulWidget> createState() {
-    return PhotoState();
-  }
-}
-
-class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
+class MinKLineState extends State<MinKLine> {
   int subscript = 0;
   int index = 0;
   double onHorizontalDragDistance = 0.0; /// 滑动距离

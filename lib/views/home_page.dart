@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:cefcfco_app/routers/application.dart';
 import 'package:cefcfco_app/views/about_page.dart';
-import 'package:cefcfco_app/views/minKlin_page.dart';
+import 'package:cefcfco_app/views/minKline_page.dart';
 import 'package:cefcfco_app/views/user_page.dart';
 import 'package:cefcfco_app/views/CustomView/DemoPage.dart';
 
@@ -71,7 +71,7 @@ class _MyHomePageState extends State<AppPage>
           physics: new NeverScrollableScrollPhysics(), // 禁用滑动
           controller: controller,
           children: <Widget>[
-        new GridAnimation(),
+        new MinKLine(),
         new AboutPage(),
         new ListPage(),
         new UserPage(),

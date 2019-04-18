@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cefcfco_app/common/utils/globals.dart' as globals;
 
+import 'package:cefcfco_app/views/dayKLine_page.dart';
+import 'package:cefcfco_app/views/minKline_page.dart';
+
 class ListPage extends StatefulWidget {
   @override
   ListPageState createState() => new ListPageState();
@@ -91,7 +94,17 @@ class ListPageState extends State<ListPage> with AutomaticKeepAliveClientMixin,S
         body: new TabBarView(
           controller: _tabController,
           children: myTabs.map((Tab tab) {    //遍历List<Tab>类型的对象myTabs并提取其属性值作为子控件的内容
-            return new Center(child: new Text(tab.text)); //使用参数值
+            return Builder(
+              builder: (BuildContext context) {
+                if(tab.text == '日行情'){
+                  return DayKLine();
+                }else if(tab.text == '分钟行情'){
+                  return MinKLine();
+                }else{
+                  return new Text(tab.text);
+                }
+              },
+            ); //使用参数值
           }).toList(),
         ),
       )
