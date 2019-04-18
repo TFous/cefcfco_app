@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:cefcfco_app/routers/application.dart';
 import 'package:cefcfco_app/views/about_page.dart';
-import 'package:cefcfco_app/views/first_page.dart';
+import 'package:cefcfco_app/views/minKlin_page.dart';
 import 'package:cefcfco_app/views/user_page.dart';
 import 'package:cefcfco_app/views/CustomView/DemoPage.dart';
 

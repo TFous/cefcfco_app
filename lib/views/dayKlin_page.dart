@@ -27,7 +27,7 @@ import 'package:fluro/fluro.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:cefcfco_app/views/CustomView/MyCustomCircle.dart';
+import 'package:cefcfco_app/views/CustomView/KLineComponent.dart';
 import 'package:cefcfco_app/common/utils/globals.dart' as globals;
 import 'package:cefcfco_app/common/utils/mockData.dart' as mockData;
 import 'package:cefcfco_app/common/utils/router_config.dart' as routerConfig;
@@ -50,7 +50,7 @@ class GridAnimationState extends State<GridAnimation> {
     Navigator.push(context,
         MaterialPageRoute<void>(builder: (BuildContext context) {
           return Scaffold(
-            appBar: AppBar(title: Text('图片${index + 1}')),
+            appBar: AppBar(title: Text('行情图')),
             body: SizedBox.expand(
               child: Hero(
                 tag: index,
@@ -158,6 +158,7 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
     mockDatas = mockData.mockKLineData('2019-04-10', initPrice);
+//    mockDatas = mockData.mockData();
 //    dropTable();
 //    mockDatas.forEach((item) async {
 //      await inserData(item);
@@ -235,15 +236,8 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
     var kLineDistance = kLineWidth + kLineMargin;
     var minLeve = width ~/ kLineDistance;
 
-
-
-
-
-
     var lastItemTime = showKLineData.last.kLineDate;
     List subList = await provider.getScaleDataByTime(lastItemTime, minLeve);
-    print('subList.length === ${subList.length} ----- $minLeve');
-    print('lastItemTime === ${subList.last.kLineDate} ----- $lastItemTime');
     setState(() {
       maxKlinNum = minLeve;
       showKLineData = subList;
@@ -321,6 +315,8 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
     if(pointerDownPositions.length>=2){
       isScale = true;
       isShowCross = false;  //两个手指的时候不显示十字坐标
+    }else{
+      isScale = false;
     }
 
     setState(() {
@@ -432,15 +428,14 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
                   child:Listener(
                       child: ClipRect(
                         key: anchorKey,
-                        child: new MyCustomCircle(showKLineData,initPrice,kLineWidth,kLineMargin,onTapDownDtails,isShowCross),
+                        child: new KLineComponent(showKLineData,initPrice,kLineWidth,kLineMargin,onTapDownDtails,isShowCross),
                         // child: Image.network(widget.url,fit: BoxFit.cover,),
                       ),
                       onPointerDown:_handelOnPointerDown,
                       onPointerUp: _handelOnPointerUp,
                       onPointerMove: _handelOnPointerMove,
                       onPointerCancel: _handelOnPointerCancel
-                  )
-,
+                  ),
                 ),
                 Container(
                   /// 此组件在主轴方向占据48.0逻辑像素

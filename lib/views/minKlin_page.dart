@@ -1,3 +1,17 @@
+/**
+ *
+ *  缩放动作，计算两点之间的距离（直角三角形斜边），移动前的距离和移动后的距离
+ *  通过计算两距离的差值，是否大于 货值（scaleDistance）
+ *
+ *
+ *
+ *
+ *
+ *
+ */
+
+
+
 import 'dart:async';
 import 'dart:math';
 
@@ -11,6 +25,7 @@ import 'package:cefcfco_app/routers/application.dart';
 import 'package:event_bus/event_bus.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:cefcfco_app/views/CustomView/KLineComponent.dart';
 import 'package:cefcfco_app/common/utils/globals.dart' as globals;
@@ -29,28 +44,29 @@ class GridAnimationState extends State<GridAnimation> {
   List<String> lists = [
     "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1542212557760&di=2c0ccc64ab23eb9baa5f6582e0e4f52d&imgtype=0&src=http%3A%2F%2Fpic.feizl.com%2Fupload%2Fallimg%2F170725%2F43998m3qcnyxwxck.jpg",
     "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1542212557760&di=37d5107e6f7277bc4bfd323845a2ef32&imgtype=0&src=http%3A%2F%2Fn1.itc.cn%2Fimg8%2Fwb%2Fsmccloud%2Ffetch%2F2015%2F06%2F05%2F79697840747611479.JPEG",
-];
+  ];
 
   void showPhoto(BuildContext context, f, index) {
     Navigator.push(context,
         MaterialPageRoute<void>(builder: (BuildContext context) {
-      return Scaffold(
-        appBar: AppBar(title: Text('图片${index + 1}')),
-        body: SizedBox.expand(
-          child: Hero(
-            tag: index,
-            child: new Photo(url: f),
-          ),
-        ),
-      );
-    }));
+          return Scaffold(
+            appBar: AppBar(title: Text('行情图')),
+            body: SizedBox.expand(
+              child: Hero(
+                tag: index,
+                child: new Photo(url: f),
+              ),
+            ),
+          );
+        }));
   }
 
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
         appBar: AppBar(
-          title: Text('GridAnimation'),
+          automaticallyImplyLeading: false,
+          title: Text('行情图'),
         ),
         body: new Column(
           children: <Widget>[
@@ -100,44 +116,49 @@ class Photo extends StatefulWidget {
 class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
   int subscript = 0;
   int index = 0;
-  double onHorizontalDragDistance;
-  double initPrice = 55.19;
+  double onHorizontalDragDistance = 0.0; /// 滑动距离
+  double initPrice = 10.2;
   double kLineWidth = 8;
+  double minKLineWidth = 4.0;
+  double maxKLineWidth = 10.0;
   double kLineMargin = 2;
   double canvasWidth;  /// 画布长度，用于计算渲染数据条数
   double sideWidth = 48.0;
   int maxKlinNum; /// 当前klin最大容量个数
-  double dragDistance = 8.0; /// 滑动距离，用于判断多长距离请求一次
+  double dragDistance = 3.0; /// 滑动距离，用于判断多长距离请求一次
+  double scaleDistance = 18.0; /// 滑动距离，用于判断多长距离请求一次
   Offset onTapDownDtails; /// 点击坐标
   ReadHistoryDbProvider provider = new ReadHistoryDbProvider();
   GlobalKey anchorKey = GlobalKey();
 
   List mockDatas =[];
-//  List mockDatas = mockData.mockDatas(100, 60.71, 49.67);
   var historyData;
   //数据源
   List showKLineData = [];
 
-
-  AnimationController _controller;
-  Animation<Offset> _animation;
-  Offset _offset = Offset.zero;
   Offset _canvasOffset = Offset.zero;
-  double _scale = 1.0;
-  Offset _normalizedOffset;
-  double _previousScale;
-  double _kMinFlingVelocity = 600.0;
+  double _scale = 0.90;
   StreamSubscription stream;
 
   Repository repository;
 
+  Offset startPosition;// 开始接触位置
+  Offset endPosition;// 结束接触位置
+  int startTouchTime;// 开始接触时间
+  int endTouchTime;// 开始接触时间
+  int minTouchTime = 150; // 最短接触时间，接触到滑动小于：出现十字左边，显示价格，否则滑动klin
+  bool isShowCross = false;  // 是否显示十字坐标
+  bool isMoveKLin = false;  // 是否在移动klin
+  bool isScale = false;  // 是否缩放
+  Map<num,dynamic> pointerDownPositions = {};
+  Map<num,dynamic> pointerMovePositions = {};
+  int pointerNum = 0; // 手指数量
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this);
     mockDatas = mockData.mockKLineData('2019-04-10', initPrice);
-
+//    mockDatas = mockData.mockData();
 //    dropTable();
 //    mockDatas.forEach((item) async {
 //      await inserData(item);
@@ -146,12 +167,6 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
     stream = Code.eventBus.on<KLineDataInEvent>().listen((event) {
       setState(() {
         repository = event.repository;
-      });
-    });
-
-    _controller.addListener(() {
-      setState(() {
-        _offset = _animation.value;
       });
     });
   }
@@ -178,67 +193,16 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
       stream.cancel();
       stream = null;
     }
-
-    _controller.dispose();
   }
 
 
-
-  Offset _clampOffset(Offset offset) {
-    final Size size = context.size;
-    // widget的屏幕宽度
-    final Offset minOffset = Offset(size.width, size.height) * (1.0 - _scale);
-    // 限制他的最小尺寸
-    return Offset(
-        offset.dx.clamp(minOffset.dx, 0.0), offset.dy.clamp(minOffset.dy, 0.0));
-  }
-
-  void _handleOnScaleStart(ScaleStartDetails details) {
-    setState(() {
-      _previousScale = _scale;
-      _normalizedOffset = (details.focalPoint - _offset) / _scale;
-      // 计算图片放大后的位置
-      _controller.stop();
-    });
-  }
-
-  void _handleOnScaleUpdate(ScaleUpdateDetails details) {
-    setState(() {
-      _scale = (_previousScale * details.scale).clamp(1.0, 3.0);
-      // 限制放大倍数 1~3倍
-      _offset = _clampOffset(details.focalPoint - _normalizedOffset * _scale);
-      // 更新当前位置
-    });
-  }
-
-  void _handleOnScaleEnd(ScaleEndDetails details) {
-    final double magnitude = details.velocity.pixelsPerSecond.distance;
-    if (magnitude < _kMinFlingVelocity) return;
-    final Offset direction = details.velocity.pixelsPerSecond / magnitude;
-    // 计算当前的方向
-    final double distance = (Offset.zero & context.size).shortestSide;
-    // 计算放大倍速，并相应的放大宽和高，比如原来是600*480的图片，放大后倍数为1.25倍时，宽和高是同时变化的
-    _animation = _controller.drive(Tween<Offset>(
-        begin: _offset, end: _clampOffset(_offset + direction * distance)));
-    _controller
-      ..value = 0.0
-      ..fling(velocity: magnitude / 1000.0);
-  }
-
-  void _handleOnHorizontalDragStart(details){
-    print('_handleOnHorizontalDragStart $details');
-    onHorizontalDragDistance = 0;
-  }
   /// 获取初始化 画布数据
   initCanvasData(width) async{
     var kLineDistance = kLineWidth+kLineMargin;
     var minLeve = width~/kLineDistance;
     var datas = await provider.getAllData();
     var length= datas.length;
-    print('length-------$length');
-//    List subList = mockDatas.sublist(length-minLeve);
     List subList = await getLimitData(minLeve,length-minLeve);
-    print('last item ===> ${subList[minLeve-1]}');
     setState(() {
       canvasWidth = width;
       maxKlinNum = minLeve;
@@ -246,22 +210,48 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
     });
   }
 
+  /// type 1:缩放 2：放大
+  scaleGetData(width, type) async {
+    var skipDistance = 0.5;
+    if (type == 1) {
+      if (kLineWidth <= minKLineWidth) {
+        return;
+      }
+      dragDistance -= skipDistance;
+      if(dragDistance<skipDistance){
+        dragDistance = skipDistance;
+      }
+
+      kLineWidth = kLineWidth * _scale;
+      kLineMargin = kLineMargin * _scale;
+    } else if (type == 2) {
+      if (kLineWidth >= maxKLineWidth) {
+        return;
+      }
+      dragDistance += skipDistance;
+      kLineWidth = kLineWidth * (2 - _scale);
+      kLineMargin = kLineMargin * (2 - _scale);
+    }
+
+    var kLineDistance = kLineWidth + kLineMargin;
+    var minLeve = width ~/ kLineDistance;
+
+    var lastItemTime = showKLineData.last.kLineDate;
+    List subList = await provider.getScaleDataByTime(lastItemTime, minLeve);
+    setState(() {
+      maxKlinNum = minLeve;
+      showKLineData = subList;
+    });
+  }
 
 
 
-  Future _handleOnHorizontalDragUpdate(details) async {
-//    print('_handleOnHorizontalDragUpdate ${details.delta.dx}');
-
+  Future moveKLine(details) async {
     onHorizontalDragDistance += details.delta.dx;
-
+//    print('onHorizontalDragDistanceonHorizontalDragDistance --- $onHorizontalDragDistance ------- $dragDistance');
     if(details.delta.dx < 0){  /// 向<----滑动，历史数据
-//      print('<------  ${details.delta.dx}');
-//      print('<------onHorizontalDragDistance  $onHorizontalDragDistance');
-//      print('<------  ${(onHorizontalDragDistance/dragDistance).abs()}');
-
-      if((onHorizontalDragDistance/dragDistance).abs()>1){
-        onHorizontalDragDistance += dragDistance;
-
+      if(onHorizontalDragDistance.abs()>dragDistance){
+        onHorizontalDragDistance = 0 ;
         /// 如果是最后时间则没有数据
         if(showKLineData.last.kLineDate.split(' ')[1] == "14:59:59"){
           return;
@@ -273,14 +263,12 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
           showKLineData = newList;
         });
       }
-
-//      print('向左滑动');
     }else{  /// 向--->滑动，最新数据
       if(showKLineData.first.kLineDate.split(' ')[1] == "09:30:59"){
         return;
       }
-      if((onHorizontalDragDistance/dragDistance).abs()>1){
-        onHorizontalDragDistance -= dragDistance;
+      if(onHorizontalDragDistance.abs()>dragDistance){
+        onHorizontalDragDistance = 0 ;
         var time = showKLineData[showKLineData.length-1].kLineDate;
         var newList = await provider.getDataByTime(time,maxKlinNum,direction:'right');
         setState(() {
@@ -290,10 +278,21 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
     }
   }
 
-
-
-
-
+  /**
+   *  PointerEvent  timeStamp  4:45:05.708000
+   *  如果小时前没0需要加上0
+   *  转换成秒
+   */
+  int getSecond(Duration timeStamp){
+    DateTime second;
+    List s =  timeStamp.toString().split(":");
+    if(s[0].length==1){
+      second = DateTime.parse('2019-04-10 0$timeStamp');
+    }else{
+      second = DateTime.parse('2019-04-10 $timeStamp');
+    }
+    return second.millisecondsSinceEpoch;
+  }
 
   static inserData(item)async{
     ReadHistoryDbProvider provider = new ReadHistoryDbProvider();
@@ -301,46 +300,113 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
   }
 
 
-  void _handleOnHorizontalDragEnd(details)async{
-    onHorizontalDragDistance = 0;
-  }
+  /// 开始触摸
+  void _handelOnPointerDown(PointerDownEvent details) {
+    /// 元素位置
+    RenderBox renderBox = anchorKey.currentContext.findRenderObject();
+    _canvasOffset =  renderBox.localToGlobal(Offset.zero);
 
-//  void _handleOnTapDown(TapDownDetails details)async{
-//    setState(() {
-//      onTapDownDtails = details;
-//    });
-//  }
-//
-  void _handleOnPanDown(DragDownDetails details)async{
+    startTouchTime = getSecond(details.timeStamp);
+
+    startPosition = details.position;
+    pointerNum++;
+    pointerDownPositions[details.pointer] = details;
+
+    if(pointerDownPositions.length>=2){
+      isScale = true;
+      isShowCross = false;  //两个手指的时候不显示十字坐标
+    }else{
+      isScale = false;
+    }
+
     setState(() {
-
-      /// 元素位置
-      RenderBox renderBox = anchorKey.currentContext.findRenderObject();
-      _canvasOffset =  renderBox.localToGlobal(Offset.zero);
-
-      onTapDownDtails = details.globalPosition - _canvasOffset;
     });
+
   }
-  void _handleOnPanStart(DragStartDetails details)async{
-//    setState(() {
-//      onTapDownDtails = details.globalPosition - _canvasOffset;
-//    });
-  }
-  void _handleOnPanUpdate(DragUpdateDetails details)async{
+
+  /// 移动
+  Future _handelOnPointerMove(details) async {
+    endPosition = details.position;
+
+    /// 滑动Klin, 两个手指的时候不能滑动
+    if (!isShowCross && !isScale) {
+      moveKLine(details);
+    }
+
     setState(() {
-      onTapDownDtails = details.globalPosition - _canvasOffset;
+      onTapDownDtails = details.position - _canvasOffset;
     });
+
+    /// 缩放动作
+    if(isScale){
+      if(details.delta.dx!=0 && details.delta.dy!=0){
+        var pointerKey = details.pointer;
+        var otherOpinterKey;
+        pointerMovePositions[pointerKey] = details;
+        for(var key in pointerDownPositions.keys){
+          if(key != pointerKey){
+            otherOpinterKey = key;
+          }
+        }
+        var px,py; /// 初始的时候一个手指动，就和另外一个初始点比较距离
+        if(pointerMovePositions[otherOpinterKey] == null){
+          px = pointerDownPositions[otherOpinterKey].position.dx;
+          py = pointerDownPositions[otherOpinterKey].position.dy;
+        }else{
+          px = pointerMovePositions[otherOpinterKey].position.dx;
+          py = pointerMovePositions[otherOpinterKey].position.dy;
+        }
+
+        var a = (pointerMovePositions[pointerKey].position.dx-px).abs();
+        var b = (pointerMovePositions[pointerKey].position.dy-py).abs();
+        var pointerMovePositionsDistance = a + b;  // 距离直角三角形斜边
+
+        var a1 = (pointerDownPositions[pointerKey].position.dx-pointerDownPositions[otherOpinterKey].position.dx).abs();
+        var b1 = (pointerDownPositions[pointerKey].position.dy-pointerDownPositions[otherOpinterKey].position.dy).abs();
+        var pointerDownPositionsDistance = a1+b1;
+
+        if(pointerDownPositionsDistance<pointerMovePositionsDistance){
+          if((pointerDownPositionsDistance-pointerMovePositionsDistance).abs()>scaleDistance){
+//              print('放大 ---------${pointerMovePositionsDistance - pointerDownPositionsDistance}');
+            pointerDownPositions[pointerKey] = pointerMovePositions[pointerKey];
+            scaleGetData(canvasWidth,2);
+          }
+        }else{
+          if((pointerDownPositionsDistance-pointerMovePositionsDistance).abs()>scaleDistance){
+//              print('缩放 ---------${pointerMovePositionsDistance - pointerDownPositionsDistance}');
+            pointerDownPositions[pointerKey] = pointerMovePositions[pointerKey];
+            scaleGetData(canvasWidth,1);
+          }
+        }
+      }
+    }
   }
-  void _handleOnPanEnd(DragEndDetails details)async{
+
+  /// 结束触摸
+  Future _handelOnPointerUp(details) async {
+    pointerNum--;
+    pointerDownPositions.remove(details.pointer);
+    pointerMovePositions.remove(details.pointer);
+
+    if(pointerDownPositions.length<2){
+      isScale = false;
+    }
+    endTouchTime = getSecond(details.timeStamp);
+    endPosition = details.position;
+    // 十字坐标
+    if(endTouchTime-startTouchTime< minTouchTime ){
+      setState(() {
+        isShowCross = !isShowCross;
+        if(isShowCross){
+          onTapDownDtails = details.position - _canvasOffset;
+        }
+      });
+    }
 
   }
 
-  void _handleOnLongPress()async{
-    print("_handleOnLongPress-----details");
-  }
-
-  void _handleOnLongPressUp()async{
-
+  void _handelOnPointerCancel(details) {
+    print('_handelOnPointerCancel --------$details');
   }
 
   @override
@@ -359,29 +425,16 @@ class PhotoState extends State<Photo> with SingleTickerProviderStateMixin {
             child: Row(
               children: <Widget>[
                 Expanded(
-                  child: GestureDetector(
-//                    onLongPress: _handleOnLongPress,
-//                    onLongPressUp: _handleOnLongPressUp,
-                    onPanDown: _handleOnPanDown,
-                    onPanStart: _handleOnPanStart,
-                    onPanUpdate: _handleOnPanUpdate,
-                    onPanEnd: _handleOnPanEnd,
-//                    onScaleStart: _handleOnScaleStart,
-//                    onScaleUpdate: _handleOnScaleUpdate,
-//                    onScaleEnd: _handleOnScaleEnd,
-                    onHorizontalDragStart:_handleOnHorizontalDragStart,
-                    onHorizontalDragUpdate:_handleOnHorizontalDragUpdate,
-                    onHorizontalDragEnd:_handleOnHorizontalDragEnd,
-                    child: ClipRect(
-                      key: anchorKey,
-                      child: Transform(
-                          transform: Matrix4.identity()
-                            ..translate(_offset.dx, _offset.dy)
-                            ..scale(_scale),
-//                          child:new MyCustomCircle(showKLineData,initPrice,kLineWidth,kLineMargin,onTapDownDtails,isShowCross)
+                  child:Listener(
+                      child: ClipRect(
+                        key: anchorKey,
+                        child: new KLineComponent(showKLineData,initPrice,kLineWidth,kLineMargin,onTapDownDtails,isShowCross),
+                        // child: Image.network(widget.url,fit: BoxFit.cover,),
                       ),
-                      // child: Image.network(widget.url,fit: BoxFit.cover,),
-                    ),
+                      onPointerDown:_handelOnPointerDown,
+                      onPointerUp: _handelOnPointerUp,
+                      onPointerMove: _handelOnPointerMove,
+                      onPointerCancel: _handelOnPointerCancel
                   ),
                 ),
                 Container(

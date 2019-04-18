@@ -10,8 +10,8 @@ class ListPageState extends State<ListPage> with AutomaticKeepAliveClientMixin,S
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   TabController _tabController;
   final List<Tab> myTabs = <Tab>[
-    new Tab(text: 'Tab1'),
-    new Tab(text: 'Tab2'),
+    new Tab(text: '日行情'),
+    new Tab(text: '分钟行情'),
     new Tab(text: 'Tab3'),
     new Tab(text: 'Tab4'),
     new Tab(text: 'Tab5'),
@@ -87,7 +87,6 @@ class ListPageState extends State<ListPage> with AutomaticKeepAliveClientMixin,S
           ),
           elevation: 0,
           primary: true,
-
         ),
         body: new TabBarView(
           controller: _tabController,

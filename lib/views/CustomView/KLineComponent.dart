@@ -1,18 +1,15 @@
 import 'dart:ui';
 
-import 'package:cefcfco_app/common/model/Repository.dart';
 import 'package:cefcfco_app/common/net/Code.dart';
 import 'package:cefcfco_app/common/utils/KLineDataInEvent.dart';
-import 'package:cefcfco_app/common/utils/mockData.dart' as mockData;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'PieData.dart';
 import 'dart:math';
 
 ///自定义  饼状图
 /// @author yinl
-class MyCustomCircle extends StatelessWidget{
+class KLineComponent extends StatelessWidget{
   //数据源
   List datas;
   double initPrice;
@@ -21,7 +18,7 @@ class MyCustomCircle extends StatelessWidget{
   double kLineMargin;
   bool isShowCross;
 
-  MyCustomCircle(this.datas,this.initPrice,this.kLineWidth,this.kLineMargin,this.onTapDownDtails,this.isShowCross);
+  KLineComponent(this.datas,this.initPrice,this.kLineWidth,this.kLineMargin,this.onTapDownDtails,this.isShowCross);
 
   @override
   Widget build(BuildContext context) {
