@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:cefcfco_app/common/model/KLineModel.dart';
 import 'package:cefcfco_app/common/net/Code.dart';
 import 'package:cefcfco_app/common/utils/KLineDataInEvent.dart';
 import 'package:cefcfco_app/common/utils/monotonex.dart';
@@ -72,6 +73,52 @@ class MyView extends CustomPainter{
     canvas.drawPath(path, paint);
   }
 
+
+  List<double> getAverageLineData(List<KLineModel>kLineDatas,int day) {
+    int length = kLineDatas.length;
+    if(length<day){
+      print('getAverageLineData:当前数据数量太少！');
+      return [];
+    }
+    List<double> averagePrices= [];
+
+    List<KLineModel> listForDay = [];
+    int i = 0;
+
+    for(;i<length;i++){
+      if((i+1)%day==0){
+        print('listForDay----$listForDay');
+        double averagePrice = getAveragePrice(listForDay,day);
+        averagePrices.add(averagePrice);
+        listForDay = [];
+      }else{
+        listForDay.add(kLineDatas[i]);
+      }
+    }
+
+    print('averagePrices-----$averagePrices');
+    return averagePrices;
+  }
+
+  /// 获取平均数
+  /// data 行情数据
+  /// day 几天，5日行情，10日行情
+  double getAveragePrice(List<KLineModel>kLineDatas,int day){
+    int length = kLineDatas.length;
+    if(length<day){
+      print('当前数据数量太少！-----length:$length');
+      return null;
+    }
+    var averagePrice=0.0;
+    int i = 0;
+    for(;i<length;i++){
+      averagePrice+=kLineDatas[i].endPrice;
+    }
+    return averagePrice/day;
+  }
+
+
+
   /// 当前横线位置的价格
   void drawPrice(Canvas canvas,lineDyPrice,initPriceText,lineDx,lineDy,canvasWidth,canvasHeight){
     double copyLineDyPrice; // 判断是否一样，防止不不停刷新
@@ -119,7 +166,6 @@ class MyView extends CustomPainter{
 
     var kLineDistance = kLineWidth + kLineMargin;
     double initPrice = (dayMaxPrice+dayMinPrice)/2;
-
 
     TextPaint = new Paint()
     ..color = Colors.black
@@ -190,6 +236,9 @@ class MyView extends CustomPainter{
         new Offset(canvasWidth, _EqualHeight/4*2), _EqualLinePaint);
     canvas.drawLine(new Offset(0, _EqualHeight/4*3),
         new Offset(canvasWidth, _EqualHeight/4*3), _EqualLinePaint);
+
+
+    getAverageLineData(mData,5);
 
     _linePaint..strokeWidth =1.3;
     mData.asMap().forEach((i, line) {
@@ -303,8 +352,6 @@ class MyView extends CustomPainter{
           return ;
         }
       }
-
-
     }
 
 

@@ -169,7 +169,7 @@ class DayKLineState extends State<DayKLine> {
   List<double> getAveragePrice(List<KLineModel>kLineDatas,int day){
     int length = kLineDatas.length;
     if(length<day){
-      print('当前数据数量太少！');
+      print('当前数据数量太少！-----length:$length');
       return [];
     }
     List<double> averagePrices= [];
