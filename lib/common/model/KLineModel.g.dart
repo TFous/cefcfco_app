@@ -1,13 +1,13 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'KLineRepository.dart';
+part of 'KLineModel.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-KLineRepository _$RepositoryFromJson(Map<String, dynamic> json) {
-  return KLineRepository(
+KLineModel _$RepositoryFromJson(Map<String, dynamic> json) {
+  return KLineModel(
       json['id'] as int,
       json['kLineDate'] as String,
       (json['startPrice'] as num)?.toDouble(),
@@ -16,7 +16,7 @@ KLineRepository _$RepositoryFromJson(Map<String, dynamic> json) {
       (json['minPrice'] as num)?.toDouble());
 }
 
-Map<String, dynamic> _$RepositoryToJson(KLineRepository instance) =>
+Map<String, dynamic> _$RepositoryToJson(KLineModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'kLineDate': instance.kLineDate,

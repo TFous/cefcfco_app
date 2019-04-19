@@ -1,8 +1,8 @@
 
-import 'package:cefcfco_app/common/model/KLineRepository.dart';
+import 'package:cefcfco_app/common/model/KLineModel.dart';
 
 class KLineDataInEvent {
-  KLineRepository repository;
+  KLineModel repository;
 
   KLineDataInEvent(this.repository);
 }

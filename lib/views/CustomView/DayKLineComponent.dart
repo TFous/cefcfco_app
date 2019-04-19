@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:cefcfco_app/common/net/Code.dart';
 import 'package:cefcfco_app/common/utils/KLineDataInEvent.dart';
+import 'package:cefcfco_app/common/utils/monotonex.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -36,6 +37,13 @@ class DayKLineComponent extends StatelessWidget{
 
 }
 
+class LinearSales {
+  final int year;
+  final int sales;
+
+  LinearSales(this.year, this.sales);
+}
+
 class MyView extends CustomPainter{
   double animValue;
   Paint _mPaint;
@@ -57,6 +65,12 @@ class MyView extends CustomPainter{
 
   MyView(this.mData,this.dayMaxPrice,this.dayMinPrice,this.kLineWidth,this.kLineMargin,this.onTapDownDtails,this.isShowCross);
 
+  void _drawSmoothLine(Canvas canvas, Paint paint, List<Point> points) {
+    final path = new Path()
+      ..moveTo(points.first.x.toDouble(), points.first.y.toDouble());
+    MonotoneX.addCurve(path, points);
+    canvas.drawPath(path, paint);
+  }
 
   /// 当前横线位置的价格
   void drawPrice(Canvas canvas,lineDyPrice,initPriceText,lineDx,lineDy,canvasWidth,canvasHeight){
@@ -104,10 +118,7 @@ class MyView extends CustomPainter{
     /// 55.19 ==> initPrice
 
     var kLineDistance = kLineWidth + kLineMargin;
-      print('dayMaxPrice---$dayMaxPrice  --- $dayMinPrice');
     double initPrice = (dayMaxPrice+dayMinPrice)/2;
-
-
 
 
     TextPaint = new Paint()
@@ -296,6 +307,18 @@ class MyView extends CustomPainter{
 
     }
 
+
+    final random = new Random();
+    final data = [
+      Point(10.0,random.nextDouble()*100),
+      Point(50.0,random.nextDouble()*100),
+      Point(90.0,random.nextDouble()*100),
+      Point(130.0,random.nextDouble()*100),
+      Point(170.0,random.nextDouble()*100),
+      Point(200.0,random.nextDouble()*100),
+    ];
+
+    _drawSmoothLine(canvas,TextPaint,data);
 
     ///绘制逻辑与Android差不多
     canvas.save();

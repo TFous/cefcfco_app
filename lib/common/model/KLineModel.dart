@@ -5,10 +5,10 @@ import 'package:json_annotation/json_annotation.dart';
  * Date: 2018-07-31
  */
 
-part 'KLineRepository.g.dart';
+part 'KLineModel.g.dart';
 
 @JsonSerializable()
-class KLineRepository {
+class KLineModel {
 
   int id;
 
@@ -32,7 +32,7 @@ class KLineRepository {
     return 'id:$id,kLineDate:$kLineDate';
   }
 
-  KLineRepository(
+  KLineModel(
     this.id,
     this.kLineDate,
     this.startPrice,
@@ -41,9 +41,9 @@ class KLineRepository {
     this.minPrice
   );
 
-  factory KLineRepository.fromJson(Map<String, dynamic> json) => _$RepositoryFromJson(json);
+  factory KLineModel.fromJson(Map<String, dynamic> json) => _$RepositoryFromJson(json);
 
   Map<String, dynamic> toJson() => _$RepositoryToJson(this);
 
-  KLineRepository.empty();
+  KLineModel.empty();
 }

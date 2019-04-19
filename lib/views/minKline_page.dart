@@ -16,7 +16,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:cefcfco_app/common/config/Config.dart';
-import 'package:cefcfco_app/common/model/KLineRepository.dart';
+import 'package:cefcfco_app/common/model/KLineModel.dart';
 import 'package:cefcfco_app/common/net/Code.dart';
 import 'package:cefcfco_app/common/provider/repos/ReadHistoryDbProvider.dart';
 import 'package:cefcfco_app/common/utils/KLineDataInEvent.dart';
@@ -64,7 +64,7 @@ class MinKLineState extends State<MinKLine> {
   double _scale = 0.90;
   StreamSubscription stream;
 
-  KLineRepository repository;
+  KLineModel repository;
 
   Offset startPosition;// 开始接触位置
   Offset endPosition;// 结束接触位置

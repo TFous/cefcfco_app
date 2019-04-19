@@ -16,7 +16,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:cefcfco_app/common/config/Config.dart';
-import 'package:cefcfco_app/common/model/KLineRepository.dart';
+import 'package:cefcfco_app/common/model/KLineModel.dart';
 import 'package:cefcfco_app/common/net/Code.dart';
 import 'package:cefcfco_app/common/provider/repos/ReadHistoryDbProvider.dart';
 import 'package:cefcfco_app/common/utils/KLineDataInEvent.dart';
@@ -64,11 +64,11 @@ class DayKLineState extends State<DayKLine> {
   double _scale = 0.90;
   StreamSubscription stream;
 
-  KLineRepository repository;
+  KLineModel repository;
 
 
-  KLineRepository firstData;
-  KLineRepository lastData;
+  KLineModel firstData;
+  KLineModel lastData;
   Offset startPosition;// 开始接触位置
   Offset endPosition;// 结束接触位置
   int startTouchTime;// 开始接触时间
@@ -84,8 +84,8 @@ class DayKLineState extends State<DayKLine> {
   @override
   void initState() {
     super.initState();
-    List mockDatas = mockData.mockData();
 //    dropTable();
+//    List mockDatas = mockData.mockData();
 //    mockDatas.forEach((item) async {
 //      await provider.insert(item[0],item[1],item[2],item[3],item[4]);
 //    });
@@ -98,8 +98,9 @@ class DayKLineState extends State<DayKLine> {
   }
 
   dropTable()async{
+    print('////////////////////正在删除////////////////////////');
     await provider.dropTable();
-    print('删除成功');
+    print('////////////////////删除成功////////////////////////');
   }
 
   getAllData()async{
@@ -110,6 +111,7 @@ class DayKLineState extends State<DayKLine> {
     return await provider.getInitData(limit,offset);
   }
 
+  /// 获取当前所有数据中最高和最低值
   Map<String, double> getMaxAndMin(lineData) {
     double maxPrice;
     double minPrice;
@@ -132,6 +134,65 @@ class DayKLineState extends State<DayKLine> {
       "minPrice": minPrice
     };
   }
+
+
+  List<double> getAverageLineData(List<KLineModel>kLineDatas,int day) {
+    int length = kLineDatas.length;
+    if(length<day){
+      print('当前数据数量太少！');
+      return [];
+    }
+    List<double> averagePrices= [];
+
+    List<KLineModel> listForDay = [];
+    int i = 0;
+
+    for(;i<length;i++){
+      if(i%day==0){
+
+
+
+
+
+        listForDay = [];
+      }else{
+        listForDay.add(kLineDatas[i]);
+      }
+    }
+
+    return averagePrices;
+
+  }
+
+  /// data 行情数据
+  /// day 几天，5日行情，10日行情
+  List<double> getAveragePrice(List<KLineModel>kLineDatas,int day){
+    int length = kLineDatas.length;
+    if(length<day){
+      print('当前数据数量太少！');
+      return [];
+    }
+    List<double> averagePrices= [];
+
+    List<KLineModel> listForDay = [];
+    int i = 0;
+
+    for(;i<length;i++){
+      if(i%day==0){
+
+
+
+
+
+        listForDay = [];
+      }else{
+        listForDay.add(kLineDatas[i]);
+      }
+    }
+
+    return averagePrices;
+  }
+
 
 
   @override
@@ -157,8 +218,8 @@ class DayKLineState extends State<DayKLine> {
     List subList = await getLimitData(minLeve,length-minLeve);
     Map maxAndMin = getMaxAndMin(subList);
     setState(() {
-      dayMaxPrice = maxAndMin['maxPrice'];
-      dayMinPrice = maxAndMin['minPrice'];
+      dayMaxPrice = maxAndMin['maxPrice']??0.0;
+      dayMinPrice = maxAndMin['minPrice']??0.0;
       canvasWidth = width;
       maxKlinNum = minLeve;
       showKLineData = subList;
@@ -192,7 +253,7 @@ class DayKLineState extends State<DayKLine> {
     var minLeve = width ~/ kLineDistance;
 
     var lastItemTime = showKLineData.last.kLineDate;
-    List subList = await provider.getScaleDataByTime(lastItemTime, minLeve);
+    List<KLineModel> subList = await provider.getScaleDataByTime(lastItemTime, minLeve);
     Map maxAndMin = getMaxAndMin(subList);
     setState(() {
       dayMaxPrice = maxAndMin['maxPrice'];
