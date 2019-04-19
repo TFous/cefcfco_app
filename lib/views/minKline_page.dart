@@ -15,7 +15,8 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:cefcfco_app/common/model/Repository.dart';
+import 'package:cefcfco_app/common/config/Config.dart';
+import 'package:cefcfco_app/common/model/KLineRepository.dart';
 import 'package:cefcfco_app/common/net/Code.dart';
 import 'package:cefcfco_app/common/provider/repos/ReadHistoryDbProvider.dart';
 import 'package:cefcfco_app/common/utils/KLineDataInEvent.dart';
@@ -50,7 +51,7 @@ class MinKLineState extends State<MinKLine> {
   double dragDistance = 3.0; /// 滑动距离，用于判断多长距离请求一次
   double scaleDistance = 18.0; /// 滑动距离，用于判断多长距离请求一次
   Offset onTapDownDtails; /// 点击坐标
-  ReadHistoryDbProvider provider = new ReadHistoryDbProvider("DB_minKLine");
+  ReadHistoryDbProvider provider = new ReadHistoryDbProvider("DB_minKLine",Config.KLINE_DAY);
   GlobalKey anchorKey = GlobalKey();
 
   List mockDatas =[];
@@ -63,7 +64,7 @@ class MinKLineState extends State<MinKLine> {
   double _scale = 0.90;
   StreamSubscription stream;
 
-  Repository repository;
+  KLineRepository repository;
 
   Offset startPosition;// 开始接触位置
   Offset endPosition;// 结束接触位置

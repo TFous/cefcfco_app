@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:cefcfco_app/common/provider/SqlProvider.dart';
-import 'package:cefcfco_app/common/model/Repository.dart';
+import 'package:cefcfco_app/common/model/KLineRepository.dart';
 import 'package:cefcfco_app/common/config/Config.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:cefcfco_app/common/utils/CodeUtils.dart';
@@ -18,6 +18,7 @@ import 'package:cefcfco_app/common/utils/CodeUtils.dart';
 /// 当前分钟最高价格，
 /// 当前分钟最低价格，
 class ReadHistoryDbProvider extends BaseDbProvider {
+  String dataType;
   String name;
   final String columnId = "id";
   final String columnDateTime = "kLineDate";
@@ -36,7 +37,7 @@ class ReadHistoryDbProvider extends BaseDbProvider {
   int readDate;
   String data;
 
-  ReadHistoryDbProvider(this.name);
+  ReadHistoryDbProvider(this.name,this.dataType);
 
   Map<String, dynamic> toMap(String kLineDate, double startPrice, double endPrice,double maxPrice,double minPrice) {
     Map<String, dynamic> map = {
@@ -124,13 +125,13 @@ class ReadHistoryDbProvider extends BaseDbProvider {
   }
 
 
-  Future<List<Repository>> getAllData() async {
+  Future<List<KLineRepository>> getAllData() async {
     Database db = await getDataBase();
     var provider = await db.rawQuery('SELECT * FROM $name ORDER BY $columnDateTime ASC' );
     if (provider != null) {
-      List<Repository> list = new List();
+      List<KLineRepository> list = new List();
       for (var providerMap in provider) {
-        list.add(Repository.fromJson(providerMap));
+        list.add(KLineRepository.fromJson(providerMap));
       }
       return list;
     }
@@ -138,13 +139,13 @@ class ReadHistoryDbProvider extends BaseDbProvider {
   }
 
 
-  Future<List<Repository>> getInitData(limit,offset) async {
+  Future<List<KLineRepository>> getInitData(limit,offset) async {
     Database db = await getDataBase();
     var provider = await db.rawQuery('SELECT * FROM $name ORDER BY $columnDateTime ASC LIMIT $limit OFFSET $offset');
     if (provider != null) {
-      List<Repository> list = new List();
+      List<KLineRepository> list = new List();
       for (var providerMap in provider) {
-        list.add(Repository.fromJson(providerMap));
+        list.add(KLineRepository.fromJson(providerMap));
       }
       return list;
     }
@@ -153,7 +154,7 @@ class ReadHistoryDbProvider extends BaseDbProvider {
 
 
 
-  Future<List<Repository>> getScaleDataByTime(time,limit) async {
+  Future<List<KLineRepository>> getScaleDataByTime(time,limit) async {
     Database db = await getDataBase();
     List provider = [];
     List otherItem =[];
@@ -164,12 +165,12 @@ class ReadHistoryDbProvider extends BaseDbProvider {
       otherItem = await db.rawQuery("SELECT * FROM $name WHERE $columnDateTime > '$time' ORDER BY $columnDateTime ASC LIMIT ${limit-providerLength}");
     }
     if (provider != null) {
-      List<Repository> list = new List();
+      List<KLineRepository> list = new List();
       for (var providerMap in provider) {
-        list.add(Repository.fromJson(providerMap));
+        list.add(KLineRepository.fromJson(providerMap));
       }
       for(var item in otherItem){
-        list.add(Repository.fromJson(item));
+        list.add(KLineRepository.fromJson(item));
       }
 
       return list;
@@ -179,7 +180,7 @@ class ReadHistoryDbProvider extends BaseDbProvider {
 
 
 
-  Future<List<Repository>> getDataByTime(time,limit,{direction:'right'}) async {
+  Future<List<KLineRepository>> getDataByTime(time,limit,{direction:'right'}) async {
     Database db = await getDataBase();
     var provider;
 //    var _symbol = direction=='right'?'<':'>';
@@ -190,9 +191,9 @@ class ReadHistoryDbProvider extends BaseDbProvider {
       provider = await db.rawQuery("select * from (SELECT * FROM $name WHERE $columnDateTime > '$time' ORDER BY $columnDateTime ASC LIMIT $limit) ORDER BY $columnDateTime ASC");
     }
     if (provider != null) {
-      List<Repository> list = new List();
+      List<KLineRepository> list = new List();
       for (var providerMap in provider) {
-        list.add(Repository.fromJson(providerMap));
+        list.add(KLineRepository.fromJson(providerMap));
       }
       return list;
     }
@@ -201,13 +202,13 @@ class ReadHistoryDbProvider extends BaseDbProvider {
 
 
   ///获取事件数据
-  Future<List<Repository>> geData(int page) async {
+  Future<List<KLineRepository>> geData(int page) async {
     Database db = await getDataBase();
     var provider = await _getProvider(db, page);
     if (provider != null) {
-      List<Repository> list = new List();
+      List<KLineRepository> list = new List();
       for (var providerMap in provider) {
-        list.add(Repository.fromJson(providerMap));
+        list.add(KLineRepository.fromJson(providerMap));
       }
       return list;
     }

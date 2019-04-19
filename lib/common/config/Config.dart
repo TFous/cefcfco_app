@@ -15,4 +15,10 @@ class Config {
   static const REFRESH_LANGUAGE = "refreshLanguageApp";
   static const THEME_COLOR = "theme-color";
   static const LOCALE = "locale";
+
+
+/// ////////////////////////////////k线图//////////////////////////////
+  static const KLINE_DAY = "kline_day";
+  static const KLINE_MIN = "kline_min";
+
 }

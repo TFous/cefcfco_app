@@ -9,7 +9,7 @@ import 'dart:math';
 
 ///自定义  饼状图
 /// @author yinl
-class KLineComponent extends StatelessWidget{
+class DayKLineComponent extends StatelessWidget{
   //数据源
   List datas;
   double initPrice;
@@ -17,8 +17,10 @@ class KLineComponent extends StatelessWidget{
   Offset onTapDownDtails;
   double kLineMargin;
   bool isShowCross;
+  double dayMinPrice;
+  double dayMaxPrice;
 
-  KLineComponent(this.datas,this.initPrice,this.kLineWidth,this.kLineMargin,this.onTapDownDtails,this.isShowCross);
+  DayKLineComponent(this.datas,this.dayMaxPrice,this.dayMinPrice,this.kLineWidth,this.kLineMargin,this.onTapDownDtails,this.isShowCross);
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +29,7 @@ class KLineComponent extends StatelessWidget{
       height: size.height,
       width: size.width,
       child: CustomPaint(
-          painter: MyView(datas,initPrice,kLineWidth,kLineMargin,onTapDownDtails,isShowCross)
+          painter: MyView(datas,this.dayMaxPrice,this.dayMinPrice,kLineWidth,kLineMargin,onTapDownDtails,isShowCross)
       ),
     );
   }
@@ -44,6 +46,8 @@ class MyView extends CustomPainter{
   bool isShowCross;
   double initPrice;
   double kLineWidth;
+  double dayMinPrice;
+  double dayMaxPrice;
   double kLineMargin;
   List kLineOffsets = []; /// k线位置[[dx,dy]]
   double lineWidth = 1.4;/// 线的宽度  譬如十字坐标
@@ -51,7 +55,7 @@ class MyView extends CustomPainter{
 
   var startAngles=[];
 
-  MyView(this.mData,this.initPrice,this.kLineWidth,this.kLineMargin,this.onTapDownDtails,this.isShowCross);
+  MyView(this.mData,this.dayMaxPrice,this.dayMinPrice,this.kLineWidth,this.kLineMargin,this.onTapDownDtails,this.isShowCross);
 
 
   /// 当前横线位置的价格
@@ -100,8 +104,11 @@ class MyView extends CustomPainter{
     /// 55.19 ==> initPrice
 
     var kLineDistance = kLineWidth + kLineMargin;
-    double dayMaxPrice = initPrice*1.1;
-    double dayMinPrice = initPrice*0.9;
+      print('dayMaxPrice---$dayMaxPrice  --- $dayMinPrice');
+    double initPrice = (dayMaxPrice+dayMinPrice)/2;
+
+
+
 
     TextPaint = new Paint()
     ..color = Colors.black

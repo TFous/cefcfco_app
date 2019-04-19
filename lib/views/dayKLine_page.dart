@@ -15,7 +15,8 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:cefcfco_app/common/model/Repository.dart';
+import 'package:cefcfco_app/common/config/Config.dart';
+import 'package:cefcfco_app/common/model/KLineRepository.dart';
 import 'package:cefcfco_app/common/net/Code.dart';
 import 'package:cefcfco_app/common/provider/repos/ReadHistoryDbProvider.dart';
 import 'package:cefcfco_app/common/utils/KLineDataInEvent.dart';
@@ -24,7 +25,7 @@ import 'package:fluro/fluro.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:cefcfco_app/views/CustomView/KLineComponent.dart';
+import 'package:cefcfco_app/views/CustomView/DayKLineComponent.dart';
 import 'package:cefcfco_app/common/utils/globals.dart' as globals;
 import 'package:cefcfco_app/common/utils/mockData.dart' as mockData;
 
@@ -40,7 +41,8 @@ class DayKLineState extends State<DayKLine> {
   int subscript = 0;
   int index = 0;
   double onHorizontalDragDistance = 0.0; /// 滑动距离
-  double initPrice = 10;
+  double dayMinPrice = 0.0;
+  double dayMaxPrice = 0.0;
   double kLineWidth = 8;
   double minKLineWidth = 4.0;
   double maxKLineWidth = 10.0;
@@ -51,7 +53,7 @@ class DayKLineState extends State<DayKLine> {
   double dragDistance = 3.0; /// 滑动距离，用于判断多长距离请求一次
   double scaleDistance = 18.0; /// 滑动距离，用于判断多长距离请求一次
   Offset onTapDownDtails; /// 点击坐标
-  ReadHistoryDbProvider provider = new ReadHistoryDbProvider('DB_DayKLine');
+  ReadHistoryDbProvider provider = new ReadHistoryDbProvider('DB_DayKLine',Config.KLINE_DAY);
   GlobalKey anchorKey = GlobalKey();
 
   var historyData;
@@ -62,8 +64,11 @@ class DayKLineState extends State<DayKLine> {
   double _scale = 0.90;
   StreamSubscription stream;
 
-  Repository repository;
+  KLineRepository repository;
 
+
+  KLineRepository firstData;
+  KLineRepository lastData;
   Offset startPosition;// 开始接触位置
   Offset endPosition;// 结束接触位置
   int startTouchTime;// 开始接触时间
@@ -105,6 +110,30 @@ class DayKLineState extends State<DayKLine> {
     return await provider.getInitData(limit,offset);
   }
 
+  Map<String, double> getMaxAndMin(lineData) {
+    double maxPrice;
+    double minPrice;
+    lineData.forEach((item) {
+      if (maxPrice != null) {
+        if (maxPrice < item.maxPrice) {
+          maxPrice = item.maxPrice;
+        }
+        if (minPrice > item.minPrice) {
+          minPrice = item.minPrice;
+        }
+      } else {
+        maxPrice = item.maxPrice;
+        minPrice = item.minPrice;
+      }
+    });
+
+    return {
+      "maxPrice": maxPrice,
+      "minPrice": minPrice
+    };
+  }
+
+
   @override
   void dispose() {
     super.dispose();
@@ -119,11 +148,17 @@ class DayKLineState extends State<DayKLine> {
   initCanvasData(width) async{
     var kLineDistance = kLineWidth+kLineMargin;
     var minLeve = width~/kLineDistance;
-    var datas = await provider.getAllData();
-    var length= datas.length;
+    var allData = await provider.getAllData();
+    var length= allData.length;
+    firstData = allData.first;
+    lastData = allData.last;
+
+
     List subList = await getLimitData(minLeve,length-minLeve);
-    print('subList-------$subList');
+    Map maxAndMin = getMaxAndMin(subList);
     setState(() {
+      dayMaxPrice = maxAndMin['maxPrice'];
+      dayMinPrice = maxAndMin['minPrice'];
       canvasWidth = width;
       maxKlinNum = minLeve;
       showKLineData = subList;
@@ -158,7 +193,10 @@ class DayKLineState extends State<DayKLine> {
 
     var lastItemTime = showKLineData.last.kLineDate;
     List subList = await provider.getScaleDataByTime(lastItemTime, minLeve);
+    Map maxAndMin = getMaxAndMin(subList);
     setState(() {
+      dayMaxPrice = maxAndMin['maxPrice'];
+      dayMinPrice = maxAndMin['minPrice'];
       maxKlinNum = minLeve;
       showKLineData = subList;
     });
@@ -172,25 +210,32 @@ class DayKLineState extends State<DayKLine> {
       if(onHorizontalDragDistance.abs()>dragDistance){
         onHorizontalDragDistance = 0 ;
         /// 如果是最后时间则没有数据
-//        if(showKLineData.last.kLineDate.split(' ')[1] == "14:59:59"){
-//          return;
-//        }
+        if(showKLineData.last.kLineDate == lastData.kLineDate){
+          print('showKLineData.last.kLineDate---${showKLineData.last.kLineDate}--${lastData.kLineDate}');
+          return;
+        }
 
         var time = showKLineData.first.kLineDate;
         var newList = await provider.getDataByTime(time,maxKlinNum,direction:'left');
+        Map maxAndMin = getMaxAndMin(newList);
         setState(() {
+          dayMaxPrice = maxAndMin['maxPrice'];
+          dayMinPrice = maxAndMin['minPrice'];
           showKLineData = newList;
         });
       }
     }else{  /// 向--->滑动，最新数据
-//      if(showKLineData.first.kLineDate.split(' ')[1] == "09:30:59"){
-//        return;
-//      }
+      if(showKLineData.first.kLineDate == firstData.kLineDate){
+        return;
+      }
       if(onHorizontalDragDistance.abs()>dragDistance){
         onHorizontalDragDistance = 0 ;
         var time = showKLineData[showKLineData.length-1].kLineDate;
         var newList = await provider.getDataByTime(time,maxKlinNum,direction:'right');
+        Map maxAndMin = getMaxAndMin(newList);
         setState(() {
+          dayMaxPrice = maxAndMin['maxPrice'];
+          dayMinPrice = maxAndMin['minPrice'];
           showKLineData = newList;
         });
       }
@@ -343,7 +388,7 @@ class DayKLineState extends State<DayKLine> {
             child:Listener(
                 child: ClipRect(
                   key: anchorKey,
-                  child: new KLineComponent(showKLineData,initPrice,kLineWidth,kLineMargin,onTapDownDtails,isShowCross),
+                  child: new DayKLineComponent(showKLineData,dayMaxPrice,dayMinPrice,kLineWidth,kLineMargin,onTapDownDtails,isShowCross),
                 ),
                 onPointerDown:_handelOnPointerDown,
                 onPointerUp: _handelOnPointerUp,
