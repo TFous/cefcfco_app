@@ -50,7 +50,7 @@ class MinKLineState extends State<MinKLine> {
   double dragDistance = 3.0; /// 滑动距离，用于判断多长距离请求一次
   double scaleDistance = 18.0; /// 滑动距离，用于判断多长距离请求一次
   Offset onTapDownDtails; /// 点击坐标
-  ReadHistoryDbProvider provider = new ReadHistoryDbProvider();
+  ReadHistoryDbProvider provider = new ReadHistoryDbProvider("DB_minKLine");
   GlobalKey anchorKey = GlobalKey();
 
   List mockDatas =[];
@@ -84,7 +84,7 @@ class MinKLineState extends State<MinKLine> {
 //    mockDatas = mockData.mockData();
 //    dropTable();
 //    mockDatas.forEach((item) async {
-//      await inserData(item);
+//      await provider.insert(item[0],item[1],item[2],item[3],item[4]);
 //    });
 
     stream = Code.eventBus.on<KLineDataInEvent>().listen((event) {
@@ -95,13 +95,11 @@ class MinKLineState extends State<MinKLine> {
   }
 
   dropTable()async{
-    ReadHistoryDbProvider provider = new ReadHistoryDbProvider();
     await provider.dropTable();
     print('删除成功');
   }
 
   getAllData()async{
-    ReadHistoryDbProvider provider = new ReadHistoryDbProvider();
     return await provider.getAllData();
   }
 
@@ -215,11 +213,6 @@ class MinKLineState extends State<MinKLine> {
       second = DateTime.parse('2019-04-10 $timeStamp');
     }
     return second.millisecondsSinceEpoch;
-  }
-
-  static inserData(item)async{
-    ReadHistoryDbProvider provider = new ReadHistoryDbProvider();
-    return provider.insert(item[0],item[1],item[2],item[3],item[4]);
   }
 
 

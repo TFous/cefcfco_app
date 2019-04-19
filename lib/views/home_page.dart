@@ -8,7 +8,6 @@ import 'package:cefcfco_app/routers/application.dart';
 import 'package:cefcfco_app/views/about_page.dart';
 import 'package:cefcfco_app/views/minKline_page.dart';
 import 'package:cefcfco_app/views/user_page.dart';
-import 'package:cefcfco_app/views/CustomView/DemoPage.dart';
 
 import 'package:cefcfco_app/common/utils/globals.dart' as globals;
 

@@ -18,7 +18,7 @@ import 'package:cefcfco_app/common/utils/CodeUtils.dart';
 /// 当前分钟最高价格，
 /// 当前分钟最低价格，
 class ReadHistoryDbProvider extends BaseDbProvider {
-  final String name = 'KLineHistory';
+  String name;
   final String columnId = "id";
   final String columnDateTime = "kLineDate";
   final String columnStartPrice = "startPrice";
@@ -36,7 +36,7 @@ class ReadHistoryDbProvider extends BaseDbProvider {
   int readDate;
   String data;
 
-  ReadHistoryDbProvider();
+  ReadHistoryDbProvider(this.name);
 
   Map<String, dynamic> toMap(String kLineDate, double startPrice, double endPrice,double maxPrice,double minPrice) {
     Map<String, dynamic> map = {
