@@ -59,6 +59,9 @@ class DayKLineState extends State<DayKLine> {
   var historyData;
   //数据源
   List showKLineData = [];
+  List day5Data = [];
+  List day10Data = [];
+
 
   Offset _canvasOffset = Offset.zero;
   double _scale = 0.90;
@@ -136,65 +139,6 @@ class DayKLineState extends State<DayKLine> {
   }
 
 
-  List<double> getAverageLineData(List<KLineModel>kLineDatas,int day) {
-    int length = kLineDatas.length;
-    if(length<day){
-      print('当前数据数量太少！');
-      return [];
-    }
-    List<double> averagePrices= [];
-
-    List<KLineModel> listForDay = [];
-    int i = 0;
-
-    for(;i<length;i++){
-      if(i%day==0){
-
-
-
-
-
-        listForDay = [];
-      }else{
-        listForDay.add(kLineDatas[i]);
-      }
-    }
-
-    return averagePrices;
-
-  }
-
-  /// data 行情数据
-  /// day 几天，5日行情，10日行情
-  List<double> getAveragePrice(List<KLineModel>kLineDatas,int day){
-    int length = kLineDatas.length;
-    if(length<day){
-      print('当前数据数量太少！-----length:$length');
-      return [];
-    }
-    List<double> averagePrices= [];
-
-    List<KLineModel> listForDay = [];
-    int i = 0;
-
-    for(;i<length;i++){
-      if(i%day==0){
-
-
-
-
-
-        listForDay = [];
-      }else{
-        listForDay.add(kLineDatas[i]);
-      }
-    }
-
-    return averagePrices;
-  }
-
-
-
   @override
   void dispose() {
     super.dispose();
@@ -216,11 +160,15 @@ class DayKLineState extends State<DayKLine> {
 
 
     List subList = await getLimitData(minLeve,length-minLeve);
+    List day5Datas = await getLimitData(minLeve+4,length-minLeve-4);
+    List day10Datas = await getLimitData(minLeve+9,length-minLeve-9);
     Map maxAndMin = getMaxAndMin(subList);
     setState(() {
       dayMaxPrice = maxAndMin['maxPrice']??0.0;
       dayMinPrice = maxAndMin['minPrice']??0.0;
       canvasWidth = width;
+      day5Data = day5Datas;
+      day10Data = day10Datas;
       maxKlinNum = minLeve;
       showKLineData = subList;
     });
@@ -253,9 +201,16 @@ class DayKLineState extends State<DayKLine> {
     var minLeve = width ~/ kLineDistance;
 
     var lastItemTime = showKLineData.last.kLineDate;
+
     List<KLineModel> subList = await provider.getScaleDataByTime(lastItemTime, minLeve);
+
+    List<KLineModel> day5Datas = await provider.getScaleDataByTime(lastItemTime, minLeve+4);
+    List<KLineModel> day10Datas = await provider.getScaleDataByTime(lastItemTime, minLeve+9);
+
     Map maxAndMin = getMaxAndMin(subList);
     setState(() {
+      day10Data = day10Datas;
+      day5Data = day5Datas;
       dayMaxPrice = maxAndMin['maxPrice'];
       dayMinPrice = maxAndMin['minPrice'];
       maxKlinNum = minLeve;
@@ -263,23 +218,29 @@ class DayKLineState extends State<DayKLine> {
     });
   }
 
-
+  /// 左右移动
   Future moveKLine(details) async {
     onHorizontalDragDistance += details.delta.dx;
-//    print('onHorizontalDragDistanceonHorizontalDragDistance --- $onHorizontalDragDistance ------- $dragDistance');
     if(details.delta.dx < 0){  /// 向<----滑动，历史数据
       if(onHorizontalDragDistance.abs()>dragDistance){
         onHorizontalDragDistance = 0 ;
         /// 如果是最后时间则没有数据
         if(showKLineData.last.kLineDate == lastData.kLineDate){
-          print('showKLineData.last.kLineDate---${showKLineData.last.kLineDate}--${lastData.kLineDate}');
           return;
         }
 
         var time = showKLineData.first.kLineDate;
         var newList = await provider.getDataByTime(time,maxKlinNum,direction:'left');
+        List day5Datas = await provider.getDataByTime(time,maxKlinNum+4,direction:'left');
+        List day10Datas = await provider.getDataByTime(time,maxKlinNum+9,direction:'left');
+        if(day5Datas.length<(maxKlinNum+4)){
+          return;
+        }
+
         Map maxAndMin = getMaxAndMin(newList);
         setState(() {
+          day5Data = day5Datas;
+          day10Data = day10Datas;
           dayMaxPrice = maxAndMin['maxPrice'];
           dayMinPrice = maxAndMin['minPrice'];
           showKLineData = newList;
@@ -293,8 +254,12 @@ class DayKLineState extends State<DayKLine> {
         onHorizontalDragDistance = 0 ;
         var time = showKLineData[showKLineData.length-1].kLineDate;
         var newList = await provider.getDataByTime(time,maxKlinNum,direction:'right');
+        List day5Datas = await provider.getDataByTime(time,maxKlinNum+4,direction:'right');
+        List day10Datas = await provider.getDataByTime(time,maxKlinNum+9,direction:'right');
         Map maxAndMin = getMaxAndMin(newList);
         setState(() {
+          day10Data = day10Datas;
+          day5Data = day5Datas;
           dayMaxPrice = maxAndMin['maxPrice'];
           dayMinPrice = maxAndMin['minPrice'];
           showKLineData = newList;
@@ -449,7 +414,7 @@ class DayKLineState extends State<DayKLine> {
             child:Listener(
                 child: ClipRect(
                   key: anchorKey,
-                  child: new DayKLineComponent(showKLineData,dayMaxPrice,dayMinPrice,kLineWidth,kLineMargin,onTapDownDtails,isShowCross),
+                  child: new DayKLineComponent(showKLineData,dayMaxPrice,dayMinPrice,kLineWidth,kLineMargin,onTapDownDtails,isShowCross,day5Data,day10Data),
                 ),
                 onPointerDown:_handelOnPointerDown,
                 onPointerUp: _handelOnPointerUp,

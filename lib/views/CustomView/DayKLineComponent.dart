@@ -14,6 +14,8 @@ import 'dart:math';
 class DayKLineComponent extends StatelessWidget{
   //数据源
   List datas;
+  List day10Data;
+  List day5Data;
   double initPrice;
   double kLineWidth;
   Offset onTapDownDtails;
@@ -22,7 +24,7 @@ class DayKLineComponent extends StatelessWidget{
   double dayMinPrice;
   double dayMaxPrice;
 
-  DayKLineComponent(this.datas,this.dayMaxPrice,this.dayMinPrice,this.kLineWidth,this.kLineMargin,this.onTapDownDtails,this.isShowCross);
+  DayKLineComponent(this.datas,this.dayMaxPrice,this.dayMinPrice,this.kLineWidth,this.kLineMargin,this.onTapDownDtails,this.isShowCross,this.day5Data,this.day10Data);
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +33,7 @@ class DayKLineComponent extends StatelessWidget{
       height: size.height,
       width: size.width,
       child: CustomPaint(
-          painter: MyView(datas,this.dayMaxPrice,this.dayMinPrice,kLineWidth,kLineMargin,onTapDownDtails,isShowCross)
+          painter: MyView(datas,this.dayMaxPrice,this.dayMinPrice,kLineWidth,kLineMargin,onTapDownDtails,isShowCross,day5Data,day10Data)
       ),
     );
   }
@@ -52,6 +54,8 @@ class MyView extends CustomPainter{
   Paint TextPaint;
   Paint _EqualLinePaint;
   List mData;
+  List day5Data;
+  List day10Data;
   bool isShowCross;
   double initPrice;
   double kLineWidth;
@@ -64,7 +68,7 @@ class MyView extends CustomPainter{
 
   var startAngles=[];
 
-  MyView(this.mData,this.dayMaxPrice,this.dayMinPrice,this.kLineWidth,this.kLineMargin,this.onTapDownDtails,this.isShowCross);
+  MyView(this.mData,this.dayMaxPrice,this.dayMinPrice,this.kLineWidth,this.kLineMargin,this.onTapDownDtails,this.isShowCross,this.day5Data,this.day10Data);
 
   void _drawSmoothLine(Canvas canvas, Paint paint, List<Point> points) {
     final path = new Path()
@@ -74,36 +78,35 @@ class MyView extends CustomPainter{
   }
 
 
-  List<double> getAverageLineData(List<KLineModel>kLineDatas,int day) {
-    int length = kLineDatas.length;
+  List<Point> getAverageLineData(List<KLineModel>averagePricesData,int day,canvasHeight,int kLineDataLength) {
+    int length = averagePricesData.length;
     if(length<day){
       print('getAverageLineData:当前数据数量太少！');
       return [];
     }
-    List<double> averagePrices= [];
-
-    List<KLineModel> listForDay = [];
+    List<Point> averagePrices= [];
     int i = 0;
-
+    int index = 0;
     for(;i<length;i++){
-      if((i+1)%day==0){
-        print('listForDay----$listForDay');
-        double averagePrice = getAveragePrice(listForDay,day);
+      if(i<=length-day){
+        List<KLineModel> listForDay = averagePricesData.sublist(i,i+day);
+        if(length<kLineDataLength+day){
+          index = i+(day-(length-kLineDataLength)-1);
+        }else{
+          index = i;
+        }
+        Point averagePrice = getAveragePrice(listForDay,day,index,canvasHeight);
         averagePrices.add(averagePrice);
-        listForDay = [];
-      }else{
-        listForDay.add(kLineDatas[i]);
       }
-    }
 
-    print('averagePrices-----$averagePrices');
+    }
     return averagePrices;
   }
 
   /// 获取平均数
   /// data 行情数据
   /// day 几天，5日行情，10日行情
-  double getAveragePrice(List<KLineModel>kLineDatas,int day){
+  Point getAveragePrice(List<KLineModel>kLineDatas,int day,int lineIndex,canvasHeight){
     int length = kLineDatas.length;
     if(length<day){
       print('当前数据数量太少！-----length:$length');
@@ -114,8 +117,25 @@ class MyView extends CustomPainter{
     for(;i<length;i++){
       averagePrice+=kLineDatas[i].endPrice;
     }
-    return averagePrice/day;
+
+    var kLineDistance = kLineWidth + kLineMargin;
+    double dx = (kLineDistance*lineIndex+kLineMargin + kLineDistance*lineIndex+kLineDistance)/2;
+
+    double dy = priceToPositionDy(averagePrice/day,canvasHeight);
+    Point position =  Point(dx,dy);
+//    print('当前数据数量太少！-----:$kLineDatas---$lineIndex');
+//    print('当前数据数量太少！-----:$position---$lineIndex');
+    return position;
   }
+
+
+  double priceToPositionDy(nowPrice,canvasHeight){
+    double initPrice = (dayMaxPrice+dayMinPrice)/2;
+    double dy = canvasHeight / 2 - ((nowPrice - initPrice) / (dayMaxPrice - initPrice) * canvasHeight /
+            2);
+    return dy;
+  }
+
 
 
 
@@ -238,7 +258,7 @@ class MyView extends CustomPainter{
         new Offset(canvasWidth, _EqualHeight/4*3), _EqualLinePaint);
 
 
-    getAverageLineData(mData,5);
+
 
     _linePaint..strokeWidth =1.3;
     mData.asMap().forEach((i, line) {
@@ -354,19 +374,21 @@ class MyView extends CustomPainter{
       }
     }
 
+    if(day5Data.isNotEmpty){
+//      print('subList----${mData.first}---${mData.last}');
+//      print('day5Datas----${day5Data.first}---${day5Data.last}');
+      TextPaint.color = Colors.deepOrange;
+      int kLineDataLength = mData.length;
+      final day5 = getAverageLineData(day5Data,5,canvasHeight,kLineDataLength);
+      _drawSmoothLine(canvas,TextPaint,day5);
+    }
 
-    final random = new Random();
-    final data = [
-      Point(10.0,random.nextDouble()*100),
-      Point(50.0,random.nextDouble()*100),
-      Point(90.0,random.nextDouble()*100),
-      Point(130.0,random.nextDouble()*100),
-      Point(170.0,random.nextDouble()*100),
-      Point(200.0,random.nextDouble()*100),
-    ];
-
-    _drawSmoothLine(canvas,TextPaint,data);
-
+    if(day10Data.isNotEmpty){
+      TextPaint.color = Colors.pinkAccent;
+      int kLineDataLength = mData.length;
+      final day5 = getAverageLineData(day10Data,10,canvasHeight,kLineDataLength);
+      _drawSmoothLine(canvas,TextPaint,day5);
+    }
     ///绘制逻辑与Android差不多
     canvas.save();
     // 将坐标点移动到View的中心

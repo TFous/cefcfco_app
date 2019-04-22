@@ -140,6 +140,12 @@ class ReadHistoryDbProvider extends BaseDbProvider {
 
 
   Future<List<KLineModel>> getInitData(limit,offset) async {
+    if(limit<0){
+      limit = 0;
+    }
+    if(offset<0){
+      offset = 0;
+    }
     Database db = await getDataBase();
     var provider = await db.rawQuery('SELECT * FROM $name ORDER BY $columnDateTime ASC LIMIT $limit OFFSET $offset');
     if (provider != null) {

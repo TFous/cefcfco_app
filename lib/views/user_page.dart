@@ -206,7 +206,7 @@ class UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin{
                             children:<Widget>[
                               Padding(
                                 padding: EdgeInsets.symmetric(horizontal: globals.sidesDistance,vertical: 6.0),
-                                child: Text(_userName,
+                                child: Text(_userName??'wu',
                                   textAlign:TextAlign.left,
                                   style: TextStyle(color: Colors.white,fontSize: 20.0),
                                 ),
