@@ -315,6 +315,23 @@ class MyView extends CustomPainter{
     var dayMaxPriceText = _newVerticalAxisTextPainter(dayMaxPrice.toStringAsFixed(2))..layout();
     dayMaxPriceText.paint(canvas, Offset(0, 0));
 
+    /// 五日均线
+    if(day5Data.isNotEmpty){
+//      print('subList----${mData.first}---${mData.last}');
+//      print('day5Datas----${day5Data.first}---${day5Data.last}');
+      TextPaint.color = Colors.deepOrange;
+      int kLineDataLength = mData.length;
+      final day5 = getAverageLineData(day5Data,5,canvasHeight,kLineDataLength);
+      _drawSmoothLine(canvas,TextPaint,day5);
+    }
+    /// 十日均线
+    if(day10Data.isNotEmpty){
+      TextPaint.color = Colors.pinkAccent;
+      int kLineDataLength = mData.length;
+      final day5 = getAverageLineData(day10Data,10,canvasHeight,kLineDataLength);
+      _drawSmoothLine(canvas,TextPaint,day5);
+    }
+
     /// 点击后画的十字
     if(onTapDownDtails!=null && isShowCross){
       _linePaint..strokeWidth = lineWidth;
@@ -374,25 +391,10 @@ class MyView extends CustomPainter{
       }
     }
 
-    if(day5Data.isNotEmpty){
-//      print('subList----${mData.first}---${mData.last}');
-//      print('day5Datas----${day5Data.first}---${day5Data.last}');
-      TextPaint.color = Colors.deepOrange;
-      int kLineDataLength = mData.length;
-      final day5 = getAverageLineData(day5Data,5,canvasHeight,kLineDataLength);
-      _drawSmoothLine(canvas,TextPaint,day5);
-    }
-
-    if(day10Data.isNotEmpty){
-      TextPaint.color = Colors.pinkAccent;
-      int kLineDataLength = mData.length;
-      final day5 = getAverageLineData(day10Data,10,canvasHeight,kLineDataLength);
-      _drawSmoothLine(canvas,TextPaint,day5);
-    }
     ///绘制逻辑与Android差不多
-    canvas.save();
-    // 将坐标点移动到View的中心
-    canvas.restore();
+//    canvas.save();
+//    // 将坐标点移动到View的中心
+//    canvas.restore();
 
   }
 

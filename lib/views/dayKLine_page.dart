@@ -50,11 +50,18 @@ class DayKLineState extends State<DayKLine> {
   double canvasWidth;  /// 画布长度，用于计算渲染数据条数
   double sideWidth = 48.0;
   int maxKlinNum; /// 当前klin最大容量个数
-  double dragDistance = 3.0; /// 滑动距离，用于判断多长距离请求一次
+  double dragDistance = 1.0; /// 滑动距离，用于判断多长距离请求一次
   double scaleDistance = 18.0; /// 滑动距离，用于判断多长距离请求一次
   Offset onTapDownDtails; /// 点击坐标
   ReadHistoryDbProvider provider = new ReadHistoryDbProvider('DB_DayKLine',Config.KLINE_DAY);
   GlobalKey anchorKey = GlobalKey();
+
+
+
+
+
+
+
 
   var historyData;
   //数据源
@@ -181,10 +188,10 @@ class DayKLineState extends State<DayKLine> {
       if (kLineWidth <= minKLineWidth) {
         return;
       }
-      dragDistance -= skipDistance;
-      if(dragDistance<skipDistance){
-        dragDistance = skipDistance;
-      }
+//      dragDistance -= skipDistance;
+//      if(dragDistance<skipDistance){
+//        dragDistance = skipDistance;
+//      }
 
       kLineWidth = kLineWidth * _scale;
       kLineMargin = kLineMargin * _scale;
@@ -192,7 +199,7 @@ class DayKLineState extends State<DayKLine> {
       if (kLineWidth >= maxKLineWidth) {
         return;
       }
-      dragDistance += skipDistance;
+//      dragDistance += skipDistance;
       kLineWidth = kLineWidth * (2 - _scale);
       kLineMargin = kLineMargin * (2 - _scale);
     }
@@ -223,47 +230,49 @@ class DayKLineState extends State<DayKLine> {
     onHorizontalDragDistance += details.delta.dx;
     if(details.delta.dx < 0){  /// 向<----滑动，历史数据
       if(onHorizontalDragDistance.abs()>dragDistance){
-        onHorizontalDragDistance = 0 ;
+//      if(true){
         /// 如果是最后时间则没有数据
-        if(showKLineData.last.kLineDate == lastData.kLineDate){
-          return;
+        if(showKLineData.last.kLineDate != lastData.kLineDate){
+          var time = showKLineData.first.kLineDate;
+          var newList = await provider.getDataByTime(time,maxKlinNum,direction:'left');
+          List day5Datas = await provider.getDataByTime(time,maxKlinNum+4,direction:'left');
+          List day10Datas = await provider.getDataByTime(time,maxKlinNum+9,direction:'left');
+          if(day5Datas.length<(maxKlinNum+4)){
+            return;
+          }
+
+          Map maxAndMin = getMaxAndMin(newList);
+          setState(() {
+            day5Data = day5Datas;
+            day10Data = day10Datas;
+            dayMaxPrice = maxAndMin['maxPrice'];
+            dayMinPrice = maxAndMin['minPrice'];
+            showKLineData = newList;
+          });
+
+          print('onHorizontalDragDistance---$onHorizontalDragDistance');
+          onHorizontalDragDistance = 0 ;
         }
 
-        var time = showKLineData.first.kLineDate;
-        var newList = await provider.getDataByTime(time,maxKlinNum,direction:'left');
-        List day5Datas = await provider.getDataByTime(time,maxKlinNum+4,direction:'left');
-        List day10Datas = await provider.getDataByTime(time,maxKlinNum+9,direction:'left');
-        if(day5Datas.length<(maxKlinNum+4)){
-          return;
-        }
 
-        Map maxAndMin = getMaxAndMin(newList);
-        setState(() {
-          day5Data = day5Datas;
-          day10Data = day10Datas;
-          dayMaxPrice = maxAndMin['maxPrice'];
-          dayMinPrice = maxAndMin['minPrice'];
-          showKLineData = newList;
-        });
       }
     }else{  /// 向--->滑动，最新数据
-      if(showKLineData.first.kLineDate == firstData.kLineDate){
-        return;
-      }
-      if(onHorizontalDragDistance.abs()>dragDistance){
-        onHorizontalDragDistance = 0 ;
-        var time = showKLineData[showKLineData.length-1].kLineDate;
-        var newList = await provider.getDataByTime(time,maxKlinNum,direction:'right');
-        List day5Datas = await provider.getDataByTime(time,maxKlinNum+4,direction:'right');
-        List day10Datas = await provider.getDataByTime(time,maxKlinNum+9,direction:'right');
-        Map maxAndMin = getMaxAndMin(newList);
-        setState(() {
-          day10Data = day10Datas;
-          day5Data = day5Datas;
-          dayMaxPrice = maxAndMin['maxPrice'];
-          dayMinPrice = maxAndMin['minPrice'];
-          showKLineData = newList;
-        });
+      if(showKLineData.first.kLineDate != firstData.kLineDate){
+        if(onHorizontalDragDistance.abs()>dragDistance){
+          onHorizontalDragDistance = 0 ;
+          var time = showKLineData[showKLineData.length-1].kLineDate;
+          var newList = await provider.getDataByTime(time,maxKlinNum,direction:'right');
+          List day5Datas = await provider.getDataByTime(time,maxKlinNum+4,direction:'right');
+          List day10Datas = await provider.getDataByTime(time,maxKlinNum+9,direction:'right');
+          Map maxAndMin = getMaxAndMin(newList);
+          setState(() {
+            day10Data = day10Datas;
+            day5Data = day5Datas;
+            dayMaxPrice = maxAndMin['maxPrice'];
+            dayMinPrice = maxAndMin['minPrice'];
+            showKLineData = newList;
+          });
+        }
       }
     }
   }
@@ -308,26 +317,15 @@ class DayKLineState extends State<DayKLine> {
       isScale = false;
     }
 
-    setState(() {
-    });
-
   }
 
   /// 移动
   Future _handelOnPointerMove(details) async {
-    endPosition = details.position;
-
+//    endPosition = details.position;
     /// 滑动Klin, 两个手指的时候不能滑动
     if (!isShowCross && !isScale) {
       moveKLine(details);
-    }
-
-    setState(() {
-      onTapDownDtails = details.position - _canvasOffset;
-    });
-
-    /// 缩放动作
-    if(isScale){
+    }else if(isScale){
       if(details.delta.dx!=0 && details.delta.dy!=0){
         var pointerKey = details.pointer;
         var otherOpinterKey;
@@ -368,7 +366,12 @@ class DayKLineState extends State<DayKLine> {
           }
         }
       }
+    }else{
+      setState(() {
+        onTapDownDtails = details.position - _canvasOffset;
+      });
     }
+    /// 缩放动作
   }
 
   /// 结束触摸
