@@ -9,9 +9,6 @@ part 'KLineModel.g.dart';
 
 @JsonSerializable()
 class KLineModel {
-
-  int id;
-
 //  @JsonKey(name: "k_line_date")
   String kLineDate;
 
@@ -29,11 +26,10 @@ class KLineModel {
 
   @override
   toString(){
-    return 'id:$id,kLineDate:$kLineDate';
+    return 'kLineDate--->$kLineDate';
   }
 
   KLineModel(
-    this.id,
     this.kLineDate,
     this.startPrice,
     this.endPrice,

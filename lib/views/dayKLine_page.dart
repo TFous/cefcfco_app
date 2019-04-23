@@ -3,7 +3,7 @@
  *  缩放动作，计算两点之间的距离（直角三角形斜边），移动前的距离和移动后的距离
  *  通过计算两距离的差值，是否大于 货值（scaleDistance）
  *
- *
+ *   477 条
  *
  *
  *
@@ -16,6 +16,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:cefcfco_app/common/config/Config.dart';
+import 'package:cefcfco_app/common/model/CanvasModel.dart';
 import 'package:cefcfco_app/common/model/KLineModel.dart';
 import 'package:cefcfco_app/common/net/Code.dart';
 import 'package:cefcfco_app/common/provider/repos/ReadHistoryDbProvider.dart';
@@ -39,36 +40,17 @@ class DayKLine extends StatefulWidget {
 class DayKLineState extends State<DayKLine> {
   bool isOnce = true;
   int subscript = 0;
-  int index = 0;
   double onHorizontalDragDistance = 0.0; /// 滑动距离
-  double dayMinPrice = 0.0;
-  double dayMaxPrice = 0.0;
-  double kLineWidth = 8;
   double minKLineWidth = 4.0;
   double maxKLineWidth = 10.0;
-  double kLineMargin = 2;
   double canvasWidth;  /// 画布长度，用于计算渲染数据条数
-  double sideWidth = 48.0;
   int maxKlinNum; /// 当前klin最大容量个数
-  double dragDistance = 1.0; /// 滑动距离，用于判断多长距离请求一次
+  double dragDistance = 0.5; /// 滑动距离，用于判断多长距离请求一次
   double scaleDistance = 18.0; /// 滑动距离，用于判断多长距离请求一次
-  Offset onTapDownDtails; /// 点击坐标
   ReadHistoryDbProvider provider = new ReadHistoryDbProvider('DB_DayKLine',Config.KLINE_DAY);
   GlobalKey anchorKey = GlobalKey();
 
-
-
-
-
-
-
-
-  var historyData;
-  //数据源
-  List showKLineData = [];
-  List day5Data = [];
-  List day10Data = [];
-
+  CanvasModel _canvasModel = new CanvasModel([],[],[],0.0,0.0,8.0,2.0,null,false);
 
   Offset _canvasOffset = Offset.zero;
   double _scale = 0.90;
@@ -76,7 +58,7 @@ class DayKLineState extends State<DayKLine> {
 
   KLineModel repository;
 
-
+  List<KLineModel> allKLineData;
   KLineModel firstData;
   KLineModel lastData;
   Offset startPosition;// 开始接触位置
@@ -84,7 +66,6 @@ class DayKLineState extends State<DayKLine> {
   int startTouchTime;// 开始接触时间
   int endTouchTime;// 开始接触时间
   int minTouchTime = 150; // 最短接触时间，接触到滑动小于：出现十字左边，显示价格，否则滑动klin
-  bool isShowCross = false;  // 是否显示十字坐标
   bool isMoveKLin = false;  // 是否在移动klin
   bool isScale = false;  // 是否缩放
   Map<num,dynamic> pointerDownPositions = {};
@@ -92,14 +73,10 @@ class DayKLineState extends State<DayKLine> {
   int pointerNum = 0; // 手指数量
 
   @override
-  void initState() {
+  initState(){
     super.initState();
-//    dropTable();
-//    List mockDatas = mockData.mockData();
-//    mockDatas.forEach((item) async {
-//      await provider.insert(item[0],item[1],item[2],item[3],item[4]);
-//    });
-
+    allKLineData = mockData.mockData(globals.kLine);
+    print('所有数据长度----${allKLineData.length}');
     stream = Code.eventBus.on<KLineDataInEvent>().listen((event) {
       setState(() {
         repository = event.repository;
@@ -107,19 +84,88 @@ class DayKLineState extends State<DayKLine> {
     });
   }
 
-  dropTable()async{
-    print('////////////////////正在删除////////////////////////');
-    await provider.dropTable();
-    print('////////////////////删除成功////////////////////////');
+
+  /// 初始化获取适应屏幕的数据
+  List<KLineModel> getLimitDatas(List<KLineModel> allData,int start,int end){
+    print('start  $start-----end  $end');
+    List<KLineModel> list = allData.sublist(start,end);
+    return list;
   }
 
-  getAllData()async{
-    return await provider.getAllData();
+  /// 缩放后根据最后一个item 的时间 获取数据
+  List<KLineModel> getScaleDatasByLastTime(List<KLineModel> allData,String lastItemTime,int length){
+    int dataLength = allData.length;
+    int i=0;
+    for(;i<dataLength;i++){
+      if(allData[i].kLineDate == lastItemTime){
+        /// 当最后的index（前面数据的条数）小于 要获取的条数
+        if(i<length){
+          return allData.sublist(0,length);
+        }else{
+          return allData.sublist(i-length,i+1);
+        }
+      }
+    }
   }
 
-  getLimitData(limit,offset)async{
-    return await provider.getInitData(limit,offset);
+
+  /// 左右移动的数据
+  /// averageDay 有志的话则为 均价 天数
+  List<KLineModel> getPointerMoveDatas(List<KLineModel> allData,String time,int length,String direction,{averageDay}){
+    List<KLineModel> list = [];
+    int dataLength = allData.length;
+    int i=0;
+    print('start  $time-----end  $length');
+
+
+    if(averageDay!=null){
+      for(;i<dataLength;i++){
+        if(allData[i].kLineDate == time){
+          if(direction=='right'){
+            int start = i-length - averageDay;
+            int end = i;
+            if(start<0){
+              start = averageDay -1;
+              end = length + averageDay -1;
+            }
+            list = allData.sublist(start,end);
+          }else{
+            int start = i+1;
+            int end = i+length + averageDay ;
+            if(end>dataLength){
+              start = dataLength-length-1-averageDay+1;
+              end = dataLength-1;
+            }
+            list = allData.sublist(start,end);
+          }
+        }
+      }
+    }else{
+      for(;i<dataLength;i++){
+        if(allData[i].kLineDate == time){
+          if(direction=='right'){
+            int start = i-length-1;
+            int end = i;
+            if(start<0){
+              start = 0;
+              end = length;
+            }
+            list = allData.sublist(start,end);
+          }else{
+            int start = i+1;
+            int end = i+length+1;
+            if(end>dataLength){
+              start = dataLength-length-1;
+              end = dataLength-1;
+            }
+            list = allData.sublist(start,end);
+          }
+        }
+      }
+    }
+    return list;
   }
+
 
   /// 获取当前所有数据中最高和最低值
   Map<String, double> getMaxAndMin(lineData) {
@@ -152,128 +198,157 @@ class DayKLineState extends State<DayKLine> {
     if(stream != null) {
       stream.cancel();
       stream = null;
+      _canvasModel = null;
     }
   }
 
 
   /// 获取初始化 画布数据
   initCanvasData(width) async{
-    var kLineDistance = kLineWidth+kLineMargin;
-    var minLeve = width~/kLineDistance;
-    var allData = await provider.getAllData();
-    var length= allData.length;
-    firstData = allData.first;
-    lastData = allData.last;
+    var kLineDistance = _canvasModel.kLineWidth+_canvasModel.kLineMargin;
+    var minLeve = width~/kLineDistance; // k线数量
+    var length= allKLineData.length;
+    firstData = allKLineData.first;
+    lastData = allKLineData.last;
 
+    List newList = getLimitDatas(allKLineData,length-minLeve,length);
+    List day5Datas = getLimitDatas(allKLineData,length-minLeve-4,length);
+    List day10Datas = getLimitDatas(allKLineData,length-minLeve-9,length);
+    Map maxAndMin = getMaxAndMin(newList);
 
-    List subList = await getLimitData(minLeve,length-minLeve);
-    List day5Datas = await getLimitData(minLeve+4,length-minLeve-4);
-    List day10Datas = await getLimitData(minLeve+9,length-minLeve-9);
-    Map maxAndMin = getMaxAndMin(subList);
+    canvasWidth = width;
+    maxKlinNum = minLeve;
+
+    var dayMaxPrice = maxAndMin['maxPrice']??0.0;
+    var dayMinPrice = maxAndMin['minPrice']??0.0;
+    CanvasModel newCanvasModel = new CanvasModel(newList,
+        day5Datas,
+        day10Datas,
+        dayMaxPrice,
+        dayMinPrice,
+        _canvasModel.kLineWidth,
+        _canvasModel.kLineMargin,
+        _canvasModel.onTapDownDtails,
+        _canvasModel.isShowCross);
     setState(() {
-      dayMaxPrice = maxAndMin['maxPrice']??0.0;
-      dayMinPrice = maxAndMin['minPrice']??0.0;
-      canvasWidth = width;
-      day5Data = day5Datas;
-      day10Data = day10Datas;
-      maxKlinNum = minLeve;
-      showKLineData = subList;
+      _canvasModel = newCanvasModel;
     });
+
   }
 
   /// type 1:缩放 2：放大
   scaleGetData(width, type) async {
+    var kLineWidth,kLineMargin;
     var skipDistance = 0.5;
     if (type == 1) {
-      if (kLineWidth <= minKLineWidth) {
+      if (_canvasModel.kLineWidth <= minKLineWidth) {
         return;
       }
-//      dragDistance -= skipDistance;
-//      if(dragDistance<skipDistance){
-//        dragDistance = skipDistance;
-//      }
+      dragDistance -= skipDistance;
+      if(dragDistance<skipDistance){
+        dragDistance = skipDistance;
+      }
 
-      kLineWidth = kLineWidth * _scale;
-      kLineMargin = kLineMargin * _scale;
+      kLineWidth = _canvasModel.kLineWidth * _scale;
+      kLineMargin = _canvasModel.kLineMargin * _scale;
     } else if (type == 2) {
-      if (kLineWidth >= maxKLineWidth) {
+      if (_canvasModel.kLineWidth >= maxKLineWidth) {
         return;
       }
-//      dragDistance += skipDistance;
-      kLineWidth = kLineWidth * (2 - _scale);
-      kLineMargin = kLineMargin * (2 - _scale);
+      dragDistance += skipDistance;
+      kLineWidth = _canvasModel.kLineWidth * (2 - _scale);
+      kLineMargin = _canvasModel.kLineMargin * (2 - _scale);
     }
-
     var kLineDistance = kLineWidth + kLineMargin;
     var minLeve = width ~/ kLineDistance;
+    var lastItemTime = _canvasModel.showKLineData.last.kLineDate;
 
-    var lastItemTime = showKLineData.last.kLineDate;
+    List<KLineModel> newList = getScaleDatasByLastTime(allKLineData,lastItemTime, minLeve);
+    List<KLineModel> day5Datas = getScaleDatasByLastTime(allKLineData,lastItemTime, minLeve+4);
+    List<KLineModel> day10Datas = getScaleDatasByLastTime(allKLineData,lastItemTime, minLeve+9);
 
-    List<KLineModel> subList = await provider.getScaleDataByTime(lastItemTime, minLeve);
+    Map maxAndMin = getMaxAndMin(newList);
 
-    List<KLineModel> day5Datas = await provider.getScaleDataByTime(lastItemTime, minLeve+4);
-    List<KLineModel> day10Datas = await provider.getScaleDataByTime(lastItemTime, minLeve+9);
+    var dayMaxPrice = maxAndMin['maxPrice']??0.0;
+    var dayMinPrice = maxAndMin['minPrice']??0.0;
+    CanvasModel newCanvasModel = new CanvasModel(newList,
+        day5Datas,
+        day10Datas,
+        dayMaxPrice,
+        dayMinPrice,
+        kLineWidth,
+        kLineMargin,
+        _canvasModel.onTapDownDtails,
+        _canvasModel.isShowCross);
 
-    Map maxAndMin = getMaxAndMin(subList);
     setState(() {
-      day10Data = day10Datas;
-      day5Data = day5Datas;
-      dayMaxPrice = maxAndMin['maxPrice'];
-      dayMinPrice = maxAndMin['minPrice'];
-      maxKlinNum = minLeve;
-      showKLineData = subList;
+      _canvasModel = newCanvasModel;
     });
+
+    maxKlinNum = minLeve;
   }
 
   /// 左右移动
-  Future moveKLine(details) async {
+  moveKLine(details) async {
     onHorizontalDragDistance += details.delta.dx;
     if(details.delta.dx < 0){  /// 向<----滑动，历史数据
       if(onHorizontalDragDistance.abs()>dragDistance){
-//      if(true){
+        onHorizontalDragDistance = 0 ;
         /// 如果是最后时间则没有数据
-        if(showKLineData.last.kLineDate != lastData.kLineDate){
-          var time = showKLineData.first.kLineDate;
-          var newList = await provider.getDataByTime(time,maxKlinNum,direction:'left');
-          List day5Datas = await provider.getDataByTime(time,maxKlinNum+4,direction:'left');
-          List day10Datas = await provider.getDataByTime(time,maxKlinNum+9,direction:'left');
-          if(day5Datas.length<(maxKlinNum+4)){
-            return;
-          }
+        if(_canvasModel.showKLineData.last.kLineDate == lastData.kLineDate){
+          return ;
+        }
+          var time = _canvasModel.showKLineData.first.kLineDate;
+          var newList = getPointerMoveDatas(allKLineData,time,maxKlinNum,'left');
+          List day5Datas = getPointerMoveDatas(allKLineData,time,maxKlinNum,'left',averageDay:5);
+          List day10Datas = getPointerMoveDatas(allKLineData,time,maxKlinNum,'left',averageDay:10);
 
           Map maxAndMin = getMaxAndMin(newList);
+
+          var dayMaxPrice = maxAndMin['maxPrice']??0.0;
+          var dayMinPrice = maxAndMin['minPrice']??0.0;
+          CanvasModel newCanvasModel = new CanvasModel(newList,
+              day5Datas,
+              day10Datas,
+              dayMaxPrice,
+              dayMinPrice,
+              _canvasModel.kLineWidth,
+              _canvasModel.kLineMargin,
+              _canvasModel.onTapDownDtails,
+              _canvasModel.isShowCross);
+
+
           setState(() {
-            day5Data = day5Datas;
-            day10Data = day10Datas;
-            dayMaxPrice = maxAndMin['maxPrice'];
-            dayMinPrice = maxAndMin['minPrice'];
-            showKLineData = newList;
+            _canvasModel = newCanvasModel;
           });
-
-          print('onHorizontalDragDistance---$onHorizontalDragDistance');
-          onHorizontalDragDistance = 0 ;
-        }
-
-
       }
     }else{  /// 向--->滑动，最新数据
-      if(showKLineData.first.kLineDate != firstData.kLineDate){
+      if(_canvasModel.showKLineData.first.kLineDate == firstData.kLineDate){
+        return;
+      }
         if(onHorizontalDragDistance.abs()>dragDistance){
           onHorizontalDragDistance = 0 ;
-          var time = showKLineData[showKLineData.length-1].kLineDate;
-          var newList = await provider.getDataByTime(time,maxKlinNum,direction:'right');
-          List day5Datas = await provider.getDataByTime(time,maxKlinNum+4,direction:'right');
-          List day10Datas = await provider.getDataByTime(time,maxKlinNum+9,direction:'right');
+          var time = _canvasModel.showKLineData.last.kLineDate;
+          var newList = getPointerMoveDatas(allKLineData,time,maxKlinNum,'right');
+          List day5Datas = getPointerMoveDatas(allKLineData,time,maxKlinNum,'right',averageDay:5);
+          List day10Datas = getPointerMoveDatas(allKLineData,time,maxKlinNum,'right',averageDay:10);
           Map maxAndMin = getMaxAndMin(newList);
+
+          var dayMaxPrice = maxAndMin['maxPrice']??0.0;
+          var dayMinPrice = maxAndMin['minPrice']??0.0;
+          CanvasModel newCanvasModel = new CanvasModel(newList,
+              day5Datas,
+              day10Datas,
+              dayMaxPrice,
+              dayMinPrice,
+              _canvasModel.kLineWidth,
+              _canvasModel.kLineMargin,
+              _canvasModel.onTapDownDtails,
+              _canvasModel.isShowCross);
           setState(() {
-            day10Data = day10Datas;
-            day5Data = day5Datas;
-            dayMaxPrice = maxAndMin['maxPrice'];
-            dayMinPrice = maxAndMin['minPrice'];
-            showKLineData = newList;
+            _canvasModel = newCanvasModel;
           });
         }
-      }
     }
   }
 
@@ -293,11 +368,6 @@ class DayKLineState extends State<DayKLine> {
     return second.millisecondsSinceEpoch;
   }
 
-//  static inserData(item)async{
-//    return provider.insert(item[0],item[1],item[2],item[3],item[4]);
-//  }
-
-
   /// 开始触摸
   void _handelOnPointerDown(PointerDownEvent details) {
     /// 元素位置
@@ -312,7 +382,7 @@ class DayKLineState extends State<DayKLine> {
 
     if(pointerDownPositions.length>=2){
       isScale = true;
-      isShowCross = false;  //两个手指的时候不显示十字坐标
+      _canvasModel.isShowCross = false;  //两个手指的时候不显示十字坐标
     }else{
       isScale = false;
     }
@@ -321,9 +391,9 @@ class DayKLineState extends State<DayKLine> {
 
   /// 移动
   Future _handelOnPointerMove(details) async {
-//    endPosition = details.position;
+    endPosition = details.position;
     /// 滑动Klin, 两个手指的时候不能滑动
-    if (!isShowCross && !isScale) {
+    if (!_canvasModel.isShowCross && !isScale) {
       moveKLine(details);
     }else if(isScale){
       if(details.delta.dx!=0 && details.delta.dy!=0){
@@ -368,7 +438,7 @@ class DayKLineState extends State<DayKLine> {
       }
     }else{
       setState(() {
-        onTapDownDtails = details.position - _canvasOffset;
+        _canvasModel.onTapDownDtails = details.position - _canvasOffset;
       });
     }
     /// 缩放动作
@@ -388,9 +458,9 @@ class DayKLineState extends State<DayKLine> {
     // 十字坐标
     if(endTouchTime-startTouchTime< minTouchTime ){
       setState(() {
-        isShowCross = !isShowCross;
-        if(isShowCross){
-          onTapDownDtails = details.position - _canvasOffset;
+        _canvasModel.isShowCross = !_canvasModel.isShowCross;
+        if(_canvasModel.isShowCross){
+          _canvasModel.onTapDownDtails = details.position - _canvasOffset;
         }
       });
     }
@@ -417,7 +487,7 @@ class DayKLineState extends State<DayKLine> {
             child:Listener(
                 child: ClipRect(
                   key: anchorKey,
-                  child: new DayKLineComponent(showKLineData,dayMaxPrice,dayMinPrice,kLineWidth,kLineMargin,onTapDownDtails,isShowCross,day5Data,day10Data),
+                  child: new DayKLineComponent(_canvasModel),
                 ),
                 onPointerDown:_handelOnPointerDown,
                 onPointerUp: _handelOnPointerUp,

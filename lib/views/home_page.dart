@@ -55,7 +55,7 @@ class _MyHomePageState extends State<AppPage>
           'num': 'new',
         }
       },
-      {'text': '动态', 'router':'/about','isShowBadge': false, 'icon': new Icon(Icons.filter_vintage)},
+//      {'text': '动态', 'router':'/about','isShowBadge': false, 'icon': new Icon(Icons.filter_vintage)},
       {'text': '列表', 'router':'/about','isShowBadge': false, 'icon': new Icon(Icons.list)},
       {'text': '我的','router':'/user', 'isShowBadge': false,'icon': new Icon(Icons.person)},
     ];
@@ -92,7 +92,7 @@ class _MyHomePageState extends State<AppPage>
           controller: controller,
           children: <Widget>[
         new DayKLine(),
-        new AboutPage(),
+//        new AboutPage(),
         new ListPage(),
         new UserPage(),
       ]),

@@ -8,7 +8,6 @@ part of 'KLineModel.dart';
 
 KLineModel _$RepositoryFromJson(Map<String, dynamic> json) {
   return KLineModel(
-      json['id'] as int,
       json['kLineDate'] as String,
       (json['startPrice'] as num)?.toDouble(),
       (json['endPrice'] as num)?.toDouble(),
@@ -18,7 +17,6 @@ KLineModel _$RepositoryFromJson(Map<String, dynamic> json) {
 
 Map<String, dynamic> _$RepositoryToJson(KLineModel instance) =>
     <String, dynamic>{
-      'id': instance.id,
       'kLineDate': instance.kLineDate,
       'startPrice': instance.startPrice,
       'endPrice': instance.endPrice,

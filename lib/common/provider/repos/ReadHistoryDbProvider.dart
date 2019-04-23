@@ -82,7 +82,6 @@ class ReadHistoryDbProvider extends BaseDbProvider {
 
 
 
-
   Future _getProvider(Database db, int page) async {
     List<Map<String, dynamic>> maps = await db.query(name,
         columns: [columnId, columnDateTime, columnStartPrice, columnEndPrice, columnMaxPrice, columnMinPrice],
@@ -114,16 +113,40 @@ class ReadHistoryDbProvider extends BaseDbProvider {
     return await db.execute('drop table $name');
   }
 
+  Future addIndex()async{
+    Database db = await getDataBase();
+    print('dbdbdb---$db');
+    return await db.execute('CREATE INDEX kLineDates_index ON $name ($columnDateTime)');
+//    return await db.execute('DROP INDEX kLineDates_index');
+  }
+
   ///插入到数据库
   Future insert(String kLineDate, double startPrice, double endPrice,double maxPrice,double minPrice) async {
+    print('///////////////正在插入//////////////////////////');
     Database db = await getDataBase();
     var provider = await _getProviderInsert(db, kLineDate);
     if (provider != null) {
       await db.delete(name, where: "$columnDateTime = ?", whereArgs: [kLineDate]);
     }
+    print('///////////////插入成功//////////////////////////');
     return await db.insert(name, toMap(kLineDate, startPrice, endPrice, maxPrice, minPrice));
   }
 
+  Future batchInsert(mockDatas) async {
+    print('///////////////正在插入//////////////////////////');
+    Database db = await getDataBase();
+    var batch = db.batch();
+    mockDatas.forEach((item) async {
+      var kLineDate = item[0];
+      var provider = await _getProviderInsert(db, kLineDate);
+      if (provider != null) {
+        await db.delete(name, where: "$columnDateTime = ?", whereArgs: [kLineDate]);
+      }
+      batch.insert(name, toMap(kLineDate, item[1], item[2], item[3], item[4]));
+    });
+    print('///////////////插入成功//////////////////////////');
+    return await batch.commit();
+  }
 
   Future<List<KLineModel>> getAllData() async {
     Database db = await getDataBase();
@@ -192,7 +215,6 @@ class ReadHistoryDbProvider extends BaseDbProvider {
 //    var _symbol = direction=='right'?'<':'>';
     if(direction=='right'){
       provider = await db.rawQuery("select * from (SELECT * FROM $name WHERE $columnDateTime < '$time' ORDER BY $columnDateTime desc LIMIT $limit) ORDER BY $columnDateTime ASC");
-
     }else{
       provider = await db.rawQuery("select * from (SELECT * FROM $name WHERE $columnDateTime > '$time' ORDER BY $columnDateTime ASC LIMIT $limit) ORDER BY $columnDateTime ASC");
     }

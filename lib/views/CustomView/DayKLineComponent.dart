@@ -13,7 +13,7 @@ import 'dart:math';
 /// @author yinl
 class DayKLineComponent extends StatelessWidget{
   //数据源
-  List datas;
+  var canvasModel;
   List day10Data;
   List day5Data;
   double initPrice;
@@ -24,7 +24,7 @@ class DayKLineComponent extends StatelessWidget{
   double dayMinPrice;
   double dayMaxPrice;
 
-  DayKLineComponent(this.datas,this.dayMaxPrice,this.dayMinPrice,this.kLineWidth,this.kLineMargin,this.onTapDownDtails,this.isShowCross,this.day5Data,this.day10Data);
+  DayKLineComponent(this.canvasModel);
 
   @override
   Widget build(BuildContext context) {
@@ -33,18 +33,11 @@ class DayKLineComponent extends StatelessWidget{
       height: size.height,
       width: size.width,
       child: CustomPaint(
-          painter: MyView(datas,this.dayMaxPrice,this.dayMinPrice,kLineWidth,kLineMargin,onTapDownDtails,isShowCross,day5Data,day10Data)
+          painter: MyView(canvasModel)
       ),
     );
   }
 
-}
-
-class LinearSales {
-  final int year;
-  final int sales;
-
-  LinearSales(this.year, this.sales);
 }
 
 class MyView extends CustomPainter{
@@ -53,22 +46,14 @@ class MyView extends CustomPainter{
   Paint _linePaint;
   Paint TextPaint;
   Paint _EqualLinePaint;
-  List mData;
-  List day5Data;
-  List day10Data;
-  bool isShowCross;
   double initPrice;
-  double kLineWidth;
-  double dayMinPrice;
-  double dayMaxPrice;
-  double kLineMargin;
   List kLineOffsets = []; /// k线位置[[dx,dy]]
   double lineWidth = 1.4;/// 线的宽度  譬如十字坐标
-  Offset onTapDownDtails;
+  var canvasModel;
 
   var startAngles=[];
 
-  MyView(this.mData,this.dayMaxPrice,this.dayMinPrice,this.kLineWidth,this.kLineMargin,this.onTapDownDtails,this.isShowCross,this.day5Data,this.day10Data);
+  MyView(this.canvasModel);
 
   void _drawSmoothLine(Canvas canvas, Paint paint, List<Point> points) {
     final path = new Path()
@@ -118,8 +103,8 @@ class MyView extends CustomPainter{
       averagePrice+=kLineDatas[i].endPrice;
     }
 
-    var kLineDistance = kLineWidth + kLineMargin;
-    double dx = (kLineDistance*lineIndex+kLineMargin + kLineDistance*lineIndex+kLineDistance)/2;
+    var kLineDistance = canvasModel.kLineWidth + canvasModel.kLineMargin;
+    double dx = (kLineDistance*lineIndex+canvasModel.kLineMargin + kLineDistance*lineIndex+kLineDistance)/2;
 
     double dy = priceToPositionDy(averagePrice/day,canvasHeight);
     Point position =  Point(dx,dy);
@@ -130,8 +115,8 @@ class MyView extends CustomPainter{
 
 
   double priceToPositionDy(nowPrice,canvasHeight){
-    double initPrice = (dayMaxPrice+dayMinPrice)/2;
-    double dy = canvasHeight / 2 - ((nowPrice - initPrice) / (dayMaxPrice - initPrice) * canvasHeight /
+    double initPrice = (canvasModel.dayMaxPrice+canvasModel.dayMinPrice)/2;
+    double dy = canvasHeight / 2 - ((nowPrice - initPrice) / (canvasModel.dayMaxPrice - initPrice) * canvasHeight /
             2);
     return dy;
   }
@@ -184,8 +169,8 @@ class MyView extends CustomPainter{
     /// 当前分钟最低价格，
     /// 55.19 ==> initPrice
 
-    var kLineDistance = kLineWidth + kLineMargin;
-    double initPrice = (dayMaxPrice+dayMinPrice)/2;
+    var kLineDistance = canvasModel.kLineWidth + canvasModel.kLineMargin;
+    double initPrice = (canvasModel.dayMaxPrice+canvasModel.dayMinPrice)/2;
 
     TextPaint = new Paint()
     ..color = Colors.black
@@ -261,7 +246,7 @@ class MyView extends CustomPainter{
 
 
     _linePaint..strokeWidth =1.3;
-    mData.asMap().forEach((i, line) {
+    canvasModel.showKLineData.asMap().forEach((i, line) {
 //      var time = line.kLineDate;
 //      var now = DateTime.parse(time);
       double startPrice = line.startPrice;
@@ -271,11 +256,11 @@ class MyView extends CustomPainter{
 
       var top;
       var bottom;
-      var left = kLineDistance*i+kLineMargin;
+      var left = kLineDistance*i+canvasModel.kLineMargin;
       var right = kLineDistance*i+kLineDistance;
 
-      top = canvasHeight/2-(startPrice-initPrice)/(dayMaxPrice-initPrice) * canvasHeight/2;
-      bottom = canvasHeight/2-((endPrice-initPrice)/(dayMaxPrice-initPrice) * canvasHeight/2);
+      top = canvasHeight/2-(startPrice-initPrice)/(canvasModel.dayMaxPrice-initPrice) * canvasHeight/2;
+      bottom = canvasHeight/2-((endPrice-initPrice)/(canvasModel.dayMaxPrice-initPrice) * canvasHeight/2);
       if(endPrice>startPrice){
         _linePaint..color = Colors.red;
       }else{
@@ -294,10 +279,10 @@ class MyView extends CustomPainter{
       canvas.drawRect(kLineReact, _linePaint);
 
       var maxTop = canvasHeight / 2 -
-          ((maxPrice - initPrice) / (dayMaxPrice - initPrice) * canvasHeight /
+          ((maxPrice - initPrice) / (canvasModel.dayMaxPrice - initPrice) * canvasHeight /
               2);
       var minBottom = canvasHeight / 2 -
-          ((minPrice - initPrice) / (dayMaxPrice - initPrice) * canvasHeight /
+          ((minPrice - initPrice) / (canvasModel.dayMaxPrice - initPrice) * canvasHeight /
               2);
 
       canvas.drawLine(
@@ -309,41 +294,41 @@ class MyView extends CustomPainter{
     var initPriceText = _newVerticalAxisTextPainter(initPrice.toStringAsFixed(2))..layout();
     initPriceText.paint(canvas, Offset(0, canvasHeight/2- initPriceText.height / 2));
 
-    var dayMinPriceText = _newVerticalAxisTextPainter(dayMinPrice.toStringAsFixed(2))..layout();
+    var dayMinPriceText = _newVerticalAxisTextPainter(canvasModel.dayMinPrice.toStringAsFixed(2))..layout();
     dayMinPriceText.paint(canvas, Offset(0, canvasHeight-dayMinPriceText.height));
 
-    var dayMaxPriceText = _newVerticalAxisTextPainter(dayMaxPrice.toStringAsFixed(2))..layout();
+    var dayMaxPriceText = _newVerticalAxisTextPainter(canvasModel.dayMaxPrice.toStringAsFixed(2))..layout();
     dayMaxPriceText.paint(canvas, Offset(0, 0));
 
     /// 五日均线
-    if(day5Data.isNotEmpty){
-//      print('subList----${mData.first}---${mData.last}');
+    if(canvasModel.day5Data.isNotEmpty){
+//      print('subList----${showKLineData.first}---${showKLineData.last}');
 //      print('day5Datas----${day5Data.first}---${day5Data.last}');
       TextPaint.color = Colors.deepOrange;
-      int kLineDataLength = mData.length;
-      final day5 = getAverageLineData(day5Data,5,canvasHeight,kLineDataLength);
+      int kLineDataLength = canvasModel.showKLineData.length;
+      final day5 = getAverageLineData(canvasModel.day5Data,5,canvasHeight,kLineDataLength);
       _drawSmoothLine(canvas,TextPaint,day5);
     }
     /// 十日均线
-    if(day10Data.isNotEmpty){
+    if(canvasModel.day10Data.isNotEmpty){
       TextPaint.color = Colors.pinkAccent;
-      int kLineDataLength = mData.length;
-      final day5 = getAverageLineData(day10Data,10,canvasHeight,kLineDataLength);
+      int kLineDataLength = canvasModel.showKLineData.length;
+      final day5 = getAverageLineData(canvasModel.day10Data,10,canvasHeight,kLineDataLength);
       _drawSmoothLine(canvas,TextPaint,day5);
     }
 
     /// 点击后画的十字
-    if(onTapDownDtails!=null && isShowCross){
+    if(canvasModel.onTapDownDtails!=null && canvasModel.isShowCross){
       _linePaint..strokeWidth = lineWidth;
       _linePaint..color = Colors.blueAccent;
 
       /// 修正dy 上下边界
-      if(onTapDownDtails.dy<0){
+      if(canvasModel.onTapDownDtails.dy<0){
         lineDy = 0.0;
-      }else if(onTapDownDtails.dy>canvasHeight){
+      }else if(canvasModel.onTapDownDtails.dy>canvasHeight){
         lineDy = canvasHeight;
       }else{
-        lineDy = onTapDownDtails.dy;
+        lineDy = canvasModel.onTapDownDtails.dy;
       }
 
 
@@ -358,9 +343,9 @@ class MyView extends CustomPainter{
       var i = 0;
       for(;i<kLineLength;i++){
         var dx = kLineOffsets[i][0];
-        lineDx = dx+kLineWidth/2;
+        lineDx = dx+canvasModel.kLineWidth/2;
 
-        if(dx>onTapDownDtails.dx){
+        if(dx>canvasModel.onTapDownDtails.dx){
           /// 横线
           canvas.drawLine(
               new Offset(lineDx, 0),
@@ -370,20 +355,20 @@ class MyView extends CustomPainter{
 
           Code.eventBus.fire(KLineDataInEvent(data));
 
-          lineDyPrice = (dayMaxPrice-dayMinPrice)*((canvasHeight-lineDy)/canvasHeight)+dayMinPrice;
+          lineDyPrice = (canvasModel.dayMaxPrice-canvasModel.dayMinPrice)*((canvasHeight-lineDy)/canvasHeight)+canvasModel.dayMinPrice;
           var initPriceText = _priceVerticalAxisTextPainter(lineDyPrice.toStringAsFixed(2))..layout();
           drawPrice(canvas,lineDyPrice,initPriceText,lineDx,lineDy,canvasWidth,canvasHeight);
           return;
         }
-        else if(onTapDownDtails.dx>kLineOffsets[kLineLength-1][0]){
+        else if(canvasModel.onTapDownDtails.dx>kLineOffsets[kLineLength-1][0]){
           /// 最后的一个线
-          lineDx = kLineOffsets[kLineLength-1][0]+kLineWidth/2;
+          lineDx = kLineOffsets[kLineLength-1][0]+canvasModel.kLineWidth/2;
           /// 横线
           canvas.drawLine(
               new Offset(lineDx, 0),
               new Offset(lineDx,canvasHeight ), _linePaint);
 
-          lineDyPrice = (dayMaxPrice-dayMinPrice)*((canvasHeight-lineDy)/canvasHeight)+dayMinPrice;
+          lineDyPrice = (canvasModel.dayMaxPrice-canvasModel.dayMinPrice)*((canvasHeight-lineDy)/canvasHeight)+canvasModel.dayMinPrice;
           var initPriceText = _priceVerticalAxisTextPainter(lineDyPrice.toStringAsFixed(2))..layout();
           drawPrice(canvas,lineDyPrice,initPriceText,lineDx,lineDy,canvasWidth,canvasHeight);
           return ;

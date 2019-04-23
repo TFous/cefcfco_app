@@ -96,11 +96,12 @@ class ListPageState extends State<ListPage> with AutomaticKeepAliveClientMixin,S
           children: myTabs.map((Tab tab) {    //遍历List<Tab>类型的对象myTabs并提取其属性值作为子控件的内容
             return Builder(
               builder: (BuildContext context) {
-                if(tab.text == '日行情'){
-                  return DayKLine();
-                }else if(tab.text == '分钟行情'){
-                  return MinKLine();
-                }else{
+//                if(tab.text == '日行情'){
+////                  return DayKLine();
+//                }else if(tab.text == '分钟行情'){
+//                  return MinKLine();
+//                }else
+                  {
                   return new Text(tab.text);
                 }
               },
