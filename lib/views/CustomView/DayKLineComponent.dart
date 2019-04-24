@@ -309,13 +309,31 @@ class MyView extends CustomPainter{
       final day5 = getAverageLineData(canvasModel.day5Data,5,canvasHeight,kLineDataLength);
       _drawSmoothLine(canvas,TextPaint,day5);
     }
+
     /// 十日均线
     if(canvasModel.day10Data.isNotEmpty){
       TextPaint.color = Colors.pinkAccent;
       int kLineDataLength = canvasModel.showKLineData.length;
-      final day5 = getAverageLineData(canvasModel.day10Data,10,canvasHeight,kLineDataLength);
-      _drawSmoothLine(canvas,TextPaint,day5);
+      final day10 = getAverageLineData(canvasModel.day10Data,10,canvasHeight,kLineDataLength);
+      _drawSmoothLine(canvas,TextPaint,day10);
     }
+
+    /// 15均线
+    if(canvasModel.day15Data.isNotEmpty){
+      TextPaint.color = Colors.brown;
+      int kLineDataLength = canvasModel.showKLineData.length;
+      final day15 = getAverageLineData(canvasModel.day15Data,15,canvasHeight,kLineDataLength);
+      _drawSmoothLine(canvas,TextPaint,day15);
+    }
+
+    /// 20均线
+    if(canvasModel.day10Data.isNotEmpty){
+      TextPaint.color = Colors.cyanAccent;
+      int kLineDataLength = canvasModel.showKLineData.length;
+      final day20 = getAverageLineData(canvasModel.day20Data,20,canvasHeight,kLineDataLength);
+      _drawSmoothLine(canvas,TextPaint,day20);
+    }
+
 
     /// 点击后画的十字
     if(canvasModel.onTapDownDtails!=null && canvasModel.isShowCross){

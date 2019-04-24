@@ -5,6 +5,8 @@ class CanvasModel{
   List<KLineModel> showKLineData;
   List<KLineModel> day5Data;
   List<KLineModel> day10Data;
+  List<KLineModel> day15Data;
+  List<KLineModel> day20Data;
   double dayMaxPrice;
   double dayMinPrice;
   double kLineWidth;
@@ -12,9 +14,12 @@ class CanvasModel{
   Offset onTapDownDtails;
   bool isShowCross;
 
-  CanvasModel(this.showKLineData,
+  CanvasModel(
+      this.showKLineData,
       this.day5Data,
       this.day10Data,
+      this.day15Data,
+      this.day20Data,
       this.dayMaxPrice,
       this.dayMinPrice,
       this.kLineWidth,

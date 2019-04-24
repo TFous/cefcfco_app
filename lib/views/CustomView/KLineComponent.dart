@@ -291,9 +291,9 @@ class MyView extends CustomPainter{
 
 
     ///绘制逻辑与Android差不多
-    canvas.save();
-    // 将坐标点移动到View的中心
-    canvas.restore();
+//    canvas.save();
+//    // 将坐标点移动到View的中心
+//    canvas.restore();
 
   }
 
