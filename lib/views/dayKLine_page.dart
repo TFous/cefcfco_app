@@ -49,10 +49,12 @@ class DayKLineState extends State<DayKLine> {
   double scaleDistance = 18.0; /// 滑动距离，用于判断多长距离请求一次
   ReadHistoryDbProvider provider = new ReadHistoryDbProvider('DB_DayKLine',Config.KLINE_DAY);
   GlobalKey anchorKey = GlobalKey();
+  GlobalKey anchorKey1 = GlobalKey();
 
   CanvasModel _canvasModel = new CanvasModel([],[],[],[],[],0.0,0.0,8.0,2.0,null,false);
 
   Offset _canvasOffset = Offset.zero;
+  Offset _canvasOffset1 = Offset.zero;
   double _scale = 0.90;
   StreamSubscription stream;
 
@@ -93,19 +95,38 @@ class DayKLineState extends State<DayKLine> {
   }
 
   /// 缩放后根据最后一个item 的时间 获取数据
-  List<KLineModel> getScaleDatasByLastTime(List<KLineModel> allData,String lastItemTime,int length){
+  List<KLineModel> getScaleDatasByLastTime(List<KLineModel> allData,String lastItemTime,int length,{averageDay}){
     int dataLength = allData.length;
+    List<KLineModel> list = [];
     int i=0;
-    for(;i<dataLength;i++){
-      if(allData[i].kLineDate == lastItemTime){
-        /// 当最后的index（前面数据的条数）小于 要获取的条数
-        if(i<length){
-          return allData.sublist(0,length);
-        }else{
-          return allData.sublist(i-length,i+1);
+    if(averageDay!=null){
+      for(;i<dataLength;i++){
+        if(allData[i].kLineDate == lastItemTime){
+          /// 当最后的index（前面数据的条数）小于 要获取的条数
+          if(i<(averageDay-1+length)){
+            list = allData.sublist(0,length);
+            print('2222');
+          }else{
+            list = allData.sublist(i-length-averageDay+1,i+1);
+            print('1111');
+          }
+        }
+      }
+    }else{
+      for(;i<dataLength;i++){
+        if(allData[i].kLineDate == lastItemTime){
+          /// 当最后的index（前面数据的条数）小于 要获取的条数
+          if(i<length){
+            list = allData.sublist(0,length);
+          }else{
+            list = allData.sublist(i-length+1,i+1);
+          }
         }
       }
     }
+
+    print('#########length $length -----${list.length}  ${list.first.kLineDate}');
+    return list;
   }
 
 
@@ -113,10 +134,10 @@ class DayKLineState extends State<DayKLine> {
   /// averageDay 有志的话则为 均价 天数
   List<KLineModel> getPointerMoveDatas(List<KLineModel> allData,String time,int length,String direction,{averageDay}){
     List<KLineModel> list = [];
-    int dataLength = allData.length;
+    int allDataLength = allData.length;
     int i=0;
-
-    for(;i<dataLength;i++){
+    /// 先取得正常的数据
+    for(;i<allDataLength;i++){
       if(allData[i].kLineDate == time){
         if(direction=='right'){
           int start = i-length-1;
@@ -129,9 +150,9 @@ class DayKLineState extends State<DayKLine> {
         }else{
           int start = i+1;
           int end = i+length+1;
-          if(end>dataLength){
-            start = dataLength-length-1;
-            end = dataLength-1;
+          if(end>allDataLength){
+            start = allDataLength-length-1;
+            end = allDataLength-1;
           }
           list = allData.sublist(start,end);
         }
@@ -142,25 +163,43 @@ class DayKLineState extends State<DayKLine> {
     List<KLineModel> averageDayList = [];
     /// 是否是均价数据
     if(averageDay!=null){
-      var averageSubTime = list.first.kLineDate;
+      var listFirstTime = list.first.kLineDate;
       int dayLength = averageDay-1;
-      for(int j=0;j<dataLength;j++){
-        if(allData[j].kLineDate == averageSubTime){
-          int start = j-dayLength;
-          int end = j;
-          if(start<0){
-//            averageDayList = allData.sublist(0,dayLength);
-//            list = averageDayList+list;
-          }else{
-            averageDayList = allData.sublist(start,end);
-            list = averageDayList+list;
-//            print('length--${averageDayList.length}--first:(${averageDayList.first.kLineDate})--last:(${averageDayList.last.kLineDate})');
+      if(direction=='right'){
+        int j = 0;
+        for (; j < allDataLength; j++) {
+          if (allData[j].kLineDate == listFirstTime) {
+            int start = j - dayLength;
+            int end = j;
+            /// 当在最左边是，如果start 小于0，则前面的数据不够，所以要获取前面的所有数据
+            if (start < 0) {
+              if (j != 0) {
+                averageDayList = allData.sublist(0, j);
+                list = averageDayList + list;
+              }
+            } else {
+              averageDayList = allData.sublist(start, end);
+              list = averageDayList + list;
+            }
+          }
+        }
+      }else{
+        int j=0;
+        for (; j < allDataLength; j++) {
+          if (allData[j].kLineDate == listFirstTime) {
+            int start = j - dayLength;
+            int end = j;
+            if (start < 0) {
+              averageDayList = allData.sublist(0, j);
+              list = averageDayList + list;
+            } else {
+              averageDayList = allData.sublist(start, end);
+              list = averageDayList + list;
+            }
           }
         }
       }
     }
-
-
     return list;
   }
 
@@ -266,19 +305,19 @@ class DayKLineState extends State<DayKLine> {
     var lastItemTime = _canvasModel.showKLineData.last.kLineDate;
 
     List<KLineModel> newList = getScaleDatasByLastTime(allKLineData,lastItemTime, minLeve);
-    List<KLineModel> day5Datas = getScaleDatasByLastTime(allKLineData,lastItemTime, minLeve+4);
-    List<KLineModel> day10Datas = getScaleDatasByLastTime(allKLineData,lastItemTime, minLeve+9);
-    List<KLineModel> day15Datas = getScaleDatasByLastTime(allKLineData,lastItemTime, minLeve+14);
-    List<KLineModel> day20Datas = getScaleDatasByLastTime(allKLineData,lastItemTime, minLeve+19);
+//    List<KLineModel> day5Datas = getScaleDatasByLastTime(allKLineData,lastItemTime, minLeve,averageDay: 5);
+//    List<KLineModel> day10Datas = getScaleDatasByLastTime(allKLineData,lastItemTime, minLeve,averageDay: 10);
+//    List<KLineModel> day15Datas = getScaleDatasByLastTime(allKLineData,lastItemTime, minLeve,averageDay: 15);
+    List<KLineModel> day20Datas = getScaleDatasByLastTime(allKLineData,lastItemTime, minLeve,averageDay: 20);
 
     Map maxAndMin = getMaxAndMin(newList);
 
     var dayMaxPrice = maxAndMin['maxPrice']??0.0;
     var dayMinPrice = maxAndMin['minPrice']??0.0;
     CanvasModel newCanvasModel = new CanvasModel(newList,
-        day5Datas,
-        day10Datas,
-        day15Datas,
+        [],
+        [],
+        [],
         day20Datas,
         dayMaxPrice,
         dayMinPrice,
@@ -387,6 +426,8 @@ class DayKLineState extends State<DayKLine> {
     /// 元素位置
     RenderBox renderBox = anchorKey.currentContext.findRenderObject();
     _canvasOffset =  renderBox.localToGlobal(Offset.zero);
+    RenderBox renderBox1 = anchorKey1.currentContext.findRenderObject();
+    _canvasOffset1 =  renderBox1.localToGlobal(Offset.zero);
 
     startTouchTime = getSecond(details.timeStamp);
 
@@ -496,11 +537,25 @@ class DayKLineState extends State<DayKLine> {
       child: Column(
         children: <Widget>[
           Container(
-            height: 200,
+            height: 300,
             padding: EdgeInsets.symmetric(vertical: globals.sidesDistance),
             child:Listener(
                 child: ClipRect(
                   key: anchorKey,
+                  child: new DayKLineComponent(_canvasModel),
+                ),
+                onPointerDown:_handelOnPointerDown,
+                onPointerUp: _handelOnPointerUp,
+                onPointerMove: _handelOnPointerMove,
+                onPointerCancel: _handelOnPointerCancel
+            ),
+          ),
+          Container(
+            height: 100,
+            padding: EdgeInsets.symmetric(vertical: globals.sidesDistance),
+            child:Listener(
+                child: ClipRect(
+                  key: anchorKey1,
                   child: new DayKLineComponent(_canvasModel),
                 ),
                 onPointerDown:_handelOnPointerDown,
@@ -528,82 +583,82 @@ class DayKLineState extends State<DayKLine> {
               ),
             ),
           ),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: globals.sidesDistance),
-            decoration: new BoxDecoration(
-              border: new Border(bottom: BorderSide(color: Color(0xFFf2f2f2))),
-              color: Colors.white,
-            ),
-            child: ListTile(
-              title: new Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Text(repository!=null?repository.startPrice.toStringAsFixed(2):'00', textAlign: TextAlign.left,style: TextStyle(color: Color(0xFF333333))),
-                    ),
-                    Expanded(
-                      child: Text("当前分钟开盘价格", textAlign: TextAlign.right,style: TextStyle(fontSize: 13.0,color: Color(0xFF999999),fontWeight: null),),
-                    ),
-                  ]
-              ),
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: globals.sidesDistance),
-            decoration: new BoxDecoration(
-              border: new Border(bottom: BorderSide(color: Color(0xFFf2f2f2))),
-              color: Colors.white,
-            ),
-            child: ListTile(
-              title: new Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Text(repository!=null?repository.endPrice.toStringAsFixed(2):'00', textAlign: TextAlign.left,style: TextStyle(color: Color(0xFF333333))),
-                    ),
-                    Expanded(
-                      child: Text("当前分钟收盘价格", textAlign: TextAlign.right,style: TextStyle(fontSize: 13.0,color: Color(0xFF999999),fontWeight: null),),
-                    ),
-                  ]
-              ),
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: globals.sidesDistance),
-            decoration: new BoxDecoration(
-              border: new Border(bottom: BorderSide(color: Color(0xFFf2f2f2))),
-              color: Colors.white,
-            ),
-            child: ListTile(
-              title: new Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Text(repository!=null?repository.maxPrice.toStringAsFixed(2):'00', textAlign: TextAlign.left,style: TextStyle(color: Color(0xFF333333))),
-                    ),
-                    Expanded(
-                      child: Text("当前分钟最高价格", textAlign: TextAlign.right,style: TextStyle(fontSize: 13.0,color: Color(0xFF999999),fontWeight: null),),
-                    ),
-                  ]
-              ),
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: globals.sidesDistance),
-            decoration: new BoxDecoration(
-              border: new Border(bottom: BorderSide(color: Color(0xFFf2f2f2))),
-              color: Colors.white,
-            ),
-            child: ListTile(
-              title: new Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Text(repository!=null?repository.minPrice.toStringAsFixed(2):'00', textAlign: TextAlign.left,style: TextStyle(color: Color(0xFF333333))),
-                    ),
-                    Expanded(
-                      child: Text("当前分钟最低价格", textAlign: TextAlign.right,style: TextStyle(fontSize: 13.0,color: Color(0xFF999999),fontWeight: null),),
-                    ),
-                  ]
-              ),
-            ),
-          ),
+//          Container(
+//            padding: EdgeInsets.symmetric(horizontal: globals.sidesDistance),
+//            decoration: new BoxDecoration(
+//              border: new Border(bottom: BorderSide(color: Color(0xFFf2f2f2))),
+//              color: Colors.white,
+//            ),
+//            child: ListTile(
+//              title: new Row(
+//                  children: <Widget>[
+//                    Expanded(
+//                      child: Text(repository!=null?repository.startPrice.toStringAsFixed(2):'00', textAlign: TextAlign.left,style: TextStyle(color: Color(0xFF333333))),
+//                    ),
+//                    Expanded(
+//                      child: Text("当前分钟开盘价格", textAlign: TextAlign.right,style: TextStyle(fontSize: 13.0,color: Color(0xFF999999),fontWeight: null),),
+//                    ),
+//                  ]
+//              ),
+//            ),
+//          ),
+//          Container(
+//            padding: EdgeInsets.symmetric(horizontal: globals.sidesDistance),
+//            decoration: new BoxDecoration(
+//              border: new Border(bottom: BorderSide(color: Color(0xFFf2f2f2))),
+//              color: Colors.white,
+//            ),
+//            child: ListTile(
+//              title: new Row(
+//                  children: <Widget>[
+//                    Expanded(
+//                      child: Text(repository!=null?repository.endPrice.toStringAsFixed(2):'00', textAlign: TextAlign.left,style: TextStyle(color: Color(0xFF333333))),
+//                    ),
+//                    Expanded(
+//                      child: Text("当前分钟收盘价格", textAlign: TextAlign.right,style: TextStyle(fontSize: 13.0,color: Color(0xFF999999),fontWeight: null),),
+//                    ),
+//                  ]
+//              ),
+//            ),
+//          ),
+//          Container(
+//            padding: EdgeInsets.symmetric(horizontal: globals.sidesDistance),
+//            decoration: new BoxDecoration(
+//              border: new Border(bottom: BorderSide(color: Color(0xFFf2f2f2))),
+//              color: Colors.white,
+//            ),
+//            child: ListTile(
+//              title: new Row(
+//                  children: <Widget>[
+//                    Expanded(
+//                      child: Text(repository!=null?repository.maxPrice.toStringAsFixed(2):'00', textAlign: TextAlign.left,style: TextStyle(color: Color(0xFF333333))),
+//                    ),
+//                    Expanded(
+//                      child: Text("当前分钟最高价格", textAlign: TextAlign.right,style: TextStyle(fontSize: 13.0,color: Color(0xFF999999),fontWeight: null),),
+//                    ),
+//                  ]
+//              ),
+//            ),
+//          ),
+//          Container(
+//            padding: EdgeInsets.symmetric(horizontal: globals.sidesDistance),
+//            decoration: new BoxDecoration(
+//              border: new Border(bottom: BorderSide(color: Color(0xFFf2f2f2))),
+//              color: Colors.white,
+//            ),
+//            child: ListTile(
+//              title: new Row(
+//                  children: <Widget>[
+//                    Expanded(
+//                      child: Text(repository!=null?repository.minPrice.toStringAsFixed(2):'00', textAlign: TextAlign.left,style: TextStyle(color: Color(0xFF333333))),
+//                    ),
+//                    Expanded(
+//                      child: Text("当前分钟最低价格", textAlign: TextAlign.right,style: TextStyle(fontSize: 13.0,color: Color(0xFF999999),fontWeight: null),),
+//                    ),
+//                  ]
+//              ),
+//            ),
+//          ),
 //          ListMenus(menusList: menusList)
         ],
       ),

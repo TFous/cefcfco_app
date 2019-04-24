@@ -62,7 +62,12 @@ class MyView extends CustomPainter{
     canvas.drawPath(path, paint);
   }
 
-
+  /// 取得相应天数的平均数和所在的 位置 公式：当前时间加上当前的前day-1天的数据/day
+  ///  averagePricesData  用于算平均数的数据:比当前画布的数据多出 day-1 条，如果不多出的话，则前几天是没有平均数的
+  ///  day  几天的平均
+  ///  canvasHeight 画布高度
+  ///  kLineDataLength  当前画布中的数据
+  ///
   List<Point> getAverageLineData(List<KLineModel>averagePricesData,int day,canvasHeight,int kLineDataLength) {
     int length = averagePricesData.length;
     if(length<day){
@@ -327,7 +332,7 @@ class MyView extends CustomPainter{
     }
 
     /// 20均线
-    if(canvasModel.day10Data.isNotEmpty){
+    if(canvasModel.day20Data.isNotEmpty){
       TextPaint.color = Colors.cyanAccent;
       int kLineDataLength = canvasModel.showKLineData.length;
       final day20 = getAverageLineData(canvasModel.day20Data,20,canvasHeight,kLineDataLength);
