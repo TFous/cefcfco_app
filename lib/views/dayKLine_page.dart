@@ -103,12 +103,14 @@ class DayKLineState extends State<DayKLine> {
       for(;i<dataLength;i++){
         if(allData[i].kLineDate == lastItemTime){
           /// 当最后的index（前面数据的条数）小于 要获取的条数
-          if(i<(averageDay-1+length)){
+          if(i<length){
             list = allData.sublist(0,length);
-            print('2222');
           }else{
-            list = allData.sublist(i-length-averageDay+1,i+1);
-            print('1111');
+            if (i - length-averageDay + 1 <=0) { /// 当最后的index（前面数据的条数）小于（length+averageDay - 1 ）所需要划线的数据，则直接取前面所有的数据
+              list = allData.sublist(0, i + 1);
+            } else {
+              list = allData.sublist(i - length - averageDay + 1, i + 1);
+            }
           }
         }
       }
@@ -124,8 +126,6 @@ class DayKLineState extends State<DayKLine> {
         }
       }
     }
-
-    print('#########length $length -----${list.length}  ${list.first.kLineDate}');
     return list;
   }
 
@@ -305,9 +305,9 @@ class DayKLineState extends State<DayKLine> {
     var lastItemTime = _canvasModel.showKLineData.last.kLineDate;
 
     List<KLineModel> newList = getScaleDatasByLastTime(allKLineData,lastItemTime, minLeve);
-//    List<KLineModel> day5Datas = getScaleDatasByLastTime(allKLineData,lastItemTime, minLeve,averageDay: 5);
-//    List<KLineModel> day10Datas = getScaleDatasByLastTime(allKLineData,lastItemTime, minLeve,averageDay: 10);
-//    List<KLineModel> day15Datas = getScaleDatasByLastTime(allKLineData,lastItemTime, minLeve,averageDay: 15);
+    List<KLineModel> day5Datas = getScaleDatasByLastTime(allKLineData,lastItemTime, minLeve,averageDay: 5);
+    List<KLineModel> day10Datas = getScaleDatasByLastTime(allKLineData,lastItemTime, minLeve,averageDay: 10);
+    List<KLineModel> day15Datas = getScaleDatasByLastTime(allKLineData,lastItemTime, minLeve,averageDay: 15);
     List<KLineModel> day20Datas = getScaleDatasByLastTime(allKLineData,lastItemTime, minLeve,averageDay: 20);
 
     Map maxAndMin = getMaxAndMin(newList);
@@ -315,9 +315,9 @@ class DayKLineState extends State<DayKLine> {
     var dayMaxPrice = maxAndMin['maxPrice']??0.0;
     var dayMinPrice = maxAndMin['minPrice']??0.0;
     CanvasModel newCanvasModel = new CanvasModel(newList,
-        [],
-        [],
-        [],
+        day5Datas,
+        day10Datas,
+        day15Datas,
         day20Datas,
         dayMaxPrice,
         dayMinPrice,

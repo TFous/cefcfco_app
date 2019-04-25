@@ -69,7 +69,7 @@ class MyView extends CustomPainter{
   ///  kLineDataLength  当前画布中的数据
   ///
   List<Point> getAverageLineData(List<KLineModel>averagePricesData,int day,canvasHeight,int kLineDataLength) {
-    int length = averagePricesData.length;
+    int length = averagePricesData.length; //平均数的数据
     if(length<day){
       print('getAverageLineData:当前数据数量太少！');
       return [];
