@@ -27,6 +27,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:cefcfco_app/views/CustomView/DayKLineComponent.dart';
+import 'package:cefcfco_app/views/CustomView/FigureComponent.dart';
 import 'package:cefcfco_app/common/utils/globals.dart' as globals;
 import 'package:cefcfco_app/common/utils/mockData.dart' as mockData;
 
@@ -551,12 +552,12 @@ class DayKLineState extends State<DayKLine> {
             ),
           ),
           Container(
-            height: 100,
+            height: 130,
             padding: EdgeInsets.symmetric(vertical: globals.sidesDistance),
             child:Listener(
                 child: ClipRect(
                   key: anchorKey1,
-                  child: new DayKLineComponent(_canvasModel),
+                  child: new FigureComponent(_canvasModel),
                 ),
                 onPointerDown:_handelOnPointerDown,
                 onPointerUp: _handelOnPointerUp,
