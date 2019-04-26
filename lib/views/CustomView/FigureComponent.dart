@@ -1,7 +1,10 @@
 import 'dart:ui';
 
+import 'package:cefcfco_app/common/config/KLineConfig.dart';
+import 'package:cefcfco_app/common/model/CanvasModel.dart';
 import 'package:cefcfco_app/common/model/KLineModel.dart';
 import 'package:cefcfco_app/common/net/Code.dart';
+import 'package:cefcfco_app/common/utils/CanvasMaxPriceInEvent.dart';
 import 'package:cefcfco_app/common/utils/KLineDataInEvent.dart';
 import 'package:cefcfco_app/common/utils/monotonex.dart';
 import 'package:flutter/cupertino.dart';
@@ -13,16 +16,7 @@ import 'dart:math';
 /// @author yinl
 class FigureComponent extends StatelessWidget{
   //数据源
-  var canvasModel;
-  List day10Data;
-  List day5Data;
-  double initPrice;
-  double kLineWidth;
-  Offset onTapDownDtails;
-  double kLineMargin;
-  bool isShowCross;
-  double dayMinPrice;
-  double dayMaxPrice;
+  CanvasModel canvasModel;
 
   FigureComponent(this.canvasModel);
 
@@ -50,6 +44,9 @@ class MyView extends CustomPainter{
   List kLineOffsets = []; /// k线位置[[dx,dy]]
   double lineWidth = 1.4;/// 线的宽度  譬如十字坐标
   var canvasModel;
+
+  double canvasMaxPrice = 0;
+  double canvasMinPrice = 0;
 
   var startAngles=[];
 
@@ -96,7 +93,7 @@ class MyView extends CustomPainter{
 
 
 
-  List<Point> getUPPointList(List<KLineModel>averagePricesData,int day,canvasHeight,int kLineDataLength) {
+  List<Point> getUPPointList(List<KLineModel>averagePricesData,int day,canvasHeight,int kLineDataLength,Canvas canvas) {
     int length = averagePricesData.length; //平均数的数据
     if(length<day){
       print('getAverageLineData:当前数据数量太少！');
@@ -118,6 +115,17 @@ class MyView extends CustomPainter{
       }
 
     }
+
+
+    if(canvasMaxPrice!=0 && canvasMaxPrice!=canvasModel.dayMaxPrice){
+//      canvasModel.dayMaxPrice = canvasMaxPrice;
+//      canvas.restore();
+
+      Code.eventBus.fire(CanvasMaxPriceInEvent(canvasMaxPrice));
+    }
+
+
+
     return pointList;
   }
 
@@ -142,6 +150,13 @@ class MyView extends CustomPainter{
         pointList.add(mdPoint);
       }
     }
+
+//    if(canvasMinPrice!=0 && canvasMinPrice!=canvasModel.dayMinPrice){
+////      canvasModel.dayMinPrice = canvasMinPrice;
+//      Code.eventBus.fire(CanvasMinPriceInEvent(canvasMinPrice));
+//
+//    }
+
     return pointList;
   }
 
@@ -213,18 +228,22 @@ class MyView extends CustomPainter{
     var kLineDistance = canvasModel.kLineWidth + canvasModel.kLineMargin;
     double dx = (kLineDistance*lineIndex+canvasModel.kLineMargin + kLineDistance*lineIndex+kLineDistance)/2;
     double mb = averagePrice/day;
-
-
-    print('$day-----------$length');
-    double c = kLineDatas.last.endPrice;
     double md = getMdData(kLineDatas, day);
     double up = getUP(mb, md);
+
+    /// 存储最高价格，用于确定上限
+    if(up>canvasModel.dayMaxPrice){
+      if(canvasMaxPrice ==0){
+        canvasMaxPrice = up;
+      }else if(up>canvasMaxPrice){
+        canvasMaxPrice = up;
+      }
+    }
+
 
     double dy = priceToPositionDy(up,canvasHeight);
 
     Point position =  Point(dx,dy);
-//    print('当前数据数量太少！-----:$kLineDatas---$lineIndex');
-//    print('当前数据数量太少！-----:$position---$lineIndex');
     return position;
   }
   Point getDNPoint(List<KLineModel>kLineDatas,int day,int lineIndex,canvasHeight){
@@ -242,14 +261,21 @@ class MyView extends CustomPainter{
     var kLineDistance = canvasModel.kLineWidth + canvasModel.kLineMargin;
     double dx = (kLineDistance*lineIndex+canvasModel.kLineMargin + kLineDistance*lineIndex+kLineDistance)/2;
     double mb = averagePrice/day;
-    double c = kLineDatas.last.endPrice;
     double md = getMdData(kLineDatas, day);
     double dn = getDN(mb, md);
+
+    /// 存储最高低，用于确定下限
+    if(dn<canvasModel.dayMinPrice){
+      if(canvasMinPrice ==0){
+        canvasMinPrice = dn;
+      }else if(dn<canvasMinPrice){
+        canvasMinPrice = dn;
+      }
+    }
+
     double dy = priceToPositionDy(dn,canvasHeight);
 
     Point position =  Point(dx,dy);
-//    print('当前数据数量太少！-----:$kLineDatas---$lineIndex');
-//    print('当前数据数量太少！-----:$position---$lineIndex');
     return position;
   }
 
@@ -290,7 +316,6 @@ class MyView extends CustomPainter{
       if(lineDx<canvasWidth/2){
         right = canvasWidth;
         left = canvasWidth - initPriceText.width;
-
       }
 
       var lineDyPriceReact = Rect.fromLTRB(left, top, right, bottom);
@@ -433,49 +458,31 @@ class MyView extends CustomPainter{
           _linePaint);
     });
 
-//    var initPriceText = _newVerticalAxisTextPainter(initPrice.toStringAsFixed(2))..layout();
-//    initPriceText.paint(canvas, Offset(0, canvasHeight/2- initPriceText.height / 2));
-//
-//    var dayMinPriceText = _newVerticalAxisTextPainter(canvasModel.dayMinPrice.toStringAsFixed(2))..layout();
-//    dayMinPriceText.paint(canvas, Offset(0, canvasHeight-dayMinPriceText.height));
-//
-//    var dayMaxPriceText = _newVerticalAxisTextPainter(canvasModel.dayMaxPrice.toStringAsFixed(2))..layout();
-//    dayMaxPriceText.paint(canvas, Offset(0, 0));
+    var initPriceText = _newVerticalAxisTextPainter(initPrice.toStringAsFixed(2))..layout();
+    initPriceText.paint(canvas, Offset(0, canvasHeight/2- initPriceText.height / 2));
+
+    var dayMinPriceText = _newVerticalAxisTextPainter(canvasModel.dayMinPrice.toStringAsFixed(2))..layout();
+    dayMinPriceText.paint(canvas, Offset(0, canvasHeight-dayMinPriceText.height));
+
+    var dayMaxPriceText = _newVerticalAxisTextPainter(canvasModel.dayMaxPrice.toStringAsFixed(2))..layout();
+    dayMaxPriceText.paint(canvas, Offset(0, 0));
 
     /// 20均线
     if(canvasModel.day20Data.isNotEmpty){
       TextPaint.color = Colors.cyanAccent;
       int kLineDataLength = canvasModel.showKLineData.length;
+
       final day20 = getAverageLineData(canvasModel.day20Data,20,canvasHeight,kLineDataLength);
-      final up = getUPPointList(canvasModel.day20Data,20,canvasHeight,kLineDataLength);
-      final dn = getDNPointList(canvasModel.day20Data,20,canvasHeight,kLineDataLength);
       _drawSmoothLine(canvas,TextPaint,day20);
 
+      final up = getUPPointList(canvasModel.day20Data,20,canvasHeight,kLineDataLength,canvas);
       TextPaint.color = Colors.redAccent;
       _drawSmoothLine(canvas,TextPaint,up);
 
-
+      final dn = getDNPointList(canvasModel.day20Data,20,canvasHeight,kLineDataLength);
       TextPaint.color = Colors.brown;
       _drawSmoothLine(canvas,TextPaint,dn);
-
-
-
-
-
-
-
-
-
-
-
-
-
     }
-
-
-
-
-
 
 
     /// 点击后画的十字
