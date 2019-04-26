@@ -17,6 +17,8 @@ import 'dart:math';
 
 import 'package:cefcfco_app/common/config/Config.dart';
 import 'package:cefcfco_app/common/config/KLineConfig.dart';
+import 'package:cefcfco_app/common/model/BollPositonsModel.dart';
+import 'package:cefcfco_app/common/model/CanvasBollModel.dart';
 import 'package:cefcfco_app/common/model/CanvasModel.dart';
 import 'package:cefcfco_app/common/model/KLineModel.dart';
 import 'package:cefcfco_app/common/net/Code.dart';
@@ -30,6 +32,7 @@ import 'package:flutter/material.dart';
 import 'package:cefcfco_app/views/CustomView/DayKLineComponent.dart';
 import 'package:cefcfco_app/views/CustomView/FigureComponent.dart';
 import 'package:cefcfco_app/common/utils/globals.dart' as globals;
+import 'package:cefcfco_app/common/utils/KLineUtils.dart';
 import 'package:cefcfco_app/common/utils/mockData.dart' as mockData;
 
 class DayKLine extends StatefulWidget {
@@ -54,6 +57,8 @@ class DayKLineState extends State<DayKLine> {
   GlobalKey anchorKey1 = GlobalKey();
 
   CanvasModel _canvasModel = new CanvasModel([],[],[],[],[],0.0,0.0,8.0,2.0,null,false);
+
+  CanvasBollModel bollModel = new CanvasBollModel([],[],[],[],0.0,0.0,8.0,2.0,null,false);
 
   Offset _canvasOffset = Offset.zero;
   Offset _canvasOffset1 = Offset.zero;
@@ -273,8 +278,24 @@ class DayKLineState extends State<DayKLine> {
         _canvasModel.kLineMargin,
         _canvasModel.onTapDownDtails,
         _canvasModel.isShowCross);
+
+    BollPositonsModel bollData = bollDataToPosition(day20Datas,20,newList.length,100,newCanvasModel);
+    CanvasBollModel newBollModel = new CanvasBollModel(
+        newList,
+        bollData.maPointList,
+        bollData.upPointList,
+        bollData.dnPointList,
+        bollData.maxUP,
+        bollData.minDN,
+        _canvasModel.kLineWidth,
+        _canvasModel.kLineMargin,
+        _canvasModel.onTapDownDtails,
+        _canvasModel.isShowCross);
+
+
     setState(() {
       _canvasModel = newCanvasModel;
+      bollModel = newBollModel;
     });
 
   }
@@ -328,8 +349,24 @@ class DayKLineState extends State<DayKLine> {
         _canvasModel.onTapDownDtails,
         _canvasModel.isShowCross);
 
+    BollPositonsModel bollData = bollDataToPosition(day20Datas,20,newList.length,100,newCanvasModel);
+    CanvasBollModel newBollModel = new CanvasBollModel(
+        newList,
+        bollData.maPointList,
+        bollData.upPointList,
+        bollData.dnPointList,
+        bollData.maxUP,
+        bollData.minDN,
+        _canvasModel.kLineWidth,
+        _canvasModel.kLineMargin,
+        _canvasModel.onTapDownDtails,
+        _canvasModel.isShowCross);
+
+
+
     setState(() {
       _canvasModel = newCanvasModel;
+      bollModel = newBollModel;
     });
 
     maxKlinNum = minLeve;
@@ -368,10 +405,24 @@ class DayKLineState extends State<DayKLine> {
               _canvasModel.onTapDownDtails,
               _canvasModel.isShowCross);
 
+        BollPositonsModel bollData = bollDataToPosition(day20Datas,20,newList.length,100,newCanvasModel);
+        CanvasBollModel newBollModel = new CanvasBollModel(
+            newList,
+            bollData.maPointList,
+            bollData.upPointList,
+            bollData.dnPointList,
+            bollData.maxUP,
+            bollData.minDN,
+            _canvasModel.kLineWidth,
+            _canvasModel.kLineMargin,
+            _canvasModel.onTapDownDtails,
+            _canvasModel.isShowCross);
 
-          setState(() {
+
+        setState(() {
             _canvasModel = newCanvasModel;
-          });
+            bollModel = newBollModel;
+        });
       }
     }else{  /// 向--->滑动，最新数据
       if(_canvasModel.showKLineData.first.kLineDate == firstData.kLineDate){
@@ -400,8 +451,23 @@ class DayKLineState extends State<DayKLine> {
               _canvasModel.kLineMargin,
               _canvasModel.onTapDownDtails,
               _canvasModel.isShowCross);
+
+          BollPositonsModel bollData = bollDataToPosition(day20Datas,20,newList.length,100,newCanvasModel);
+          CanvasBollModel newBollModel = new CanvasBollModel(
+              newList,
+              bollData.maPointList,
+              bollData.upPointList,
+              bollData.dnPointList,
+              bollData.maxUP,
+              bollData.minDN,
+              _canvasModel.kLineWidth,
+              _canvasModel.kLineMargin,
+              _canvasModel.onTapDownDtails,
+              _canvasModel.isShowCross);
+
           setState(() {
             _canvasModel = newCanvasModel;
+            bollModel = newBollModel;
           });
         }
     }
@@ -508,6 +574,12 @@ class DayKLineState extends State<DayKLine> {
         if(_canvasModel.isShowCross){
           _canvasModel.onTapDownDtails = details.position - _canvasOffset;
         }
+
+
+//        bollModel.isShowCross = !bollModel.isShowCross;
+//        if(bollModel.isShowCross){
+//          bollModel.onTapDownDtails = details.position - _canvasOffset;
+//        }
       });
     }
 
@@ -544,15 +616,9 @@ class DayKLineState extends State<DayKLine> {
           Container(
             height: 100 ,
             padding: EdgeInsets.symmetric(vertical: globals.sidesDistance),
-            child: Listener(
-                child: ClipRect(
-                  key: anchorKey1,
-                  child: new FigureComponent(_canvasModel),
-                ),
-                onPointerDown: _handelOnPointerDown,
-                onPointerUp: _handelOnPointerUp,
-                onPointerMove: _handelOnPointerMove,
-                onPointerCancel: _handelOnPointerCancel
+            child: ClipRect(
+              key: anchorKey1,
+              child: new FigureComponent(bollModel),
             ),
           ),
           Container(
@@ -705,8 +771,7 @@ class DayKLineState extends State<DayKLine> {
                                 Expanded(
                                   child: Text(
                                     "当前分钟最低价格", textAlign: TextAlign.right,
-                                    style: TextStyle(fontSize: 13.0,
-                                        color: Color(0xFF999999),
+                                    style: TextStyle(fontSize: 13.0, color: Color(0xFF999999),
                                         fontWeight: null),),
                                 ),
                               ]

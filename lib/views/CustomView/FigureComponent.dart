@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:cefcfco_app/common/config/KLineConfig.dart';
+import 'package:cefcfco_app/common/model/CanvasBollModel.dart';
 import 'package:cefcfco_app/common/model/CanvasModel.dart';
 import 'package:cefcfco_app/common/model/KLineModel.dart';
 import 'package:cefcfco_app/common/net/Code.dart';
@@ -16,7 +17,7 @@ import 'dart:math';
 /// @author yinl
 class FigureComponent extends StatelessWidget{
   //数据源
-  CanvasModel canvasModel;
+  CanvasBollModel canvasModel;
 
   FigureComponent(this.canvasModel);
 
@@ -43,7 +44,7 @@ class MyView extends CustomPainter{
   double initPrice;
   List kLineOffsets = []; /// k线位置[[dx,dy]]
   double lineWidth = 1.4;/// 线的宽度  譬如十字坐标
-  var canvasModel;
+  CanvasBollModel canvasModel;
 
   double canvasMaxPrice = 0;
   double canvasMinPrice = 0;
@@ -188,6 +189,7 @@ class MyView extends CustomPainter{
     double num = mb-md*2;
     return num;
   }
+
   /// 获取平均数 并 转换成点
   /// data 行情数据
   /// day 几天，5日行情，10日行情
@@ -197,6 +199,7 @@ class MyView extends CustomPainter{
       print('当前数据数量太少！-----length:$length');
       return null;
     }
+
     var averagePrice=0.0;
     int i = 0;
     for(;i<length;i++){
@@ -468,20 +471,22 @@ class MyView extends CustomPainter{
     dayMaxPriceText.paint(canvas, Offset(0, 0));
 
     /// 20均线
-    if(canvasModel.day20Data.isNotEmpty){
+    if(canvasModel.maPointList.isNotEmpty){
       TextPaint.color = Colors.cyanAccent;
-      int kLineDataLength = canvasModel.showKLineData.length;
+//      int kLineDataLength = canvasModel.showKLineData.length;
 
-      final day20 = getAverageLineData(canvasModel.day20Data,20,canvasHeight,kLineDataLength);
-      _drawSmoothLine(canvas,TextPaint,day20);
+//      final day20 = getAverageLineData(canvasModel.day20Data,20,canvasHeight,kLineDataLength);
+      _drawSmoothLine(canvas,TextPaint,canvasModel.maPointList);
 
-      final up = getUPPointList(canvasModel.day20Data,20,canvasHeight,kLineDataLength,canvas);
+//      final up = getUPPointList(canvasModel.day20Data,20,canvasHeight,kLineDataLength,canvas);
       TextPaint.color = Colors.redAccent;
-      _drawSmoothLine(canvas,TextPaint,up);
+      _drawSmoothLine(canvas,TextPaint,canvasModel.upPointList);
 
-      final dn = getDNPointList(canvasModel.day20Data,20,canvasHeight,kLineDataLength);
+//      final dn = getDNPointList(canvasModel.day20Data,20,canvasHeight,kLineDataLength);
       TextPaint.color = Colors.brown;
-      _drawSmoothLine(canvas,TextPaint,dn);
+//      _drawSmoothLine(canvas,TextPaint,dn);
+      _drawSmoothLine(canvas,TextPaint,canvasModel.dnPointList);
+
     }
 
 

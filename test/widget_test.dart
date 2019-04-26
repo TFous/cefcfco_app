@@ -30,19 +30,5 @@ class CustomException implements Exception {
     CustomException(this.cause);
 }
 void main() {
-    var d1 = DateTime.parse('2018-10-10 03:31:58');
-    var d2 = DateTime.parse('2018-10-10 03:31:59');
-    var timeStamp1 =  "4:31:59.117000";
-
-
-    var list = [21,22,33,44,32,52,67,77,88,15];
-
-
-    var aa = new HttpErrorEvent(1,'2');
-    double b = aa.getmd(list, 10);
-    print(b);
-
-}
-throwException() {
-    throw new CustomException('This is my first custom exception');
+    throw ('This is my first custom exception');
 }
