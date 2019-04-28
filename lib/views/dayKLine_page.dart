@@ -47,18 +47,18 @@ class DayKLineState extends State<DayKLine> {
   int subscript = 0;
   double onHorizontalDragDistance = 0.0; /// 滑动距离
   double minKLineWidth = 4.0;
-  double maxKLineWidth = 10.0;
+  double maxKLineWidth = 50.0;
   double canvasWidth;  /// 画布长度，用于计算渲染数据条数
-  int maxKlinNum; /// 当前klin最大容量个数
+  int maxKlineNum; /// 当前klin最大容量个数
   double dragDistance = 2; /// 滑动距离，用于判断多长距离请求一次
   double scaleDistance = 18.0; /// 滑动距离，用于判断多长距离请求一次
   ReadHistoryDbProvider provider = new ReadHistoryDbProvider('DB_DayKLine',Config.KLINE_DAY);
   GlobalKey anchorKey = GlobalKey();
   GlobalKey anchorKey1 = GlobalKey();
 
-  CanvasModel _canvasModel = new CanvasModel([],[],[],[],[],0.0,0.0,8.0,2.0,null,false);
+  CanvasModel _canvasModel = new CanvasModel([],[],[],[],[],0.0,0.0,38.0,2.0,null,false);
 
-  CanvasBollModel bollModel = new CanvasBollModel([],[],[],[],0.0,0.0,8.0,2.0,null,false);
+  CanvasBollModel bollModel = new CanvasBollModel([], [],[],[],[],0.0,0.0,38.0,2.0,null,false);
 
   Offset _canvasOffset = Offset.zero;
   Offset _canvasOffset1 = Offset.zero;
@@ -96,7 +96,6 @@ class DayKLineState extends State<DayKLine> {
 
   /// 初始化获取适应屏幕的数据
   List<KLineModel> getLimitDatas(List<KLineModel> allData,int start,int end){
-    print('start  $start-----end  $end');
     List<KLineModel> list = allData.sublist(start,end);
     return list;
   }
@@ -251,19 +250,19 @@ class DayKLineState extends State<DayKLine> {
   initCanvasData(width) async{
     var kLineDistance = _canvasModel.kLineWidth+_canvasModel.kLineMargin;
     var minLeve = width~/kLineDistance; // k线数量
-    var length= allKLineData.length;
     firstData = allKLineData.first;
     lastData = allKLineData.last;
 
-    List newList = getLimitDatas(allKLineData,length-minLeve,length);
-    List day5Datas = getLimitDatas(allKLineData,length-minLeve-4,length);
-    List day10Datas = getLimitDatas(allKLineData,length-minLeve-9,length);
-    List day15Datas = getLimitDatas(allKLineData,length-minLeve-14,length);
-    List day20Datas = getLimitDatas(allKLineData,length-minLeve-19,length);
+    List<KLineModel> newList = getKLineData(allKLineData,[], minLeve,null);
+    List<KLineModel> day5Datas = getKLineData(allKLineData,[], minLeve,null,otherDay: 5);
+    List<KLineModel> day10Datas = getKLineData(allKLineData,[], minLeve,null,otherDay: 10);
+    List<KLineModel> day15Datas = getKLineData(allKLineData,[], minLeve,null,otherDay: 15);
+    List<KLineModel> day20Datas = getKLineData(allKLineData,[], minLeve,null,otherDay: 20);
+
     Map maxAndMin = getMaxAndMin(newList);
 
     canvasWidth = width;
-    maxKlinNum = minLeve;
+    maxKlineNum = minLeve;
 
     var dayMaxPrice = maxAndMin['maxPrice']??0.0;
     var dayMinPrice = maxAndMin['minPrice']??0.0;
@@ -279,8 +278,9 @@ class DayKLineState extends State<DayKLine> {
         _canvasModel.onTapDownDtails,
         _canvasModel.isShowCross);
 
-    BollPositonsModel bollData = bollDataToPosition(day20Datas,20,newList.length,100,newCanvasModel);
+    BollPositonsModel bollData = bollDataToPosition(day20Datas,20,newList,100,newCanvasModel);
     CanvasBollModel newBollModel = new CanvasBollModel(
+        bollData.historyData,
         newList,
         bollData.maPointList,
         bollData.upPointList,
@@ -333,6 +333,8 @@ class DayKLineState extends State<DayKLine> {
     List<KLineModel> day15Datas = getScaleDatasByLastTime(allKLineData,lastItemTime, minLeve,averageDay: 15);
     List<KLineModel> day20Datas = getScaleDatasByLastTime(allKLineData,lastItemTime, minLeve,averageDay: 20);
 
+
+
     Map maxAndMin = getMaxAndMin(newList);
 
     var dayMaxPrice = maxAndMin['maxPrice']??0.0;
@@ -349,8 +351,9 @@ class DayKLineState extends State<DayKLine> {
         _canvasModel.onTapDownDtails,
         _canvasModel.isShowCross);
 
-    BollPositonsModel bollData = bollDataToPosition(day20Datas,20,newList.length,100,newCanvasModel);
+    BollPositonsModel bollData = bollDataToPosition(day20Datas,20,newList,100,newCanvasModel);
     CanvasBollModel newBollModel = new CanvasBollModel(
+        bollData.historyData,
         newList,
         bollData.maPointList,
         bollData.upPointList,
@@ -369,7 +372,7 @@ class DayKLineState extends State<DayKLine> {
       bollModel = newBollModel;
     });
 
-    maxKlinNum = minLeve;
+    maxKlineNum = minLeve;
   }
 
   /// 左右移动
@@ -383,13 +386,25 @@ class DayKLineState extends State<DayKLine> {
           return ;
         }
           var time = _canvasModel.showKLineData.first.kLineDate;
-          var newList = getPointerMoveDatas(allKLineData,time,maxKlinNum,'left');
-          List day5Datas = getPointerMoveDatas(allKLineData,time,maxKlinNum,'left',averageDay:5);
-          List day10Datas = getPointerMoveDatas(allKLineData,time,maxKlinNum,'left',averageDay:10);
-          List day15Datas = getPointerMoveDatas(allKLineData,time,maxKlinNum,'left',averageDay:15);
-          List day20Datas = getPointerMoveDatas(allKLineData,time,maxKlinNum,'left',averageDay:20);
+          var newList = getPointerMoveDatas(allKLineData,time,maxKlineNum,'left');
+          List day5Datas = getPointerMoveDatas(allKLineData,time,maxKlineNum,'left',averageDay:5);
+          List day10Datas = getPointerMoveDatas(allKLineData,time,maxKlineNum,'left',averageDay:10);
+          List day15Datas = getPointerMoveDatas(allKLineData,time,maxKlineNum,'left',averageDay:15);
+          List day20Datas = getPointerMoveDatas(allKLineData,time,maxKlineNum,'left',averageDay:20);
 
-          Map maxAndMin = getMaxAndMin(newList);
+
+        List<KLineModel> newList2 = getKLineData(allKLineData,_canvasModel.showKLineData, maxKlineNum,'left');
+        List<KLineModel> day5Datas2 = getKLineData(allKLineData,_canvasModel.day5Data, maxKlineNum,'left',otherDay: 5);
+
+        print('${_canvasModel.day5Data.first.kLineDate}');
+        print('last-----${_canvasModel.day5Data.last.kLineDate}');
+//        print('newList2---${newList.length}--${newList2.length}--${newList.first.kLineDate==newList2.first.kLineDate}--${newList.last.kLineDate==newList2.last.kLineDate}');
+        print('day5Datas2---${day5Datas.length}--${day5Datas2.length}--${day5Datas.first.kLineDate==day5Datas2.first.kLineDate}--${day5Datas.last.kLineDate==day5Datas2.last.kLineDate}');
+        print('day5Datas2---${day5Datas.first.kLineDate}--${day5Datas2.first.kLineDate}--${day5Datas.last.kLineDate}--${day5Datas2.last.kLineDate}');
+//        print('${newList.length}--${newList2.length}--${newList.first.kLineDate}--${newList2.first.kLineDate}--${newList.last.kLineDate}--${newList2.last.kLineDate}');
+
+
+        Map maxAndMin = getMaxAndMin(newList);
 
           var dayMaxPrice = maxAndMin['maxPrice']??0.0;
           var dayMinPrice = maxAndMin['minPrice']??0.0;
@@ -405,8 +420,13 @@ class DayKLineState extends State<DayKLine> {
               _canvasModel.onTapDownDtails,
               _canvasModel.isShowCross);
 
-        BollPositonsModel bollData = bollDataToPosition(day20Datas,20,newList.length,100,newCanvasModel);
+        List<KLineModel> day22Datas = getKLineData(allKLineData,_canvasModel.day20Data, maxKlineNum,'left',otherDay: 20);
+        BollPositonsModel bollData = bollDataToPosition(day22Datas,20,newList,100,newCanvasModel);
+
+
+
         CanvasBollModel newBollModel = new CanvasBollModel(
+            bollData.historyData,
             newList,
             bollData.maPointList,
             bollData.upPointList,
@@ -431,16 +451,24 @@ class DayKLineState extends State<DayKLine> {
         if(onHorizontalDragDistance.abs()>dragDistance){
           onHorizontalDragDistance = 0 ;
           var time = _canvasModel.showKLineData.last.kLineDate;
-          var newList = getPointerMoveDatas(allKLineData,time,maxKlinNum,'right');
-          List day5Datas = getPointerMoveDatas(allKLineData,time,maxKlinNum,'right',averageDay:5);
-          List day10Datas = getPointerMoveDatas(allKLineData,time,maxKlinNum,'right',averageDay:10);
-          List day15Datas = getPointerMoveDatas(allKLineData,time,maxKlinNum,'right',averageDay:15);
-          List day20Datas = getPointerMoveDatas(allKLineData,time,maxKlinNum,'right',averageDay:20);
+//          List<KLineModel> newList = getPointerMoveDatas(allKLineData,time,maxKlineNum,'right');
+          List<KLineModel> newList = getKLineData(allKLineData,_canvasModel.showKLineData, maxKlineNum,'right');
+
+          List day5Datas = getKLineData(allKLineData,_canvasModel.day5Data, maxKlineNum,'right',otherDay: 5);
+          List day10Datas = getKLineData(allKLineData,_canvasModel.day10Data, maxKlineNum,'right',otherDay: 10);
+          List day15Datas = getKLineData(allKLineData,_canvasModel.day15Data, maxKlineNum,'right',otherDay: 15);
+          List day20Datas = getKLineData(allKLineData,_canvasModel.day20Data, maxKlineNum,'right',otherDay: 20);
+
           Map maxAndMin = getMaxAndMin(newList);
+
+          print('${_canvasModel.showKLineData.first.kLineDate}');
+          print('last-----${newList.last.kLineDate}');
+//        print('newList2---${newList.length}--${newList.length}--${newList.first.kLineDate==newList2.first.kLineDate}--${newList.last.kLineDate==newList2.last.kLineDate}');
 
           var dayMaxPrice = maxAndMin['maxPrice']??0.0;
           var dayMinPrice = maxAndMin['minPrice']??0.0;
-          CanvasModel newCanvasModel = new CanvasModel(newList,
+          CanvasModel newCanvasModel = new CanvasModel(
+              newList,
               day5Datas,
               day10Datas,
               day15Datas,
@@ -452,8 +480,10 @@ class DayKLineState extends State<DayKLine> {
               _canvasModel.onTapDownDtails,
               _canvasModel.isShowCross);
 
-          BollPositonsModel bollData = bollDataToPosition(day20Datas,20,newList.length,100,newCanvasModel);
+
+          BollPositonsModel bollData = bollDataToPosition(day20Datas,20,newList,100,newCanvasModel);
           CanvasBollModel newBollModel = new CanvasBollModel(
+              bollData.historyData,
               newList,
               bollData.maPointList,
               bollData.upPointList,
@@ -641,15 +671,14 @@ class DayKLineState extends State<DayKLine> {
                                 Expanded(
                                   child: Text(
                                       repository != null ? repository.kLineDate
-                                          .toString().split(' ')[1] : '00',
+                                          .toString(): '00',
                                       textAlign: TextAlign.left,
                                       style: TextStyle(
                                           color: Color(0xFF333333))),
                                 ),
                                 Expanded(
                                   child: Text(
-                                    repository != null ? repository.kLineDate
-                                        .toString().split(' ')[0] : '时间',
+                                    '时间',
                                     textAlign: TextAlign.right,
                                     style: TextStyle(fontSize: 13.0,
                                         color: Color(0xFF999999),

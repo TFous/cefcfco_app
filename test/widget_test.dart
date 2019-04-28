@@ -28,7 +28,17 @@ class HttpErrorEvent {
 class CustomException implements Exception {
     String cause;
     CustomException(this.cause);
+
+    var a = new HttpErrorEvent(1, '2');
+    var b = new HttpErrorEvent(1, '2');
+
+
+
 }
 void main() {
-    throw ('This is my first custom exception');
+
+    var c=[1,2,3,4,5,6,7,8,9,0];
+    int a= 2;
+    var d = c.sublist(8,22);
+    print(d);
 }
