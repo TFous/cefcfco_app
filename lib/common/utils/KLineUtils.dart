@@ -1,10 +1,13 @@
 import 'dart:math';
+import 'dart:ui';
 
+import 'package:cefcfco_app/common/config/KLineConfig.dart';
 import 'package:cefcfco_app/common/model/BollListModel.dart';
 import 'package:cefcfco_app/common/model/BollModel.dart';
 import 'package:cefcfco_app/common/model/BollPositonsModel.dart';
 import 'package:cefcfco_app/common/model/CanvasModel.dart';
 import 'package:cefcfco_app/common/model/KLineModel.dart';
+import 'package:cefcfco_app/common/utils/monotonex.dart';
 /*
 k线图的一些公用方法
 
@@ -33,17 +36,17 @@ List<KLineModel> getKLineData(List<KLineModel> allData,
       //向右滑动，数据向前拿⬅
 
       if (historyFirstItem.kLineDate == allData.first.kLineDate) {
-        list = allData.sublist(0, length);
+        list = allData.sublist(0, day);
       }  else{
         for (int i = 0; i < allDataLength; i++) {
-          if (historyFirstItem.kLineDate == allData[i].kLineDate) {
-            int start = i - num;
-            int end = i + length - num;
-            if(i + length - num>allDataLength){
-              list = historyData;
-            }else{
-              list = allData.sublist(start, end);
+          if (historyLastItem.kLineDate == allData[i].kLineDate) {
+            int start = i - length- num;
+            int end = i - num;
+            if(start<0){
+              start = 0;
+              end = day;
             }
+            list = allData.sublist(start, end);
           }
         }
       }
@@ -56,11 +59,16 @@ List<KLineModel> getKLineData(List<KLineModel> allData,
       } else {
         // 不然返回向后瞬移一条的数据
         for (int i = 0; i < allDataLength; i++) {
-          if (historyFirstItem.kLineDate == allData[i].kLineDate) {
-            int start = i+num;
-            int end = i + length + num;
-            if(end>allDataLength){
-              list = historyData;
+//          if (historyFirstItem.kLineDate == allData[i].kLineDate) {
+//            print('historyFirstItem--$i');
+//          }
+          if (historyLastItem.kLineDate == allData[i].kLineDate) {
+            int start = i-length+num;
+            int end = i + num+1;
+            if(start<=0){
+              list = allData.sublist(0, end);
+            }else if(end>allDataLength){
+              list = allData.sublist(allDataLength - length);
             }else{
               list = allData.sublist(start, end);
             }
@@ -73,14 +81,9 @@ List<KLineModel> getKLineData(List<KLineModel> allData,
 
 }
 
-double priceToPositionDy(
-    double nowPrice, double canvasHeight, CanvasModel canvasModel) {
+double priceToPositionDy(double nowPrice, double canvasHeight, canvasModel) {
   double initPrice = (canvasModel.dayMaxPrice + canvasModel.dayMinPrice) / 2;
-  double dy = canvasHeight / 2 -
-      ((nowPrice - initPrice) /
-          (canvasModel.dayMaxPrice - initPrice) *
-          canvasHeight /
-          2);
+  double dy = canvasHeight / 2 - ((nowPrice - initPrice) / (canvasModel.dayMaxPrice - initPrice) * canvasHeight / 2);
   return dy;
 }
 
@@ -152,69 +155,33 @@ BollModel getBollData(List<KLineModel> slotDatas, int positionIndex) {
   return new BollModel(positionIndex, mb, up, dn);
 }
 
-/// slotDatas 为计算均值的时间段
-Point getUPPoint(List<KLineModel> slotDatas, int day, int lineIndex,
-    double canvasHeight, CanvasModel canvasModel) {
-  int length = slotDatas.length;
-  if (length < day) {
-    print('当前数据数量太少！-----length:$length');
-    return null;
-  }
-
-  double mb = getMA(slotDatas);
-  double md = getMdData(slotDatas, day);
-  double up = getUP(mb, md);
-
-  double dx = getDx(canvasModel, lineIndex);
-  double dy = priceToPositionDy(up, canvasHeight, canvasModel);
-  Point position = Point(dx, dy);
-  return position;
-}
-
-/// 获取几天的平均值数组， 便于计算最高值和最低值
-/// n 几天的平局值
-/// auxiliaryDatas  画辅助线的总数据
-List<Point> getMaList(List<KLineModel> auxiliaryDatas, int n,
-    int kLineDataLength, double canvasHeight, CanvasModel canvasModel) {
-  int length = auxiliaryDatas.length;
-  int i = 0;
-  int index = 0;
-  List<Point> pointList = [];
-  for (; i < length; i++) {
-    if (i <= length - n) {
-      List<KLineModel> listForN = auxiliaryDatas.sublist(i, i + n);
-      if (length < kLineDataLength + n) {
-        index = i + (n - (length - kLineDataLength) - 1);
-      } else {
-        index = i;
-      }
-      Point mdPoint = getUPPoint(listForN, n, index, canvasHeight, canvasModel);
-      pointList.add(mdPoint);
-    }
-  }
-  return pointList;
-}
-
 /// 获取几天的平均值数组， 便于计算最高值和最低值
 /// n 几天的平局值
 /// auxiliaryDatas  画辅助线的总数据
 /// kLineDataLength  k线图的数据长度，长度要少于auxiliaryDatas长度，相减值为n-1，
 /// 如果相等或不为n-1,则index向后移 index = i+(n-(length-kLineDataLength)-1);
 BollListModel getBollDataList(
-    List<KLineModel> auxiliaryDatas, int n, int kLineDataLength) {
-  int length = auxiliaryDatas.length;
+    List<KLineModel> allKLineData,
+    List<KLineModel> auxiliaryDatas,
+    int n, List<KLineModel> kLineData) {
+  int length = auxiliaryDatas.length; //28  20  9
   int i = 0;
-  int index = 0;
+  int index = -1;  // 默认不在屏幕上显示
+  int kLineDataLength = kLineData.length;
   double maxUP; // 最大的上轨
   double minDN; // 最低的下轨
   List<BollModel> list = [];
-  for (; i < length; i++) {
-    if (i <= length - n) {
-      List<KLineModel> listForN = auxiliaryDatas.sublist(i, i + n);
-      if (length < kLineDataLength + n) {
-        index = i + (n - (length - kLineDataLength) - 1);
-      } else {
-        index = i;
+  for (; i <= length; i++) {
+    if (i >= n) {
+      List<KLineModel> listForN = auxiliaryDatas.sublist(i-n, i);
+//      print('${listForN.first.kLineDate}--${listForN.last.kLineDate}---${listForN.length}');
+//      print('${i-n}--${i}');
+//      print('***************');
+      KLineModel last = listForN.last;
+      for(var p=0;p<kLineDataLength;p++){
+        if(last.kLineDate==kLineData[p].kLineDate){
+          index = p;
+        }
       }
 
       BollModel bollData = getBollData(listForN, index);
@@ -239,10 +206,12 @@ BollListModel getBollDataList(
       }
     }
   }
+
   return new BollListModel(list, maxUP, minDN);
 }
 
 BollPositonsModel bollDataToPosition(
+    List<KLineModel> allKLineData,
     List<KLineModel> auxiliaryDatas,
     int n,
     List<KLineModel> kLineData,
@@ -252,24 +221,46 @@ BollPositonsModel bollDataToPosition(
   List<Point> upPointList = [];
   List<Point> dnPointList = [];
   int kLineDataLength = kLineData.length;
-  BollListModel bollList = getBollDataList(auxiliaryDatas, n, kLineDataLength);
+  BollListModel bollList = getBollDataList(allKLineData,auxiliaryDatas, n, kLineData);
+//  print('///////////////////////////');
+//  print('item.positionIndex ${kLineData.first.kLineDate}  dx-- (${kLineData.last.kLineDate})');
+  int length = bollList.list.length;
+  int i=0;
+  if(bollList.list.isNotEmpty){
+    for(;i<length;i++){
+      BollModel item = bollList.list[i];
+      double dx = getDx(canvasModel, item.positionIndex);
+//      print('///////////////////////////');
+//      print('item.positionIndex ${item.positionIndex}  dx-- ($dx)');
+      double maDy = priceToPositionDy(item.ma, canvasHeight, canvasModel);
+      double upDy = priceToPositionDy(item.up, canvasHeight, canvasModel);
+      double dnDy = priceToPositionDy(item.dn, canvasHeight, canvasModel);
 
-  print('auxiliaryDatas--${auxiliaryDatas.length}--'
-      '--$kLineDataLength----${auxiliaryDatas.length-kLineDataLength}');
-
-  bollList.list.forEach((item) {
-    double dx = getDx(canvasModel, item.positionIndex);
-
-    double maDy = priceToPositionDy(item.ma, canvasHeight, canvasModel);
-    double upDy = priceToPositionDy(item.up, canvasHeight, canvasModel);
-    double dnDy = priceToPositionDy(item.dn, canvasHeight, canvasModel);
-
-    maPointList.add(new Point(dx, maDy));
-    upPointList.add(new Point(dx, upDy));
-    dnPointList.add(new Point(dx, dnDy));
-  });
+      maPointList.add(new Point(dx, maDy));
+      upPointList.add(new Point(dx, upDy));
+      dnPointList.add(new Point(dx, dnDy));
+    }
+  }else{
+    print('maPointList--${maPointList}--'
+        '--$kLineDataLength----${auxiliaryDatas.length-kLineDataLength}');
+    return new BollPositonsModel(
+        kLineData,
+        maPointList, upPointList, dnPointList, bollList.maxUP, bollList.minDN);
+  }
 
   return new BollPositonsModel(
       kLineData,
-      maPointList, upPointList, dnPointList, bollList.maxUP, bollList.minDN);
+      maPointList, upPointList, dnPointList, bollList.maxUP*(1+KLineConfig.HEIGHT_LIMIT), bollList.minDN*(1-KLineConfig.HEIGHT_LIMIT));
+}
+
+
+void drawSmoothLine(Canvas canvas, Paint paint, List<Point> points) {
+  if(points.isNotEmpty){
+    final path = new Path()
+      ..moveTo(points.first.x.toDouble(), points.first.y.toDouble());
+    MonotoneX.addCurve(path, points);
+    canvas.drawPath(path, paint);
+  }else{
+    print('无数据！！');
+  }
 }

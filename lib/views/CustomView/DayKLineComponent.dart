@@ -1,8 +1,11 @@
 import 'dart:ui';
 
+import 'package:cefcfco_app/common/model/BollListModel.dart';
+import 'package:cefcfco_app/common/model/BollPositonsModel.dart';
 import 'package:cefcfco_app/common/model/KLineModel.dart';
 import 'package:cefcfco_app/common/net/Code.dart';
 import 'package:cefcfco_app/common/utils/KLineDataInEvent.dart';
+import 'package:cefcfco_app/common/utils/KLineUtils.dart';
 import 'package:cefcfco_app/common/utils/monotonex.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -54,13 +57,6 @@ class MyView extends CustomPainter{
   var startAngles=[];
 
   MyView(this.canvasModel);
-
-  void _drawSmoothLine(Canvas canvas, Paint paint, List<Point> points) {
-    final path = new Path()
-      ..moveTo(points.first.x.toDouble(), points.first.y.toDouble());
-    MonotoneX.addCurve(path, points);
-    canvas.drawPath(path, paint);
-  }
 
   /// 取得相应天数的平均数和所在的 位置 公式：当前时间加上当前的前day-1天的数据/day
   ///  averagePricesData  用于算平均数的数据:比当前画布的数据多出 day-1 条，如果不多出的话，则前几天是没有平均数的
@@ -311,32 +307,32 @@ class MyView extends CustomPainter{
 //      print('day5Datas----${day5Data.first}---${day5Data.last}');
       TextPaint.color = Colors.deepOrange;
       int kLineDataLength = canvasModel.showKLineData.length;
+
+//      BollListModel bollList = getBollDataList(canvasModel.allKLineData,canvasModel.day5Data, 5, canvasModel.showKLineData);
+      BollPositonsModel boll5Data = bollDataToPosition(canvasModel.allKLineData,canvasModel.day5Data,5,canvasModel.showKLineData,canvasHeight,canvasModel);
       final day5 = getAverageLineData(canvasModel.day5Data,5,canvasHeight,kLineDataLength);
-      _drawSmoothLine(canvas,TextPaint,day5);
+      drawSmoothLine(canvas,TextPaint,boll5Data.maPointList);
     }
 
     /// 十日均线
     if(canvasModel.day10Data.isNotEmpty){
       TextPaint.color = Colors.pinkAccent;
-      int kLineDataLength = canvasModel.showKLineData.length;
-      final day10 = getAverageLineData(canvasModel.day10Data,10,canvasHeight,kLineDataLength);
-      _drawSmoothLine(canvas,TextPaint,day10);
+      BollPositonsModel day10 = bollDataToPosition(canvasModel.allKLineData,canvasModel.day10Data,10,canvasModel.showKLineData,canvasHeight,canvasModel);
+      drawSmoothLine(canvas,TextPaint,day10.maPointList);
     }
 
     /// 15均线
     if(canvasModel.day15Data.isNotEmpty){
       TextPaint.color = Colors.brown;
-      int kLineDataLength = canvasModel.showKLineData.length;
-      final day15 = getAverageLineData(canvasModel.day15Data,15,canvasHeight,kLineDataLength);
-      _drawSmoothLine(canvas,TextPaint,day15);
+      BollPositonsModel data = bollDataToPosition(canvasModel.allKLineData,canvasModel.day15Data,15,canvasModel.showKLineData,canvasHeight,canvasModel);
+      drawSmoothLine(canvas,TextPaint,data.maPointList);
     }
 
     /// 20均线
     if(canvasModel.day20Data.isNotEmpty){
       TextPaint.color = Colors.cyanAccent;
-      int kLineDataLength = canvasModel.showKLineData.length;
-      final day20 = getAverageLineData(canvasModel.day20Data,20,canvasHeight,kLineDataLength);
-      _drawSmoothLine(canvas,TextPaint,day20);
+      BollPositonsModel data = bollDataToPosition(canvasModel.allKLineData,canvasModel.day20Data,20,canvasModel.showKLineData,canvasHeight,canvasModel);
+      drawSmoothLine(canvas,TextPaint,data.maPointList);
     }
 
 
