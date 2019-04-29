@@ -81,9 +81,9 @@ List<KLineModel> getKLineData(List<KLineModel> allData,
 
 }
 
-double priceToPositionDy(double nowPrice, double canvasHeight, canvasModel) {
-  double initPrice = (canvasModel.dayMaxPrice + canvasModel.dayMinPrice) / 2;
-  double dy = canvasHeight / 2 - ((nowPrice - initPrice) / (canvasModel.dayMaxPrice - initPrice) * canvasHeight / 2);
+double priceToPositionDy(double nowPrice, double canvasHeight,double dayMaxPrice,double dayMinPrice) {
+  double initPrice = (dayMaxPrice + dayMinPrice) / 2;
+  double dy = canvasHeight / 2 - ((nowPrice - initPrice) / (dayMaxPrice - initPrice) * canvasHeight / 2);
   return dy;
 }
 
@@ -204,6 +204,7 @@ BollListModel getBollDataList(
           minDN = bollData.dn;
         }
       }
+
     }
   }
 
@@ -230,19 +231,16 @@ BollPositonsModel bollDataToPosition(
     for(;i<length;i++){
       BollModel item = bollList.list[i];
       double dx = getDx(canvasModel, item.positionIndex);
-//      print('///////////////////////////');
-//      print('item.positionIndex ${item.positionIndex}  dx-- ($dx)');
-      double maDy = priceToPositionDy(item.ma, canvasHeight, canvasModel);
-      double upDy = priceToPositionDy(item.up, canvasHeight, canvasModel);
-      double dnDy = priceToPositionDy(item.dn, canvasHeight, canvasModel);
+      double maDy = priceToPositionDy(item.ma, canvasHeight, bollList.maxUP,bollList.minDN);
+      double upDy = priceToPositionDy(item.up, canvasHeight, bollList.maxUP,bollList.minDN);
+      double dnDy = priceToPositionDy(item.dn, canvasHeight, bollList.maxUP,bollList.minDN);
 
       maPointList.add(new Point(dx, maDy));
       upPointList.add(new Point(dx, upDy));
       dnPointList.add(new Point(dx, dnDy));
     }
   }else{
-    print('maPointList--${maPointList}--'
-        '--$kLineDataLength----${auxiliaryDatas.length-kLineDataLength}');
+    // 空就返回一个空对象
     return new BollPositonsModel(
         kLineData,
         maPointList, upPointList, dnPointList, bollList.maxUP, bollList.minDN);
@@ -250,7 +248,7 @@ BollPositonsModel bollDataToPosition(
 
   return new BollPositonsModel(
       kLineData,
-      maPointList, upPointList, dnPointList, bollList.maxUP*(1+KLineConfig.HEIGHT_LIMIT), bollList.minDN*(1-KLineConfig.HEIGHT_LIMIT));
+      maPointList, upPointList, dnPointList, bollList.maxUP, bollList.minDN);
 }
 
 

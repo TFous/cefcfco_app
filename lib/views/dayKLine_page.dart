@@ -17,6 +17,8 @@ import 'dart:math';
 
 import 'package:cefcfco_app/common/config/Config.dart';
 import 'package:cefcfco_app/common/config/KLineConfig.dart';
+import 'package:cefcfco_app/common/model/BollListModel.dart';
+import 'package:cefcfco_app/common/model/BollModel.dart';
 import 'package:cefcfco_app/common/model/BollPositonsModel.dart';
 import 'package:cefcfco_app/common/model/CanvasBollModel.dart';
 import 'package:cefcfco_app/common/model/CanvasModel.dart';
@@ -281,8 +283,11 @@ class DayKLineState extends State<DayKLine> {
         _canvasModel.kLineMargin,
         _canvasModel.onTapDownDtails,
         _canvasModel.isShowCross);
+//    BollListModel bollList = getBollDataList(allKLineData,day20Datas, 20,newList);
 
     BollPositonsModel bollData = bollDataToPosition(allKLineData,day20Datas,20,newList,figureComponentHeight,newCanvasModel);
+
+
     CanvasBollModel newBollModel = new CanvasBollModel(
         bollData.historyData,
         newList,

@@ -183,8 +183,8 @@ class MyView extends CustomPainter{
       var left = kLineDistance*i+canvasModel.kLineMargin;
       var right = kLineDistance*i+kLineDistance;
 
-      top = priceToPositionDy(startPrice,canvasHeight,canvasModel);
-      bottom = priceToPositionDy(endPrice,canvasHeight,canvasModel);
+      top = priceToPositionDy(startPrice,canvasHeight,canvasModel.dayMaxPrice,canvasModel.dayMinPrice);
+      bottom = priceToPositionDy(endPrice,canvasHeight,canvasModel.dayMaxPrice,canvasModel.dayMinPrice);
 
       if(endPrice>startPrice){
         _linePaint..color = Colors.red;
@@ -203,8 +203,8 @@ class MyView extends CustomPainter{
 
       canvas.drawRect(kLineReact, _linePaint);
 
-      var maxTop = priceToPositionDy(maxPrice,canvasHeight,canvasModel);
-      var minBottom = priceToPositionDy(minPrice,canvasHeight,canvasModel);
+      var maxTop = priceToPositionDy(maxPrice,canvasHeight,canvasModel.dayMaxPrice,canvasModel.dayMinPrice);
+      var minBottom = priceToPositionDy(minPrice,canvasHeight,canvasModel.dayMaxPrice,canvasModel.dayMinPrice);
 
       canvas.drawLine(
           new Offset((left + right) / 2, maxTop),
