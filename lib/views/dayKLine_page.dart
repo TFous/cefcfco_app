@@ -90,10 +90,9 @@ class DayKLineState extends State<DayKLine> {
     super.initState();
     allKLineData = mockData.mockData(globals.kLine);
     print('所有数据长度----${allKLineData.length}');
+    // evenbus内不能用setstate,不然无限刷新
     stream = Code.eventBus.on<KLineDataInEvent>().listen((event) {
-      setState(() {
-        repository = event.repository;
-      });
+      repository = event.repository;
     });
   }
 
@@ -429,20 +428,30 @@ class DayKLineState extends State<DayKLine> {
               _canvasModel.isShowCross);
 
         BollPositonsModel bollData = bollDataToPosition(allKLineData,day20Datas,20,newList,figureComponentHeight,newCanvasModel);
-//
+        double max;
+        double min;
+        if(bollData.maxUP>dayMaxPrice){
+          max = bollData.maxUP;
+        }else{
+          max = dayMaxPrice;
+        }
+        if(bollData.minDN>dayMinPrice){
+          min = dayMinPrice;
+        }else{
+          min = bollData.minDN;
+        }
         CanvasBollModel newBollModel = new CanvasBollModel(
             bollData.historyData,
             newList,
             bollData.maPointList,
             bollData.upPointList,
             bollData.dnPointList,
-            bollData.maxUP??dayMaxPrice,
-            bollData.minDN??dayMinPrice,
+            max,
+            min,
             _canvasModel.kLineWidth,
             _canvasModel.kLineMargin,
             _canvasModel.onTapDownDtails,
             _canvasModel.isShowCross);
-
 
         setState(() {
             _canvasModel = newCanvasModel;
@@ -485,14 +494,26 @@ class DayKLineState extends State<DayKLine> {
 //          print('newList-----${newList.last.kLineDate}--newListlength:${newList.length}');
 
           BollPositonsModel bollData = bollDataToPosition(allKLineData,day20Datas,20,newList,figureComponentHeight,newCanvasModel);
+          double max;
+          double min;
+          if(bollData.maxUP>dayMaxPrice){
+            max = bollData.maxUP;
+          }else{
+            max = dayMaxPrice;
+          }
+          if(bollData.minDN>dayMinPrice){
+            min = dayMinPrice;
+          }else{
+            min = bollData.minDN;
+          }
           CanvasBollModel newBollModel = new CanvasBollModel(
               bollData.historyData,
               newList,
               bollData.maPointList,
               bollData.upPointList,
               bollData.dnPointList,
-              bollData.maxUP??dayMaxPrice,
-              bollData.minDN??dayMinPrice,
+              max,
+              min,
               _canvasModel.kLineWidth,
               _canvasModel.kLineMargin,
               _canvasModel.onTapDownDtails,
@@ -516,14 +537,15 @@ class DayKLineState extends State<DayKLine> {
     _canvasOffset1 =  renderBox1.localToGlobal(Offset.zero);
 
     startTouchTime = getMillisecondsSinceEpoch();
-
     startPosition = details.position;
     pointerNum++;
     pointerDownPositions[details.pointer] = details;
 
     if(pointerDownPositions.length>=2){
       isScale = true;
-      _canvasModel.isShowCross = false;  //两个手指的时候不显示十字坐标
+      setState(() {
+        _canvasModel.isShowCross = false;  //两个手指的时候不显示十字坐标
+      });
     }else{
       isScale = false;
     }
@@ -603,12 +625,6 @@ class DayKLineState extends State<DayKLine> {
         if(_canvasModel.isShowCross){
           _canvasModel.onTapDownDtails = details.position - _canvasOffset;
         }
-
-
-//        bollModel.isShowCross = !bollModel.isShowCross;
-//        if(bollModel.isShowCross){
-//          bollModel.onTapDownDtails = details.position - _canvasOffset;
-//        }
       });
     }
 

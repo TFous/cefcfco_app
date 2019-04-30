@@ -171,16 +171,19 @@ BollListModel getBollDataList(
   double maxUP; // 最大的上轨
   double minDN; // 最低的下轨
   List<BollModel> list = [];
+//  print('${listForN.first.kLineDate}--${listForN.last.kLineDate}---${listForN.length}');
+  print('kLineData${kLineData.first.kLineDate}--${kLineData.last.kLineDate}---${kLineData.length}');
+  print('auxiliaryDatas${auxiliaryDatas.first.kLineDate}--${auxiliaryDatas.last.kLineDate}---${auxiliaryDatas.length}');
+  print('***************');
   for (; i <= length; i++) {
     if (i >= n) {
       List<KLineModel> listForN = auxiliaryDatas.sublist(i-n, i);
-//      print('${listForN.first.kLineDate}--${listForN.last.kLineDate}---${listForN.length}');
-//      print('${i-n}--${i}');
-//      print('***************');
       KLineModel last = listForN.last;
       for(var p=0;p<kLineDataLength;p++){
         if(last.kLineDate==kLineData[p].kLineDate){
           index = p;
+          print('index}--${index}');
+
         }
       }
 

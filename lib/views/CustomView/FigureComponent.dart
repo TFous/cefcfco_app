@@ -168,8 +168,6 @@ class MyView extends CustomPainter{
         new Offset(canvasWidth, _EqualHeight/4*3), _EqualLinePaint);
 
 
-    print('canvasModel.dayMaxPrice--${canvasModel.dayMaxPrice}---$canvasHeight');
-
     _linePaint..strokeWidth =1.3;
     canvasModel.showKLineData.asMap().forEach((i, line) {
 
