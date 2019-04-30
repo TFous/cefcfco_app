@@ -386,7 +386,7 @@ class DayKLineState extends State<DayKLine> {
   /// 左右移动
   moveKLine(details) async {
     onHorizontalDragDistance += details.delta.dx;
-    if(details.delta.dx < 0){  /// 向<----滑动，历史数据
+    if(details.delta.dx < 0){  /// 向左滑动，新数据
       if(onHorizontalDragDistance.abs()>dragDistance){
         onHorizontalDragDistance = 0 ;
         /// 如果是最后时间则没有数据
@@ -430,12 +430,16 @@ class DayKLineState extends State<DayKLine> {
         BollPositonsModel bollData = bollDataToPosition(allKLineData,day20Datas,20,newList,figureComponentHeight,newCanvasModel);
         double max;
         double min;
-        if(bollData.maxUP>dayMaxPrice){
+        if(bollData.maxUP==null){
+          max = dayMaxPrice;
+        }else if(bollData.maxUP>dayMaxPrice){
           max = bollData.maxUP;
         }else{
           max = dayMaxPrice;
         }
-        if(bollData.minDN>dayMinPrice){
+        if(bollData.minDN==null){
+          min = dayMinPrice;
+        }else if(bollData.minDN>dayMinPrice){
           min = dayMinPrice;
         }else{
           min = bollData.minDN;
@@ -458,7 +462,7 @@ class DayKLineState extends State<DayKLine> {
             bollModel = newBollModel;
         });
       }
-    }else{  /// 向--->滑动，最新数据
+    }else{  /// 向右滑动，旧数据
       if(_canvasModel.showKLineData.first.kLineDate == firstData.kLineDate){
         return;
       }
@@ -496,12 +500,16 @@ class DayKLineState extends State<DayKLine> {
           BollPositonsModel bollData = bollDataToPosition(allKLineData,day20Datas,20,newList,figureComponentHeight,newCanvasModel);
           double max;
           double min;
-          if(bollData.maxUP>dayMaxPrice){
+          if(bollData.maxUP==null){
+            max = dayMaxPrice;
+          }else if(bollData.maxUP>dayMaxPrice){
             max = bollData.maxUP;
           }else{
             max = dayMaxPrice;
           }
-          if(bollData.minDN>dayMinPrice){
+          if(bollData.minDN==null){
+            min = dayMinPrice;
+          }else if(bollData.minDN>dayMinPrice){
             min = dayMinPrice;
           }else{
             min = bollData.minDN;

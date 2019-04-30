@@ -301,33 +301,33 @@ class MyView extends CustomPainter{
     var dayMaxPriceText = _newVerticalAxisTextPainter(canvasModel.dayMaxPrice.toStringAsFixed(2))..layout();
     dayMaxPriceText.paint(canvas, Offset(0, 0));
 
-//    /// 五日均线
-//    if(canvasModel.day5Data.isNotEmpty){
-//      TextPaint.color = Colors.deepOrange;
-//      BollPositonsModel boll5Data = bollDataToPosition(canvasModel.allKLineData,canvasModel.day5Data,5,canvasModel.showKLineData,canvasHeight,canvasModel);
-//      drawSmoothLine(canvas,TextPaint,boll5Data.maPointList);
-//    }
-//
-//    /// 十日均线
-//    if(canvasModel.day10Data.isNotEmpty){
-//      TextPaint.color = Colors.pinkAccent;
-//      BollPositonsModel day10 = bollDataToPosition(canvasModel.allKLineData,canvasModel.day10Data,10,canvasModel.showKLineData,canvasHeight,canvasModel);
-//      drawSmoothLine(canvas,TextPaint,day10.maPointList);
-//    }
-//
-//    /// 15均线
-//    if(canvasModel.day15Data.isNotEmpty){
-//      TextPaint.color = Colors.brown;
-//      BollPositonsModel data = bollDataToPosition(canvasModel.allKLineData,canvasModel.day15Data,15,canvasModel.showKLineData,canvasHeight,canvasModel);
-//      drawSmoothLine(canvas,TextPaint,data.maPointList);
-//    }
-//
-//    /// 20均线
-//    if(canvasModel.day20Data.isNotEmpty){
-//      TextPaint.color = Colors.cyanAccent;
-//      BollPositonsModel data = bollDataToPosition(canvasModel.allKLineData,canvasModel.day20Data,20,canvasModel.showKLineData,canvasHeight,canvasModel);
-//      drawSmoothLine(canvas,TextPaint,data.maPointList);
-//    }
+    /// 五日均线
+    if(canvasModel.day5Data.isNotEmpty){
+      TextPaint.color = Colors.deepOrange;
+      BollPositonsModel boll5Data = bollDataToPosition(canvasModel.allKLineData,canvasModel.day5Data,5,canvasModel.showKLineData,canvasHeight,canvasModel);
+      drawSmoothLine(canvas,TextPaint,boll5Data.maPointList);
+    }
+
+    /// 十日均线
+    if(canvasModel.day10Data.isNotEmpty){
+      TextPaint.color = Colors.pinkAccent;
+      BollPositonsModel day10 = bollDataToPosition(canvasModel.allKLineData,canvasModel.day10Data,10,canvasModel.showKLineData,canvasHeight,canvasModel);
+      drawSmoothLine(canvas,TextPaint,day10.maPointList);
+    }
+
+    /// 15均线
+    if(canvasModel.day15Data.isNotEmpty){
+      TextPaint.color = Colors.brown;
+      BollPositonsModel data = bollDataToPosition(canvasModel.allKLineData,canvasModel.day15Data,15,canvasModel.showKLineData,canvasHeight,canvasModel);
+      drawSmoothLine(canvas,TextPaint,data.maPointList);
+    }
+
+    /// 20均线
+    if(canvasModel.day20Data.isNotEmpty){
+      TextPaint.color = Colors.cyanAccent;
+      BollPositonsModel data = bollDataToPosition(canvasModel.allKLineData,canvasModel.day20Data,20,canvasModel.showKLineData,canvasHeight,canvasModel);
+      drawSmoothLine(canvas,TextPaint,data.maPointList);
+    }
 
 
     /// 点击后画的十字

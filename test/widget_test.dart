@@ -39,6 +39,6 @@ void main() {
 
     var c=[1,2,3,4,5,6,7,8,9,0];
     int a= 2;
-    var d = c.sublist(0,2);
+    var d = c.sublist(0,1);
     print(d);
 }

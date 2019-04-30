@@ -17,66 +17,60 @@ k线图的一些公用方法
 // 每次调用返回比原先数据多一条
 List<KLineModel> getKLineData(List<KLineModel> allData,
     List<KLineModel> historyData, int day, String direction,
-    {num: 1, otherDay}) {
+    {num: 1, otherDay=0}) {
   int length = day;
-  if (otherDay != null && otherDay > 0) {
+  if (otherDay > 0) {
     length = day + otherDay - 1;
   }
   int allDataLength = allData.length;
   List<KLineModel> list = [];
   if(historyData.isEmpty){ // 没有历史数据则是初始化，去最新数据
     list = allData.sublist(allDataLength - length);
-  }else if (allDataLength <= length) {// 如果总数据小于需求的条数，则直接返回全部
-    list = allData.sublist(0, allDataLength);
-  } else {
-//    print('historyData--${historyData.length}--${historyData.first.kLineDate}');
+  }else {
     KLineModel historyFirstItem = historyData.first;
     KLineModel historyLastItem = historyData.last;
+    List<KLineModel> otherList = [];
     if (direction == 'right') {
       //向右滑动，数据向前拿⬅
-
-      if (historyFirstItem.kLineDate == allData.first.kLineDate) {
-        list = allData.sublist(0, day);
-      }  else{
-        for (int i = 0; i < allDataLength; i++) {
-          if (historyLastItem.kLineDate == allData[i].kLineDate) {
-            int start = i - length- num;
-            int end = i - num;
-            if(start<0){
-              start = 0;
-              end = day;
+      for (int i = 0; i < allDataLength; i++) {
+        if (historyFirstItem.kLineDate == allData[i].kLineDate) {
+          if(i==0){
+            for (int j = 0; j < allDataLength; j++) {
+              if (historyLastItem.kLineDate == allData[j].kLineDate) {
+                list = allData.sublist(0, j);
+              }
             }
-            list = allData.sublist(start, end);
+          }else{
+            int start;
+            start = i-1<0?0:i-1;
+            otherList = allData.sublist(start, start+1);
+            list = otherList+historyData.sublist(0, historyData.length-1);
           }
         }
       }
     } else {
       // 向左滑动，数据向后→
-
-      //如果原来的数据没有更新的数据，则直接返回最新的一段数据
-      if (historyLastItem.kLineDate == allData.last.kLineDate) {
-        list = allData.sublist(allDataLength - length);
-      } else {
-        // 不然返回向后瞬移一条的数据
-        for (int i = 0; i < allDataLength; i++) {
-//          if (historyFirstItem.kLineDate == allData[i].kLineDate) {
-//            print('historyFirstItem--$i');
-//          }
-          if (historyLastItem.kLineDate == allData[i].kLineDate) {
-            int start = i-length+num;
-            int end = i + num+1;
-            if(start<=0){
-              list = allData.sublist(0, end);
-            }else if(end>allDataLength){
-              list = allData.sublist(allDataLength - length);
-            }else{
-              list = allData.sublist(start, end);
-            }
+      for (int i = 0; i < allDataLength; i++) {
+        if (historyLastItem.kLineDate == allData[i].kLineDate) {
+          // 等于最后一个
+          if(i==allDataLength-1){
+            list = allData.sublist(i-length, i);
+          }else if(i<=length){
+            list = allData.sublist(0, i+2);
+          }else{
+            int start;
+            start = i+1>=allDataLength?allDataLength:i+1;
+            otherList = allData.sublist(start, start+1);
+            list = historyData.sublist(1, historyData.length)+otherList;
+//            if(otherDay==20){
+//              print('${list.length}-${historyData.length}----${historyData.sublist(1, historyData.length).length}-----${otherList.length}');
+//            }
           }
         }
       }
     }
   }
+
   return list;
 
 }
@@ -172,9 +166,9 @@ BollListModel getBollDataList(
   double minDN; // 最低的下轨
   List<BollModel> list = [];
 //  print('${listForN.first.kLineDate}--${listForN.last.kLineDate}---${listForN.length}');
-  print('kLineData${kLineData.first.kLineDate}--${kLineData.last.kLineDate}---${kLineData.length}');
-  print('auxiliaryDatas${auxiliaryDatas.first.kLineDate}--${auxiliaryDatas.last.kLineDate}---${auxiliaryDatas.length}');
-  print('***************');
+//  print('kLineData${kLineData.first.kLineDate}--${kLineData.last.kLineDate}---${kLineData.length}');
+//  print('auxiliaryDatas${auxiliaryDatas.first.kLineDate}--${auxiliaryDatas.last.kLineDate}---${auxiliaryDatas.length}');
+//  print('***************');
   for (; i <= length; i++) {
     if (i >= n) {
       List<KLineModel> listForN = auxiliaryDatas.sublist(i-n, i);
@@ -182,8 +176,6 @@ BollListModel getBollDataList(
       for(var p=0;p<kLineDataLength;p++){
         if(last.kLineDate==kLineData[p].kLineDate){
           index = p;
-          print('index}--${index}');
-
         }
       }
 
