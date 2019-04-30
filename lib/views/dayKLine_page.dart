@@ -49,7 +49,7 @@ class DayKLineState extends State<DayKLine> {
   int subscript = 0;
   double onHorizontalDragDistance = 0.0; /// 滑动距离
   double minKLineWidth = 4.0;
-  double maxKLineWidth = 30.0;
+  double maxKLineWidth = 26.0;
   double figureComponentHeight = 100.0;
   double kLineComponentHeight = 230.0;
   double canvasWidth;  /// 画布长度，用于计算渲染数据条数
@@ -97,147 +97,6 @@ class DayKLineState extends State<DayKLine> {
   }
 
 
-  /// 初始化获取适应屏幕的数据
-  List<KLineModel> getLimitDatas(List<KLineModel> allData,int start,int end){
-    List<KLineModel> list = allData.sublist(start,end);
-    return list;
-  }
-
-  /// 缩放后根据最后一个item 的时间 获取数据
-  List<KLineModel> getScaleDatasByLastTime(List<KLineModel> allData,String lastItemTime,int length,{averageDay}){
-    int dataLength = allData.length;
-    List<KLineModel> list = [];
-    int i=0;
-    if(averageDay!=null){
-      for(;i<dataLength;i++){
-        if(allData[i].kLineDate == lastItemTime){
-          /// 当最后的index（前面数据的条数）小于 要获取的条数
-          if(i<length){
-            list = allData.sublist(0,length);
-          }else{
-            if (i - length-averageDay + 1 <=0) { /// 当最后的index（前面数据的条数）小于（length+averageDay - 1 ）所需要划线的数据，则直接取前面所有的数据
-              list = allData.sublist(0, i + 1);
-            } else {
-              list = allData.sublist(i - length - averageDay + 1, i + 1);
-            }
-          }
-        }
-      }
-    }else{
-      for(;i<dataLength;i++){
-        if(allData[i].kLineDate == lastItemTime){
-          /// 当最后的index（前面数据的条数）小于 要获取的条数
-          if(i<length){
-            list = allData.sublist(0,length);
-          }else{
-            list = allData.sublist(i-length+1,i+1);
-          }
-        }
-      }
-    }
-    return list;
-  }
-
-
-  /// 左右移动的数据
-  /// averageDay 有志的话则为 均价 天数
-  List<KLineModel> getPointerMoveDatas(List<KLineModel> allData,String time,int length,String direction,{averageDay}){
-    List<KLineModel> list = [];
-    int allDataLength = allData.length;
-    int i=0;
-    /// 先取得正常的数据
-    for(;i<allDataLength;i++){
-      if(allData[i].kLineDate == time){
-        if(direction=='right'){
-          int start = i-length-1;
-          int end = i;
-          if(start<0){
-            start = 0;
-            end = length;
-          }
-          list = allData.sublist(start,end);
-        }else{
-          int start = i+1;
-          int end = i+length+1;
-          if(end>allDataLength){
-            start = allDataLength-length-1;
-            end = allDataLength-1;
-          }
-          list = allData.sublist(start,end);
-        }
-      }
-    }
-
-
-    List<KLineModel> averageDayList = [];
-    /// 是否是均价数据
-    if(averageDay!=null){
-      var listFirstTime = list.first.kLineDate;
-      int dayLength = averageDay-1;
-      if(direction=='right'){
-        int j = 0;
-        for (; j < allDataLength; j++) {
-          if (allData[j].kLineDate == listFirstTime) {
-            int start = j - dayLength;
-            int end = j;
-            /// 当在最左边是，如果start 小于0，则前面的数据不够，所以要获取前面的所有数据
-            if (start < 0) {
-              if (j != 0) {
-                averageDayList = allData.sublist(0, j);
-                list = averageDayList + list;
-              }
-            } else {
-              averageDayList = allData.sublist(start, end);
-              list = averageDayList + list;
-            }
-          }
-        }
-      }else{
-        int j=0;
-        for (; j < allDataLength; j++) {
-          if (allData[j].kLineDate == listFirstTime) {
-            int start = j - dayLength;
-            int end = j;
-            if (start < 0) {
-              averageDayList = allData.sublist(0, j);
-              list = averageDayList + list;
-            } else {
-              averageDayList = allData.sublist(start, end);
-              list = averageDayList + list;
-            }
-          }
-        }
-      }
-    }
-    return list;
-  }
-
-
-  /// 获取当前所有数据中最高和最低值
-  Map<String, double> getMaxAndMin(lineData) {
-    double maxPrice;
-    double minPrice;
-    lineData.forEach((item) {
-      if (maxPrice != null) {
-        if (maxPrice < item.maxPrice) {
-          maxPrice = item.maxPrice;
-        }
-        if (minPrice > item.minPrice) {
-          minPrice = item.minPrice;
-        }
-      } else {
-        maxPrice = item.maxPrice;
-        minPrice = item.minPrice;
-      }
-    });
-
-    return {
-      "maxPrice": maxPrice*(1+KLineConfig.HEIGHT_LIMIT),
-      "minPrice": minPrice*(1-KLineConfig.HEIGHT_LIMIT)
-    };
-  }
-
-
   @override
   void dispose() {
     super.dispose();
@@ -282,7 +141,6 @@ class DayKLineState extends State<DayKLine> {
         _canvasModel.kLineMargin,
         _canvasModel.onTapDownDtails,
         _canvasModel.isShowCross);
-//    BollListModel bollList = getBollDataList(allKLineData,day20Datas, 20,newList);
 
     BollPositonsModel bollData = bollDataToPosition(allKLineData,day20Datas,20,newList,figureComponentHeight,newCanvasModel);
 
@@ -401,14 +259,6 @@ class DayKLineState extends State<DayKLine> {
         List day20Datas = getKLineData(allKLineData,_canvasModel.day20Data, maxKlineNum,'left',otherDay: 20);
 
 
-
-
-//        print('${_canvasModel.day5Data.first.kLineDate}');
-//        print('last-----${_canvasModel.day5Data.last.kLineDate}');
-//        print('day5Datas2---${day5Datas.length}--${day5Datas2.length}--${day5Datas.first.kLineDate==day5Datas2.first.kLineDate}--${day5Datas.last.kLineDate==day5Datas2.last.kLineDate}');
-//        print('day5Datas2---${day5Datas.first.kLineDate}--${day5Datas2.first.kLineDate}--${day5Datas.last.kLineDate}--${day5Datas2.last.kLineDate}');
-
-
         Map maxAndMin = getMaxAndMin(newList);
 
           var dayMaxPrice = maxAndMin['maxPrice']??0.0;
@@ -492,10 +342,6 @@ class DayKLineState extends State<DayKLine> {
               _canvasModel.kLineMargin,
               _canvasModel.onTapDownDtails,
               _canvasModel.isShowCross);
-
-//          print('${_canvasModel.day20Data.last.kLineDate}');
-//          print('day20Datas-----${day20Datas.last.kLineDate}--day20Dataslength:${day20Datas.length}');
-//          print('newList-----${newList.last.kLineDate}--newListlength:${newList.length}');
 
           BollPositonsModel bollData = bollDataToPosition(allKLineData,day20Datas,20,newList,figureComponentHeight,newCanvasModel);
           double max;

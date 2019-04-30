@@ -14,6 +14,68 @@ k线图的一些公用方法
 
  */
 
+
+/// 缩放后根据最后一个item 的时间 获取数据
+List<KLineModel> getScaleDatasByLastTime(List<KLineModel> allData,String lastItemTime,int length,{averageDay}){
+  int dataLength = allData.length;
+  List<KLineModel> list = [];
+  int i=0;
+  if(averageDay!=null){
+    for(;i<dataLength;i++){
+      if(allData[i].kLineDate == lastItemTime){
+        /// 当最后的index（前面数据的条数）小于 要获取的条数
+        if(i<length){
+          list = allData.sublist(0,length);
+        }else{
+          if (i - length-averageDay + 1 <=0) { /// 当最后的index（前面数据的条数）小于（length+averageDay - 1 ）所需要划线的数据，则直接取前面所有的数据
+            list = allData.sublist(0, i + 1);
+          } else {
+            list = allData.sublist(i - length - averageDay + 1, i + 1);
+          }
+        }
+      }
+    }
+  }else{
+    for(;i<dataLength;i++){
+      if(allData[i].kLineDate == lastItemTime){
+        /// 当最后的index（前面数据的条数）小于 要获取的条数
+        if(i<length){
+          list = allData.sublist(0,length);
+        }else{
+          list = allData.sublist(i-length+1,i+1);
+        }
+      }
+    }
+  }
+  return list;
+}
+
+
+/// 获取当前所有数据中最高和最低值
+Map<String, double> getMaxAndMin(List<KLineModel> lineData) {
+  double maxPrice;
+  double minPrice;
+  lineData.forEach((item) {
+    if (maxPrice != null) {
+      if (maxPrice < item.maxPrice) {
+        maxPrice = item.maxPrice;
+      }
+      if (minPrice > item.minPrice) {
+        minPrice = item.minPrice;
+      }
+    } else {
+      maxPrice = item.maxPrice;
+      minPrice = item.minPrice;
+    }
+  });
+
+  return {
+    "maxPrice": maxPrice*(1+KLineConfig.HEIGHT_LIMIT),
+    "minPrice": minPrice*(1-KLineConfig.HEIGHT_LIMIT)
+  };
+}
+
+
 // 每次调用返回比原先数据多一条
 List<KLineModel> getKLineData(List<KLineModel> allData,
     List<KLineModel> historyData, int day, String direction,
