@@ -22,6 +22,7 @@ import 'package:cefcfco_app/common/model/BollModel.dart';
 import 'package:cefcfco_app/common/model/BollPositonsModel.dart';
 import 'package:cefcfco_app/common/model/CanvasBollModel.dart';
 import 'package:cefcfco_app/common/model/CanvasModel.dart';
+import 'package:cefcfco_app/common/model/KLineInfoModel.dart';
 import 'package:cefcfco_app/common/model/KLineModel.dart';
 import 'package:cefcfco_app/common/net/Code.dart';
 import 'package:cefcfco_app/common/provider/repos/ReadHistoryDbProvider.dart';
@@ -60,7 +61,8 @@ class DayKLineState extends State<DayKLine> {
   GlobalKey anchorKey = GlobalKey();
   GlobalKey anchorKey1 = GlobalKey();
 
-  CanvasModel _canvasModel = new CanvasModel([],[],[],[],[],[],0.0,0.0,7.0,2.0,null,false);
+
+  CanvasModel _canvasModel = new CanvasModel([],[],[],[],[],[],new KLineInfoModel(0, 0, 0, 0),7.0,2.0,null,false);
 
   CanvasBollModel bollModel = new CanvasBollModel([], [],[],[],[],0.0,0.0,7.0,2.0,null,false);
 
@@ -101,7 +103,6 @@ class DayKLineState extends State<DayKLine> {
 
   }
 
-
   @override
   void dispose() {
     super.dispose();
@@ -126,13 +127,13 @@ class DayKLineState extends State<DayKLine> {
     List<KLineModel> day15Datas = getKLineData(allKLineData,[], minLeve,null,otherDay: 15);
     List<KLineModel> day20Datas = getKLineData(allKLineData,[], minLeve,null,otherDay: 20);
 
-    Map maxAndMin = getMaxAndMin(newList);
-
     canvasWidth = width;
     maxKlineNum = minLeve;
 
-    var dayMaxPrice = maxAndMin['maxPrice']??0.0;
-    var dayMinPrice = maxAndMin['minPrice']??0.0;
+    KLineInfoModel kLineListInfo= getKLineInfoModel(newList);
+    var dayMaxPrice = kLineListInfo.maxPrice;
+    var dayMinPrice = kLineListInfo.minPrice;
+
     CanvasModel newCanvasModel = new CanvasModel(
         allKLineData,
         newList,
@@ -140,8 +141,7 @@ class DayKLineState extends State<DayKLine> {
         day10Datas,
         day15Datas,
         day20Datas,
-        dayMaxPrice,
-        dayMinPrice,
+        kLineListInfo,
         _canvasModel.kLineWidth,
         _canvasModel.kLineMargin,
         _canvasModel.onTapDownDtails,
@@ -206,17 +206,16 @@ class DayKLineState extends State<DayKLine> {
 
 
 
-    Map maxAndMin = getMaxAndMin(newList);
+    KLineInfoModel kLineListInfo= getKLineInfoModel(newList);
+    var dayMaxPrice = kLineListInfo.maxPrice;
+    var dayMinPrice = kLineListInfo.minPrice;
 
-    var dayMaxPrice = maxAndMin['maxPrice']??0.0;
-    var dayMinPrice = maxAndMin['minPrice']??0.0;
     CanvasModel newCanvasModel = new CanvasModel(allKLineData,newList,
         day5Datas,
         day10Datas,
         day15Datas,
         day20Datas,
-        dayMaxPrice,
-        dayMinPrice,
+        kLineListInfo,
         kLineWidth,
         kLineMargin,
         _canvasModel.onTapDownDtails,
@@ -264,10 +263,10 @@ class DayKLineState extends State<DayKLine> {
         List day20Datas = getKLineData(allKLineData,_canvasModel.day20Data, maxKlineNum,'left',otherDay: 20);
 
 
-        Map maxAndMin = getMaxAndMin(newList);
+        KLineInfoModel kLineListInfo= getKLineInfoModel(newList);
+        var dayMaxPrice = kLineListInfo.maxPrice;
+        var dayMinPrice = kLineListInfo.minPrice;
 
-          var dayMaxPrice = maxAndMin['maxPrice']??0.0;
-          var dayMinPrice = maxAndMin['minPrice']??0.0;
           CanvasModel newCanvasModel = new CanvasModel(
               allKLineData,
               newList,
@@ -275,8 +274,7 @@ class DayKLineState extends State<DayKLine> {
               day10Datas,
               day15Datas,
               day20Datas,
-              dayMaxPrice,
-              dayMinPrice,
+              kLineListInfo,
               _canvasModel.kLineWidth,
               _canvasModel.kLineMargin,
               _canvasModel.onTapDownDtails,
@@ -330,10 +328,10 @@ class DayKLineState extends State<DayKLine> {
           List day15Datas = getKLineData(allKLineData,_canvasModel.day15Data, maxKlineNum,'right',otherDay: 15);
           List day20Datas = getKLineData(allKLineData,_canvasModel.day20Data, maxKlineNum,'right',otherDay: 20);
 
-          Map maxAndMin = getMaxAndMin(newList);
+          KLineInfoModel kLineListInfo= getKLineInfoModel(newList);
+          var dayMaxPrice = kLineListInfo.maxPrice;
+          var dayMinPrice = kLineListInfo.minPrice;
 
-          var dayMaxPrice = maxAndMin['maxPrice']??0.0;
-          var dayMinPrice = maxAndMin['minPrice']??0.0;
           CanvasModel newCanvasModel = new CanvasModel(
               allKLineData,
               newList,
@@ -341,8 +339,7 @@ class DayKLineState extends State<DayKLine> {
               day10Datas,
               day15Datas,
               day20Datas,
-              dayMaxPrice,
-              dayMinPrice,
+              kLineListInfo,
               _canvasModel.kLineWidth,
               _canvasModel.kLineMargin,
               _canvasModel.onTapDownDtails,

@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:cefcfco_app/common/model/KLineInfoModel.dart';
 import 'package:cefcfco_app/common/model/KLineModel.dart';
 
 class CanvasModel{
@@ -8,8 +9,7 @@ class CanvasModel{
   List<KLineModel> day10Data;
   List<KLineModel> day15Data;
   List<KLineModel> day20Data;
-  double dayMaxPrice;
-  double dayMinPrice;
+  KLineInfoModel kLineListInfo;
   double kLineWidth;
   double kLineMargin;
   Offset onTapDownDtails;
@@ -22,8 +22,7 @@ class CanvasModel{
       this.day10Data,
       this.day15Data,
       this.day20Data,
-      this.dayMaxPrice,
-      this.dayMinPrice,
+      this.kLineListInfo,
       this.kLineWidth,
       this.kLineMargin,
       this.onTapDownDtails,

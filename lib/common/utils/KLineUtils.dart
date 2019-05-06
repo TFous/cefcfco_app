@@ -6,6 +6,7 @@ import 'package:cefcfco_app/common/model/BollListModel.dart';
 import 'package:cefcfco_app/common/model/BollModel.dart';
 import 'package:cefcfco_app/common/model/BollPositonsModel.dart';
 import 'package:cefcfco_app/common/model/CanvasModel.dart';
+import 'package:cefcfco_app/common/model/KLineInfoModel.dart';
 import 'package:cefcfco_app/common/model/KLineModel.dart';
 import 'package:cefcfco_app/common/utils/monotonex.dart';
 /*
@@ -52,27 +53,35 @@ List<KLineModel> getScaleDatasByLastTime(List<KLineModel> allData,String lastIte
 
 
 /// 获取当前所有数据中最高和最低值
-Map<String, double> getMaxAndMin(List<KLineModel> lineData) {
-  double maxPrice;
-  double minPrice;
-  lineData.forEach((item) {
-    if (maxPrice != null) {
+KLineInfoModel getKLineInfoModel(List<KLineModel> lineData) {
+  double maxPrice = 0.0;
+  double minPrice = 0.0;
+
+  int i = 0;
+  int maxIndex = 0;
+  int minIndex = 0;
+  int length = lineData.length;
+
+  for (; i < length; i++) {
+    KLineModel item = lineData[i];
+    if (maxPrice != 0.0) {
       if (maxPrice < item.maxPrice) {
         maxPrice = item.maxPrice;
+        maxIndex = i;
       }
       if (minPrice > item.minPrice) {
         minPrice = item.minPrice;
+        minIndex = i;
       }
     } else {
       maxPrice = item.maxPrice;
       minPrice = item.minPrice;
+      maxIndex = i;
+      minIndex = i;
     }
-  });
+  }
 
-  return {
-    "maxPrice": maxPrice*(1+KLineConfig.HEIGHT_LIMIT),
-    "minPrice": minPrice*(1-KLineConfig.HEIGHT_LIMIT)
-  };
+  return new KLineInfoModel(maxIndex, minIndex, maxPrice*(1+KLineConfig.HEIGHT_LIMIT), minPrice*(1-KLineConfig.HEIGHT_LIMIT));
 }
 
 
@@ -317,5 +326,56 @@ void drawSmoothLine(Canvas canvas, Paint paint, List<Point> points) {
     canvas.drawPath(path, paint);
   }else{
     print('无数据！！');
+  }
+}
+
+//    drawArrow(canvas,_linePaint,new Offset(12,33),new Offset(66,33));
+//    drawArrow(canvas,_linePaint,new Offset(66,77),new Offset(12,77));
+//    drawArrow(canvas,_linePaint,new Offset(44,12),new Offset(44,77));
+//    drawArrow(canvas,_linePaint,new Offset(44,12),new Offset(44,77));
+drawArrow(Canvas canvas,Paint linePaint,Offset startOffset,Offset endOffset,{theta:30,headlen:6}) {
+  var angle = atan2(startOffset.dy - endOffset.dy, startOffset.dx - endOffset.dx) * 180 / pi,
+      angle1 = (angle + theta) * pi / 180,
+      angle2 = (angle - theta) * pi / 180,
+      topX = headlen * cos(angle1),
+      topY = headlen * sin(angle1),
+      botX = headlen * cos(angle2),
+      botY = headlen * sin(angle2);
+  canvas.drawLine(startOffset,endOffset, linePaint);
+
+  canvas.drawLine(new Offset(endOffset.dx + topX, endOffset.dy + topY),endOffset, linePaint);
+  canvas.drawLine(new Offset(endOffset.dx + botX, endOffset.dy + botY),endOffset, linePaint);
+}
+
+
+/// 当前横线位置的价格
+void drawPrice(Canvas canvas,lineDyPrice,initPriceText,lineDx,lineDy,canvasWidth,canvasHeight,linePaint){
+  double copyLineDyPrice; // 判断是否一样，防止不不停刷新
+  if(lineDyPrice!=copyLineDyPrice){
+    copyLineDyPrice = lineDyPrice;
+    var initPriceTextHeight = initPriceText.height/2;
+
+    var left = 0.0;
+    var right = initPriceText.width;
+    var top = lineDy - initPriceTextHeight;
+    var bottom = lineDy + initPriceTextHeight;
+    /// 上下边界价格显示
+    if(lineDy<initPriceTextHeight){
+      top = 0.0;
+      bottom = initPriceText.height;
+    }else if(lineDy>canvasHeight-initPriceText.height){
+      top = canvasHeight-initPriceText.height;
+      bottom = canvasHeight;
+    }
+
+    /// 价格显示在左还是右边 ，canvas 一半
+    if(lineDx<canvasWidth/2){
+      right = canvasWidth;
+      left = canvasWidth - initPriceText.width;
+    }
+
+    var lineDyPriceReact = Rect.fromLTRB(left, top, right, bottom);
+    canvas.drawRect(lineDyPriceReact, linePaint);
+    initPriceText.paint(canvas, Offset(left, top));
   }
 }
