@@ -333,7 +333,7 @@ void drawSmoothLine(Canvas canvas, Paint paint, List<Point> points) {
 //    drawArrow(canvas,_linePaint,new Offset(66,77),new Offset(12,77));
 //    drawArrow(canvas,_linePaint,new Offset(44,12),new Offset(44,77));
 //    drawArrow(canvas,_linePaint,new Offset(44,12),new Offset(44,77));
-drawArrow(Canvas canvas,Paint linePaint,Offset startOffset,Offset endOffset,{theta:30,headlen:6}) {
+drawArrow(Canvas canvas,Paint linePaint,Offset startOffset,Offset endOffset,{theta:30,headlen:5}) {
   var angle = atan2(startOffset.dy - endOffset.dy, startOffset.dx - endOffset.dx) * 180 / pi,
       angle1 = (angle + theta) * pi / 180,
       angle2 = (angle - theta) * pi / 180,
