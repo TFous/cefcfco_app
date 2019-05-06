@@ -301,6 +301,14 @@ class MyView extends CustomPainter{
     var dayMaxPriceText = _newVerticalAxisTextPainter(canvasModel.dayMaxPrice.toStringAsFixed(2))..layout();
     dayMaxPriceText.paint(canvas, Offset(0, 0));
 
+    double price1 = (canvasModel.dayMaxPrice+initPrice)/2;
+    var priceText1 = _newVerticalAxisTextPainter(price1.toStringAsFixed(2))..layout();
+    priceText1.paint(canvas, Offset(0, _EqualHeight/4-priceText1.height/2));
+
+    double price2 = (canvasModel.dayMinPrice+initPrice)/2;
+    var priceText2 = _newVerticalAxisTextPainter(price2.toStringAsFixed(2))..layout();
+    priceText2.paint(canvas, Offset(0, _EqualHeight/4*3-priceText2.height/2));
+
     /// 五日均线
     if(canvasModel.day5Data.isNotEmpty){
       TextPaint.color = Colors.deepOrange;

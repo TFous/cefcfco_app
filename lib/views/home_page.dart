@@ -66,27 +66,6 @@ class _MyHomePageState extends State<AppPage>
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      appBar: new AppBar(
-        automaticallyImplyLeading: false,
-
-        //设置标题栏的背景颜色
-        title: new Title(
-          child: new Text(
-            '行情',
-            style: new TextStyle(
-              fontSize: 20.0,
-              color: Colors.white,
-            ),
-          ),
-          color: Colors
-              .white, //设置标题栏文字的颜色(new title的时候color不能为null不然会报错一般可以不用new title 直接new text,不过最终的文字里面还是以里面new text的style样式文字颜色为准)
-        ),
-//          centerTitle: true,//设置标题居中
-        elevation: 0,
-        //设置标题栏下面阴影的高度
-//        brightness:Brightness.dark,//设置明暗模式（不过写了没看出变化，后面再看）
-        primary: true,
-      ),
       body: new TabBarView(
           physics: new NeverScrollableScrollPhysics(), // 禁用滑动
           controller: controller,
