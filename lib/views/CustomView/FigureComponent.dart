@@ -2,23 +2,16 @@ import 'dart:ui';
 
 import 'package:cefcfco_app/common/config/KLineConfig.dart';
 import 'package:cefcfco_app/common/model/CanvasBollModel.dart';
-import 'package:cefcfco_app/common/model/CanvasModel.dart';
-import 'package:cefcfco_app/common/model/KLineModel.dart';
 import 'package:cefcfco_app/common/net/Code.dart';
 import 'package:cefcfco_app/common/utils/KLineDataInEvent.dart';
 import 'package:cefcfco_app/common/utils/KLineUtils.dart';
-import 'package:cefcfco_app/common/utils/monotonex.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'dart:math';
 
-///自定义  饼状图
-/// @author yinl
+/// @author xiaolei.teng
 class FigureComponent extends StatelessWidget{
-  //数据源
   CanvasBollModel canvasModel;
-
   FigureComponent(this.canvasModel);
 
   @override
@@ -36,79 +29,29 @@ class FigureComponent extends StatelessWidget{
 }
 
 class MyView extends CustomPainter{
-  double animValue;
-  Paint _mPaint;
   Paint _linePaint;
   Paint TextPaint;
   Paint _EqualLinePaint;
   double initPrice;
   List kLineOffsets = []; /// k线位置[[dx,dy]]
-  double lineWidth = 1.4;/// 线的宽度  譬如十字坐标
+  double lineWidth = KLineConfig.CROSS_LINE_WIDTH;/// 线的宽度  譬如十字坐标
   CanvasBollModel canvasModel;
 
-
-  var startAngles=[];
-
   MyView(this.canvasModel);
-
-  /// 当前横线位置的价格
-  void drawPrice(Canvas canvas,lineDyPrice,initPriceText,lineDx,lineDy,canvasWidth,canvasHeight){
-    double copyLineDyPrice; // 判断是否一样，防止不不停刷新
-    if(lineDyPrice!=copyLineDyPrice){
-      copyLineDyPrice = lineDyPrice;
-      var initPriceTextHeight = initPriceText.height/2;
-
-      var left = 0.0;
-      var right = initPriceText.width;
-      var top = lineDy - initPriceTextHeight;
-      var bottom = lineDy + initPriceTextHeight;
-      /// 上下边界价格显示
-      if(lineDy<initPriceTextHeight){
-        top = 0.0;
-        bottom = initPriceText.height;
-      }else if(lineDy>canvasHeight-initPriceText.height){
-        top = canvasHeight-initPriceText.height;
-        bottom = canvasHeight;
-      }
-
-      /// 价格显示在左还是右边 ，canvas 一半
-      if(lineDx<canvasWidth/2){
-        right = canvasWidth;
-        left = canvasWidth - initPriceText.width;
-      }
-
-      var lineDyPriceReact = Rect.fromLTRB(left, top, right, bottom);
-      canvas.drawRect(lineDyPriceReact, _linePaint);
-      initPriceText.paint(canvas, Offset(left, top));
-    }
-  }
-
 
 
   @override
   void paint(Canvas canvas, Size size) {
-    var nowTime;
-    /// 如果是分钟图，则分别是 时间，
-    /// 当前分钟开盘价格，
-    /// 当前分钟收盘价格，
-    /// 当前分钟最高价格，
-    /// 当前分钟最低价格，
-    /// 55.19 ==> initPrice
-
-    var kLineDistance = canvasModel.kLineWidth + canvasModel.kLineMargin;
+    double kLineDistance = canvasModel.kLineWidth + canvasModel.kLineMargin;
     double initPrice = (canvasModel.dayMaxPrice+canvasModel.dayMinPrice)/2;
 
     TextPaint = new Paint()
-    ..color = Colors.black
+    ..color = KLineConfig.WRAP_BORDER_COLOR
       ..style=PaintingStyle.stroke
     ..strokeWidth =1.0;
 
-    _mPaint = new Paint()
-      ..isAntiAlias = true
-      ..style = PaintingStyle.fill //填充
-      ..color = Colors.blueAccent; //背景为纸黄色
-    var canvasWidth = size.width;
-    var canvasHeight = size.height;
+    double canvasWidth = size.width;
+    double canvasHeight = size.height;
     double lineDyPrice;  //横线指的价格
     double lineDy;
     double lineDx;
@@ -129,30 +72,19 @@ class MyView extends CustomPainter{
         ..text = TextSpan(
           text: text,
           style: new TextStyle(
-            color: Colors.black,
-            fontSize: 13.0,
-          ),
-        );
-    }
-
-    TextPainter _priceVerticalAxisTextPainter(String text) {
-      return textPainter
-        ..text = TextSpan(
-          text: text,
-          style: new TextStyle(
-            color: Colors.white,
+            color: KLineConfig.ARROW_COLOR,
             fontSize: 13.0,
           ),
         );
     }
 
     _EqualLinePaint = new Paint()
-      ..color = Colors.black12
+      ..color = KLineConfig.EQUAL_LINE_COLOR
       ..style=PaintingStyle.stroke
       ..strokeWidth =1.0;
 
-    var _EqualWidth = canvasWidth;
-    var _EqualHeight = canvasHeight;
+    double _EqualWidth = canvasWidth;
+    double _EqualHeight = canvasHeight;
     canvas.drawLine(new Offset(_EqualWidth/4, 0),
         new Offset(_EqualWidth/4, canvasHeight), _EqualLinePaint);
     canvas.drawLine(new Offset(_EqualWidth/4*2, 0),
@@ -176,18 +108,18 @@ class MyView extends CustomPainter{
       double maxPrice = line.maxPrice;
       double minPrice = line.minPrice;
 
-      var top;
-      var bottom;
-      var left = kLineDistance*i+canvasModel.kLineMargin;
-      var right = kLineDistance*i+kLineDistance;
+      double top;
+      double bottom;
+      double left = kLineDistance*i+canvasModel.kLineMargin;
+      double right = kLineDistance*i+kLineDistance;
 
       top = priceToPositionDy(startPrice,canvasHeight,canvasModel.dayMaxPrice,canvasModel.dayMinPrice);
       bottom = priceToPositionDy(endPrice,canvasHeight,canvasModel.dayMaxPrice,canvasModel.dayMinPrice);
 
       if(endPrice>startPrice){
-        _linePaint..color = Colors.red;
+        _linePaint..color = KLineConfig.KLINE_UP_COLOR;
       }else{
-        _linePaint..color = Colors.green;
+        _linePaint..color = KLineConfig.KLINE_DOWN_COLOR;
       }
 
       Rect kLineReact;
@@ -201,8 +133,8 @@ class MyView extends CustomPainter{
 
       canvas.drawRect(kLineReact, _linePaint);
 
-      var maxTop = priceToPositionDy(maxPrice,canvasHeight,canvasModel.dayMaxPrice,canvasModel.dayMinPrice);
-      var minBottom = priceToPositionDy(minPrice,canvasHeight,canvasModel.dayMaxPrice,canvasModel.dayMinPrice);
+      double maxTop = priceToPositionDy(maxPrice,canvasHeight,canvasModel.dayMaxPrice,canvasModel.dayMinPrice);
+      double minBottom = priceToPositionDy(minPrice,canvasHeight,canvasModel.dayMaxPrice,canvasModel.dayMinPrice);
 
       canvas.drawLine(
           new Offset((left + right) / 2, maxTop),
@@ -219,15 +151,15 @@ class MyView extends CustomPainter{
     var dayMaxPriceText = _newVerticalAxisTextPainter(canvasModel.dayMaxPrice.toStringAsFixed(2))..layout();
     dayMaxPriceText.paint(canvas, Offset(0, 0));
 
-    /// 20均线
+    /// boll 线
     if(canvasModel.maPointList.isNotEmpty){
-      TextPaint.color = Colors.cyanAccent;
+      TextPaint.color = KLineConfig.BOLL_MA_COLOR;
       drawSmoothLine(canvas,TextPaint,canvasModel.maPointList);
 
-      TextPaint.color = Colors.redAccent;
+      TextPaint.color = KLineConfig.BOLL_UP_COLOR;
       drawSmoothLine(canvas,TextPaint,canvasModel.upPointList);
 
-      TextPaint.color = Colors.brown;
+      TextPaint.color = KLineConfig.BOLL_DN_COLOR;
       drawSmoothLine(canvas,TextPaint,canvasModel.dnPointList);
     }
 
@@ -235,7 +167,7 @@ class MyView extends CustomPainter{
     /// 点击后画的十字
     if(canvasModel.onTapDownDtails!=null && canvasModel.isShowCross){
       _linePaint..strokeWidth = lineWidth;
-      _linePaint..color = Colors.blueAccent;
+      _linePaint..color = KLineConfig.CROSS_LINE_COLOR;
 
       /// 修正dy 上下边界
       if(canvasModel.onTapDownDtails.dy<0){
@@ -291,10 +223,9 @@ class MyView extends CustomPainter{
       }
     }
 
-    ///绘制逻辑与Android差不多
-    canvas.save();
-    // 将坐标点移动到View的中心
-    canvas.restore();
+//    canvas.save();
+//    // 将坐标点移动到View的中心
+//    canvas.restore();
 
   }
 

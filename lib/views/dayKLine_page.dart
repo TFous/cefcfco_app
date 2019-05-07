@@ -13,12 +13,8 @@
 
 
 import 'dart:async';
-import 'dart:math';
 
 import 'package:cefcfco_app/common/config/Config.dart';
-import 'package:cefcfco_app/common/config/KLineConfig.dart';
-import 'package:cefcfco_app/common/model/BollListModel.dart';
-import 'package:cefcfco_app/common/model/BollModel.dart';
 import 'package:cefcfco_app/common/model/BollPositonsModel.dart';
 import 'package:cefcfco_app/common/model/CanvasBollModel.dart';
 import 'package:cefcfco_app/common/model/CanvasModel.dart';
@@ -27,8 +23,6 @@ import 'package:cefcfco_app/common/model/KLineModel.dart';
 import 'package:cefcfco_app/common/net/Code.dart';
 import 'package:cefcfco_app/common/provider/repos/ReadHistoryDbProvider.dart';
 import 'package:cefcfco_app/common/utils/KLineDataInEvent.dart';
-import 'package:event_bus/event_bus.dart';
-import 'package:fluro/fluro.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -131,7 +125,6 @@ class DayKLineState extends State<DayKLine> {
     maxKlineNum = minLeve;
 
     KLineInfoModel kLineListInfo= getKLineInfoModel(newList);
-
     CanvasModel newCanvasModel = new CanvasModel(
         allKLineData,
         newList,
@@ -146,8 +139,6 @@ class DayKLineState extends State<DayKLine> {
         _canvasModel.isShowCross);
 
     BollPositonsModel bollData = bollDataToPosition(allKLineData,day20Datas,20,newList,figureComponentHeight,newCanvasModel);
-
-
     CanvasBollModel newBollModel = new CanvasBollModel(
         bollData.historyData,
         newList,
@@ -202,10 +193,7 @@ class DayKLineState extends State<DayKLine> {
     List<KLineModel> day15Datas = getScaleDatasByLastTime(allKLineData,lastItemTime, minLeve,averageDay: 15);
     List<KLineModel> day20Datas = getScaleDatasByLastTime(allKLineData,lastItemTime, minLeve,averageDay: 20);
 
-
-
     KLineInfoModel kLineListInfo= getKLineInfoModel(newList);
-
     CanvasModel newCanvasModel = new CanvasModel(allKLineData,newList,
         day5Datas,
         day10Datas,
@@ -230,8 +218,6 @@ class DayKLineState extends State<DayKLine> {
         _canvasModel.kLineMargin,
         _canvasModel.onTapDownDtails,
         _canvasModel.isShowCross);
-
-
 
     setState(() {
       _canvasModel = newCanvasModel;
@@ -260,22 +246,20 @@ class DayKLineState extends State<DayKLine> {
 
 
         KLineInfoModel kLineListInfo= getKLineInfoModel(newList);
-
-          CanvasModel newCanvasModel = new CanvasModel(
-              allKLineData,
-              newList,
-              day5Datas,
-              day10Datas,
-              day15Datas,
-              day20Datas,
-              kLineListInfo,
-              _canvasModel.kLineWidth,
-              _canvasModel.kLineMargin,
-              _canvasModel.onTapDownDtails,
-              _canvasModel.isShowCross);
+        CanvasModel newCanvasModel = new CanvasModel(
+            allKLineData,
+            newList,
+            day5Datas,
+            day10Datas,
+            day15Datas,
+            day20Datas,
+            kLineListInfo,
+            _canvasModel.kLineWidth,
+            _canvasModel.kLineMargin,
+            _canvasModel.onTapDownDtails,
+            _canvasModel.isShowCross);
 
         BollPositonsModel bollData = bollDataToPosition(allKLineData,day20Datas,20,newList,figureComponentHeight,newCanvasModel);
-
         CanvasBollModel newBollModel = new CanvasBollModel(
             bollData.historyData,
             newList,
@@ -308,7 +292,6 @@ class DayKLineState extends State<DayKLine> {
           List day20Datas = getKLineData(allKLineData,_canvasModel.day20Data, maxKlineNum,'right',otherDay: 20);
 
           KLineInfoModel kLineListInfo= getKLineInfoModel(newList);
-
           CanvasModel newCanvasModel = new CanvasModel(
               allKLineData,
               newList,
@@ -323,7 +306,6 @@ class DayKLineState extends State<DayKLine> {
               _canvasModel.isShowCross);
 
           BollPositonsModel bollData = bollDataToPosition(allKLineData,day20Datas,20,newList,figureComponentHeight,newCanvasModel);
-
           CanvasBollModel newBollModel = new CanvasBollModel(
               bollData.historyData,
               newList,
@@ -447,7 +429,6 @@ class DayKLineState extends State<DayKLine> {
         if(_canvasModel.isShowCross){
           _canvasModel.onTapDownDtails = details.position - _canvasOffset;
         }
-
 
         bollModel.isShowCross = !bollModel.isShowCross;
         if(bollModel.isShowCross){
