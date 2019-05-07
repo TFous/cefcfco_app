@@ -447,7 +447,7 @@ class DayKLineState extends State<DayKLine> {
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
     if(isOnce==true){
-      initCanvasData(width);
+      initCanvasData(width-globals.horizontalDistance*2);
       isOnce = false;
     }
     return new Scaffold(
@@ -476,7 +476,7 @@ class DayKLineState extends State<DayKLine> {
           children: <Widget>[
             Container(
               height: kLineComponentHeight,
-              padding: EdgeInsets.symmetric(vertical: globals.sidesDistance),
+              margin: EdgeInsets.symmetric(vertical: globals.sidesDistance,horizontal: globals.horizontalDistance),
               child: Listener(
                   child: ClipRect(
                     key: anchorKey,
@@ -489,6 +489,7 @@ class DayKLineState extends State<DayKLine> {
               ),
             ),
             Container(
+              margin: EdgeInsets.symmetric(horizontal: globals.horizontalDistance),
               height: figureComponentHeight ,
               child: ClipRect(
                 key: anchorKey1,
@@ -496,7 +497,7 @@ class DayKLineState extends State<DayKLine> {
               ),
             ),
             Container(
-                height: 150,
+                height: 120,
                 padding: EdgeInsets.symmetric(vertical: globals.sidesDistance),
                 child: SingleChildScrollView(
                     child: Column(

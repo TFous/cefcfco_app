@@ -40,6 +40,8 @@ List myPageTabData = [
 
 double sidesDistance = 10.0;
 
+double horizontalDistance = 2.0;
+
 const DEBUG = true;
 
 

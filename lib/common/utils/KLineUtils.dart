@@ -388,9 +388,9 @@ void drawPrice(Canvas canvas,lineDyPrice,initPriceText,lineDx,lineDy,canvasWidth
 }
 
 
-drawDashLine(Canvas canvas,Offset startOffset,Offset endOffset, {dashLength:5,color='dddddd',strokeWidth:1.0}){
+drawDashLine(Canvas canvas,Offset startOffset,Offset endOffset, {dashLength:5,color=0xFFdddddd,strokeWidth:1.0}){
   final Paint black = Paint()
-    ..color = Color(int.parse('0xFF$color'))
+    ..color = Color(color)
     ..strokeWidth = strokeWidth
     ..style = PaintingStyle.stroke;
 
