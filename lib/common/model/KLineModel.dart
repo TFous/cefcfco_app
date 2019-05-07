@@ -26,7 +26,7 @@ class KLineModel {
 
   @override
   toString(){
-    return 'kLineDate--->$kLineDate';
+    return 'kLineDate--->$kLineDate-->$endPrice';
   }
 
   KLineModel(

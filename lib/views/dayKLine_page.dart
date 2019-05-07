@@ -131,8 +131,6 @@ class DayKLineState extends State<DayKLine> {
     maxKlineNum = minLeve;
 
     KLineInfoModel kLineListInfo= getKLineInfoModel(newList);
-    var dayMaxPrice = kLineListInfo.maxPrice;
-    var dayMinPrice = kLineListInfo.minPrice;
 
     CanvasModel newCanvasModel = new CanvasModel(
         allKLineData,
@@ -156,8 +154,8 @@ class DayKLineState extends State<DayKLine> {
         bollData.maPointList,
         bollData.upPointList,
         bollData.dnPointList,
-        bollData.maxUP??dayMaxPrice,
-        bollData.minDN??dayMinPrice,
+        bollData.maxUP,
+        bollData.minDN,
         _canvasModel.kLineWidth,
         _canvasModel.kLineMargin,
         _canvasModel.onTapDownDtails,
@@ -207,8 +205,6 @@ class DayKLineState extends State<DayKLine> {
 
 
     KLineInfoModel kLineListInfo= getKLineInfoModel(newList);
-    var dayMaxPrice = kLineListInfo.maxPrice;
-    var dayMinPrice = kLineListInfo.minPrice;
 
     CanvasModel newCanvasModel = new CanvasModel(allKLineData,newList,
         day5Datas,
@@ -264,8 +260,6 @@ class DayKLineState extends State<DayKLine> {
 
 
         KLineInfoModel kLineListInfo= getKLineInfoModel(newList);
-        var dayMaxPrice = kLineListInfo.maxPrice;
-        var dayMinPrice = kLineListInfo.minPrice;
 
           CanvasModel newCanvasModel = new CanvasModel(
               allKLineData,
@@ -281,30 +275,15 @@ class DayKLineState extends State<DayKLine> {
               _canvasModel.isShowCross);
 
         BollPositonsModel bollData = bollDataToPosition(allKLineData,day20Datas,20,newList,figureComponentHeight,newCanvasModel);
-        double max;
-        double min;
-        if(bollData.maxUP==null){
-          max = dayMaxPrice;
-        }else if(bollData.maxUP>dayMaxPrice){
-          max = bollData.maxUP;
-        }else{
-          max = dayMaxPrice;
-        }
-        if(bollData.minDN==null){
-          min = dayMinPrice;
-        }else if(bollData.minDN>dayMinPrice){
-          min = dayMinPrice;
-        }else{
-          min = bollData.minDN;
-        }
+
         CanvasBollModel newBollModel = new CanvasBollModel(
             bollData.historyData,
             newList,
             bollData.maPointList,
             bollData.upPointList,
             bollData.dnPointList,
-            max,
-            min,
+            bollData.maxUP,
+            bollData.minDN,
             _canvasModel.kLineWidth,
             _canvasModel.kLineMargin,
             _canvasModel.onTapDownDtails,
@@ -329,8 +308,6 @@ class DayKLineState extends State<DayKLine> {
           List day20Datas = getKLineData(allKLineData,_canvasModel.day20Data, maxKlineNum,'right',otherDay: 20);
 
           KLineInfoModel kLineListInfo= getKLineInfoModel(newList);
-          var dayMaxPrice = kLineListInfo.maxPrice;
-          var dayMinPrice = kLineListInfo.minPrice;
 
           CanvasModel newCanvasModel = new CanvasModel(
               allKLineData,
@@ -346,30 +323,15 @@ class DayKLineState extends State<DayKLine> {
               _canvasModel.isShowCross);
 
           BollPositonsModel bollData = bollDataToPosition(allKLineData,day20Datas,20,newList,figureComponentHeight,newCanvasModel);
-          double max;
-          double min;
-          if(bollData.maxUP==null){
-            max = dayMaxPrice;
-          }else if(bollData.maxUP>dayMaxPrice){
-            max = bollData.maxUP;
-          }else{
-            max = dayMaxPrice;
-          }
-          if(bollData.minDN==null){
-            min = dayMinPrice;
-          }else if(bollData.minDN>dayMinPrice){
-            min = dayMinPrice;
-          }else{
-            min = bollData.minDN;
-          }
+
           CanvasBollModel newBollModel = new CanvasBollModel(
               bollData.historyData,
               newList,
               bollData.maPointList,
               bollData.upPointList,
               bollData.dnPointList,
-              max,
-              min,
+              bollData.maxUP,
+              bollData.minDN,
               _canvasModel.kLineWidth,
               _canvasModel.kLineMargin,
               _canvasModel.onTapDownDtails,

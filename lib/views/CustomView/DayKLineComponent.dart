@@ -246,31 +246,87 @@ class MyView extends CustomPainter{
     /// 五日均线
     if(canvasModel.day5Data.isNotEmpty){
       TextPaint.color = Colors.deepOrange;
-      BollPositonsModel boll5Data = bollDataToPosition(canvasModel.allKLineData,canvasModel.day5Data,5,canvasModel.showKLineData,canvasHeight,canvasModel);
-      drawSmoothLine(canvas,TextPaint,boll5Data.maPointList);
+      List<Point> maPointList = [];
+      BollListModel bollList = getBollDataList(canvasModel.allKLineData,canvasModel.day5Data, 5,canvasModel.showKLineData);
+      bollList.list.forEach((item){
+        double dx = getDx(canvasModel, item.positionIndex);
+        double maDy = priceToPositionDy(item.ma, canvasHeight, canvasModel.kLineListInfo.maxPrice,canvasModel.kLineListInfo.minPrice);
+        maPointList.add(new Point(dx, maDy));
+      });
+      drawSmoothLine(canvas,TextPaint,maPointList);
     }
 
     /// 十日均线
     if(canvasModel.day10Data.isNotEmpty){
       TextPaint.color = Colors.pinkAccent;
-      BollPositonsModel day10 = bollDataToPosition(canvasModel.allKLineData,canvasModel.day10Data,10,canvasModel.showKLineData,canvasHeight,canvasModel);
-      drawSmoothLine(canvas,TextPaint,day10.maPointList);
+      List<Point> maPointList = [];
+      BollListModel bollList = getBollDataList(canvasModel.allKLineData,canvasModel.day10Data,10,canvasModel.showKLineData);
+      bollList.list.forEach((item){
+        double dx = getDx(canvasModel, item.positionIndex);
+        double maDy = priceToPositionDy(item.ma, canvasHeight, canvasModel.kLineListInfo.maxPrice,canvasModel.kLineListInfo.minPrice);
+        maPointList.add(new Point(dx, maDy));
+      });
+      drawSmoothLine(canvas,TextPaint,maPointList);
     }
 
     /// 15均线
     if(canvasModel.day15Data.isNotEmpty){
       TextPaint.color = Colors.brown;
-      BollPositonsModel data = bollDataToPosition(canvasModel.allKLineData,canvasModel.day15Data,15,canvasModel.showKLineData,canvasHeight,canvasModel);
-      drawSmoothLine(canvas,TextPaint,data.maPointList);
+      List<Point> maPointList = [];
+      BollListModel bollList = getBollDataList(canvasModel.allKLineData,canvasModel.day15Data,15,canvasModel.showKLineData);
+      bollList.list.forEach((item){
+        double dx = getDx(canvasModel, item.positionIndex);
+        double maDy = priceToPositionDy(item.ma, canvasHeight, canvasModel.kLineListInfo.maxPrice,canvasModel.kLineListInfo.minPrice);
+        maPointList.add(new Point(dx, maDy));
+      });
+      drawSmoothLine(canvas,TextPaint,maPointList);
+
     }
 
     /// 20均线
     if(canvasModel.day20Data.isNotEmpty){
       TextPaint.color = Colors.cyanAccent;
-      BollPositonsModel data = bollDataToPosition(canvasModel.allKLineData,canvasModel.day20Data,20,canvasModel.showKLineData,canvasHeight,canvasModel);
-      drawSmoothLine(canvas,TextPaint,data.maPointList);
+      List<Point> maPointList = [];
+      BollListModel bollList = getBollDataList(canvasModel.allKLineData,canvasModel.day20Data,20,canvasModel.showKLineData);
+      bollList.list.forEach((item){
+        double dx = getDx(canvasModel, item.positionIndex);
+        double maDy = priceToPositionDy(item.ma, canvasHeight, canvasModel.kLineListInfo.maxPrice,canvasModel.kLineListInfo.minPrice);
+        maPointList.add(new Point(dx, maDy));
+      });
+      drawSmoothLine(canvas,TextPaint,maPointList);
     }
 
+
+    // 标注当前屏幕最高价和最低价
+    int kLineLength = canvasModel.showKLineData.length;
+    _linePaint.color = KLineConfig.ARROW_COLOR;
+    _linePaint..strokeWidth =0.8;
+
+    var top = priceToPositionDy(maxItem.maxPrice,canvasHeight,canvasModel.kLineListInfo.maxPrice,canvasModel.kLineListInfo.minPrice);
+    var bottom = priceToPositionDy(minItem.minPrice,canvasHeight,canvasModel.kLineListInfo.maxPrice,canvasModel.kLineListInfo.minPrice);
+    var max = kLineDistance*canvasModel.kLineListInfo.maxIndex;
+    var min = kLineDistance*canvasModel.kLineListInfo.minIndex;
+
+    var maxPriceText = priceTextPainter(maxItem.maxPrice.toStringAsFixed(2))
+      ..layout();
+    if(canvasModel.kLineListInfo.maxIndex > kLineLength/2){
+      drawArrow(canvas, _linePaint, Offset(max-KLineConfig.ARROW_WIDTH+kLineDistance/2,top),Offset(max+kLineDistance/2,top));
+      maxPriceText.paint(canvas, Offset(max-maxPriceText.width-KLineConfig.ARROW_WIDTH+kLineDistance/2,top-maxPriceText.height/2));
+    }else{
+      drawArrow(canvas, _linePaint, Offset(max+KLineConfig.ARROW_WIDTH+kLineDistance/2,top),Offset(max+kLineDistance/2,top));
+      maxPriceText.paint(canvas, Offset(max+KLineConfig.ARROW_WIDTH+kLineDistance/2,top-maxPriceText.height/2));
+    }
+
+    var minPriceText = priceTextPainter(minItem.minPrice.toStringAsFixed(2))
+      ..layout();
+    if(canvasModel.kLineListInfo.minIndex > kLineLength/2){
+      drawArrow(canvas, _linePaint, Offset(min-KLineConfig.ARROW_WIDTH+kLineDistance/2,bottom),Offset(min+kLineDistance/2,bottom));
+      minPriceText.paint(canvas, Offset(min-minPriceText.width-KLineConfig.ARROW_WIDTH+kLineDistance/2,bottom-minPriceText.height/2));
+    }else{
+      drawArrow(canvas, _linePaint, Offset(min+KLineConfig.ARROW_WIDTH+kLineDistance/2,bottom),Offset(min+kLineDistance/2,bottom));
+      minPriceText.paint(canvas, Offset(min+KLineConfig.ARROW_WIDTH+kLineDistance/2,bottom-minPriceText.height/2));
+    }
+    // 标注当前屏幕最高价和最低价 ---end
 
     /// 点击后画的十字
     if(canvasModel.onTapDownDtails!=null && canvasModel.isShowCross){
@@ -329,39 +385,6 @@ class MyView extends CustomPainter{
         }
       }
     }
-
-
-    // 标注当前屏幕最高价和最低价
-    int kLineLength = canvasModel.showKLineData.length;
-    _linePaint.color = KLineConfig.ARROW_COLOR;
-    _linePaint..strokeWidth =0.8;
-
-    var top = priceToPositionDy(maxItem.maxPrice,canvasHeight,canvasModel.kLineListInfo.maxPrice,canvasModel.kLineListInfo.minPrice);
-    var bottom = priceToPositionDy(minItem.minPrice,canvasHeight,canvasModel.kLineListInfo.maxPrice,canvasModel.kLineListInfo.minPrice);
-    var max = kLineDistance*canvasModel.kLineListInfo.maxIndex;
-    var min = kLineDistance*canvasModel.kLineListInfo.minIndex;
-
-    var maxPriceText = priceTextPainter(maxItem.maxPrice.toStringAsFixed(2))
-      ..layout();
-    if(canvasModel.kLineListInfo.maxIndex > kLineLength/2){
-      drawArrow(canvas, _linePaint, Offset(max-KLineConfig.ARROW_WIDTH+kLineDistance/2,top),Offset(max+kLineDistance/2,top));
-      maxPriceText.paint(canvas, Offset(max-maxPriceText.width-KLineConfig.ARROW_WIDTH+kLineDistance/2,top-maxPriceText.height/2));
-    }else{
-      drawArrow(canvas, _linePaint, Offset(max+KLineConfig.ARROW_WIDTH+kLineDistance/2,top),Offset(max+kLineDistance/2,top));
-      maxPriceText.paint(canvas, Offset(max+KLineConfig.ARROW_WIDTH+kLineDistance/2,top-maxPriceText.height/2));
-    }
-
-    var minPriceText = priceTextPainter(minItem.minPrice.toStringAsFixed(2))
-      ..layout();
-    if(canvasModel.kLineListInfo.minIndex > kLineLength/2){
-      drawArrow(canvas, _linePaint, Offset(min-KLineConfig.ARROW_WIDTH+kLineDistance/2,bottom),Offset(min+kLineDistance/2,bottom));
-      minPriceText.paint(canvas, Offset(min-minPriceText.width-KLineConfig.ARROW_WIDTH+kLineDistance/2,bottom-minPriceText.height/2));
-    }else{
-      drawArrow(canvas, _linePaint, Offset(min+KLineConfig.ARROW_WIDTH+kLineDistance/2,bottom),Offset(min+kLineDistance/2,bottom));
-      minPriceText.paint(canvas, Offset(min+KLineConfig.ARROW_WIDTH+kLineDistance/2,bottom-minPriceText.height/2));
-    }
-    // 标注当前屏幕最高价和最低价 ---end
-
 
     ///绘制逻辑与Android差不多
 //    canvas.save();

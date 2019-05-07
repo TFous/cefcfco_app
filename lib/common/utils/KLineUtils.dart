@@ -229,6 +229,7 @@ BollListModel getBollDataList(
     List<KLineModel> allKLineData,
     List<KLineModel> auxiliaryDatas,
     int n, List<KLineModel> kLineData) {
+  KLineInfoModel kLineListInfo= getKLineInfoModel(kLineData);
   int length = auxiliaryDatas.length; //28  20  9
   int i = 0;
   int index = -1;  // 默认不在屏幕上显示
@@ -259,15 +260,21 @@ BollListModel getBollDataList(
       } else {
         if (maxUP < bollData.up) {
           maxUP = bollData.up;
+          if(maxUP<kLineListInfo.maxPrice){
+            maxUP = kLineListInfo.maxPrice;
+          }
         }
       }
 
-      // 存储最下的dn
+      // 存储最小的dn
       if (minDN == null) {
         minDN = bollData.dn;
       } else {
         if (minDN > bollData.dn) {
           minDN = bollData.dn;
+          if(minDN>kLineListInfo.minPrice){
+            minDN = kLineListInfo.minPrice;
+          }
         }
       }
 
@@ -287,7 +294,6 @@ BollPositonsModel bollDataToPosition(
   List<Point> maPointList = [];
   List<Point> upPointList = [];
   List<Point> dnPointList = [];
-  int kLineDataLength = kLineData.length;
   BollListModel bollList = getBollDataList(allKLineData,auxiliaryDatas, n, kLineData);
 //  print('///////////////////////////');
 //  print('item.positionIndex ${kLineData.first.kLineDate}  dx-- (${kLineData.last.kLineDate})');
