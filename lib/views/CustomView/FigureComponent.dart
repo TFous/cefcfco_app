@@ -31,7 +31,6 @@ class FigureComponent extends StatelessWidget{
 class MyView extends CustomPainter{
   Paint _linePaint;
   Paint TextPaint;
-  Paint _EqualLinePaint;
   double initPrice;
   List kLineOffsets = []; /// k线位置[[dx,dy]]
   double lineWidth = KLineConfig.CROSS_LINE_WIDTH;/// 线的宽度  譬如十字坐标
@@ -58,46 +57,15 @@ class MyView extends CustomPainter{
     Rect rect2 = Rect.fromLTRB(0,0,canvasWidth,canvasHeight);
     canvas.drawRect(rect2, TextPaint);
 
-
     _linePaint = new Paint();
 
-    /// 生成纵轴文字的TextPainter
-    TextPainter textPainter = TextPainter(
-      textDirection: TextDirection.ltr,
-      maxLines: 1,
-    );
 
-    TextPainter _newVerticalAxisTextPainter(String text) {
-      return textPainter
-        ..text = TextSpan(
-          text: text,
-          style: new TextStyle(
-            color: KLineConfig.ARROW_COLOR,
-            fontSize: 13.0,
-          ),
-        );
-    }
+    // 区域等分线三横三竖
 
-    _EqualLinePaint = new Paint()
-      ..color = KLineConfig.EQUAL_LINE_COLOR
-      ..style=PaintingStyle.stroke
-      ..strokeWidth =1.0;
+    drawDashLine(canvas,new Offset(0, canvasHeight/4*2),
+        new Offset(canvasWidth, canvasHeight/4*2));
 
-    double _EqualWidth = canvasWidth;
-    double _EqualHeight = canvasHeight;
-    canvas.drawLine(new Offset(_EqualWidth/4, 0),
-        new Offset(_EqualWidth/4, canvasHeight), _EqualLinePaint);
-    canvas.drawLine(new Offset(_EqualWidth/4*2, 0),
-        new Offset(_EqualWidth/4*2, canvasHeight), _EqualLinePaint);
-    canvas.drawLine(new Offset(_EqualWidth/4*3, 0),
-        new Offset(_EqualWidth/4*3, canvasHeight), _EqualLinePaint);
-
-    canvas.drawLine(new Offset(0, _EqualHeight/4),
-        new Offset(canvasWidth, _EqualHeight/4), _EqualLinePaint);
-    canvas.drawLine(new Offset(0, _EqualHeight/4*2),
-        new Offset(canvasWidth, _EqualHeight/4*2), _EqualLinePaint);
-    canvas.drawLine(new Offset(0, _EqualHeight/4*3),
-        new Offset(canvasWidth, _EqualHeight/4*3), _EqualLinePaint);
+    // 区域等分线三横三竖 --end
 
 
     _linePaint..strokeWidth =1.3;
@@ -142,14 +110,14 @@ class MyView extends CustomPainter{
           _linePaint);
     });
 
-    var initPriceText = _newVerticalAxisTextPainter(initPrice.toStringAsFixed(2))..layout();
-    initPriceText.paint(canvas, Offset(0, canvasHeight/2- initPriceText.height / 2));
+    var initPriceText = newVerticalAxisTextPainter(initPrice.toStringAsFixed(2))..layout();
+    initPriceText.paint(canvas, Offset(KLineConfig.EQUAL_PRICE_MARGIN, canvasHeight/2- initPriceText.height / 2));
 
-    var dayMinPriceText = _newVerticalAxisTextPainter(canvasModel.dayMinPrice.toStringAsFixed(2))..layout();
-    dayMinPriceText.paint(canvas, Offset(0, canvasHeight-dayMinPriceText.height));
+    var dayMinPriceText = newVerticalAxisTextPainter(canvasModel.dayMinPrice.toStringAsFixed(2))..layout();
+    dayMinPriceText.paint(canvas, Offset(KLineConfig.EQUAL_PRICE_MARGIN, canvasHeight-dayMinPriceText.height));
 
-    var dayMaxPriceText = _newVerticalAxisTextPainter(canvasModel.dayMaxPrice.toStringAsFixed(2))..layout();
-    dayMaxPriceText.paint(canvas, Offset(0, 0));
+    var dayMaxPriceText = newVerticalAxisTextPainter(canvasModel.dayMaxPrice.toStringAsFixed(2))..layout();
+    dayMaxPriceText.paint(canvas, Offset(KLineConfig.EQUAL_PRICE_MARGIN, 0));
 
     /// boll 线
     if(canvasModel.maPointList.isNotEmpty){
@@ -203,7 +171,7 @@ class MyView extends CustomPainter{
           Code.eventBus.fire(KLineDataInEvent(data));
 
 //          lineDyPrice = (canvasModel.dayMaxPrice-canvasModel.dayMinPrice)*((canvasHeight-lineDy)/canvasHeight)+canvasModel.dayMinPrice;
-//          var initPriceText = _priceVerticalAxisTextPainter(lineDyPrice.toStringAsFixed(2))..layout();
+//          var initPriceText = priceVerticalAxisTextPainter(lineDyPrice.toStringAsFixed(2))..layout();
 //          drawPrice(canvas,lineDyPrice,initPriceText,lineDx,lineDy,canvasWidth,canvasHeight);
           return;
         }
@@ -216,7 +184,7 @@ class MyView extends CustomPainter{
               new Offset(lineDx,canvasHeight ), _linePaint);
 
 //          lineDyPrice = (canvasModel.dayMaxPrice-canvasModel.dayMinPrice)*((canvasHeight-lineDy)/canvasHeight)+canvasModel.dayMinPrice;
-//          var initPriceText = _priceVerticalAxisTextPainter(lineDyPrice.toStringAsFixed(2))..layout();
+//          var initPriceText = priceVerticalAxisTextPainter(lineDyPrice.toStringAsFixed(2))..layout();
 //          drawPrice(canvas,lineDyPrice,initPriceText,lineDx,lineDy,canvasWidth,canvasHeight);
           return ;
         }

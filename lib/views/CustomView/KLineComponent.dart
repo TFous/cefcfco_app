@@ -130,7 +130,7 @@ class MyView extends CustomPainter{
       maxLines: 1,
     );
 
-    TextPainter _newVerticalAxisTextPainter(String text) {
+    TextPainter newVerticalAxisTextPainter(String text) {
       return textPainter
         ..text = TextSpan(
           text: text,
@@ -141,7 +141,7 @@ class MyView extends CustomPainter{
         );
     }
 
-    TextPainter _priceVerticalAxisTextPainter(String text) {
+    TextPainter priceVerticalAxisTextPainter(String text) {
       return textPainter
         ..text = TextSpan(
           text: text,
@@ -219,13 +219,13 @@ class MyView extends CustomPainter{
           _linePaint);
     });
 
-    var initPriceText = _newVerticalAxisTextPainter(initPrice.toStringAsFixed(2))..layout();
+    var initPriceText = newVerticalAxisTextPainter(initPrice.toStringAsFixed(2))..layout();
     initPriceText.paint(canvas, Offset(0, canvasHeight/2- initPriceText.height / 2));
 
-    var dayMinPriceText = _newVerticalAxisTextPainter(dayMinPrice.toStringAsFixed(2))..layout();
+    var dayMinPriceText = newVerticalAxisTextPainter(dayMinPrice.toStringAsFixed(2))..layout();
     dayMinPriceText.paint(canvas, Offset(0, canvasHeight-dayMinPriceText.height));
 
-    var dayMaxPriceText = _newVerticalAxisTextPainter(dayMaxPrice.toStringAsFixed(2))..layout();
+    var dayMaxPriceText = newVerticalAxisTextPainter(dayMaxPrice.toStringAsFixed(2))..layout();
     dayMaxPriceText.paint(canvas, Offset(0, 0));
 
     /// 点击后画的十字
@@ -267,7 +267,7 @@ class MyView extends CustomPainter{
           Code.eventBus.fire(KLineDataInEvent(data));
 
           lineDyPrice = (dayMaxPrice-dayMinPrice)*((canvasHeight-lineDy)/canvasHeight)+dayMinPrice;
-          var initPriceText = _priceVerticalAxisTextPainter(lineDyPrice.toStringAsFixed(2))..layout();
+          var initPriceText = priceVerticalAxisTextPainter(lineDyPrice.toStringAsFixed(2))..layout();
           drawPrice(canvas,lineDyPrice,initPriceText,lineDx,lineDy,canvasWidth,canvasHeight);
           return;
         }
@@ -280,7 +280,7 @@ class MyView extends CustomPainter{
               new Offset(lineDx,canvasHeight ), _linePaint);
 
           lineDyPrice = (dayMaxPrice-dayMinPrice)*((canvasHeight-lineDy)/canvasHeight)+dayMinPrice;
-          var initPriceText = _priceVerticalAxisTextPainter(lineDyPrice.toStringAsFixed(2))..layout();
+          var initPriceText = priceVerticalAxisTextPainter(lineDyPrice.toStringAsFixed(2))..layout();
           drawPrice(canvas,lineDyPrice,initPriceText,lineDx,lineDy,canvasWidth,canvasHeight);
           return ;
         }

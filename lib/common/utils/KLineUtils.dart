@@ -9,6 +9,7 @@ import 'package:cefcfco_app/common/model/CanvasModel.dart';
 import 'package:cefcfco_app/common/model/KLineInfoModel.dart';
 import 'package:cefcfco_app/common/model/KLineModel.dart';
 import 'package:cefcfco_app/common/utils/monotonex.dart';
+import 'package:flutter/material.dart';
 /*
 k线图的一些公用方法
 
@@ -360,9 +361,9 @@ void drawPrice(Canvas canvas,lineDyPrice,initPriceText,lineDx,lineDy,canvasWidth
   if(lineDyPrice!=copyLineDyPrice){
     copyLineDyPrice = lineDyPrice;
     var initPriceTextHeight = initPriceText.height/2;
-
+    var margin = 2.0;
     var left = 0.0;
-    var right = initPriceText.width;
+    var right = initPriceText.width+margin*2;
     var top = lineDy - initPriceTextHeight;
     var bottom = lineDy + initPriceTextHeight;
     /// 上下边界价格显示
@@ -377,11 +378,77 @@ void drawPrice(Canvas canvas,lineDyPrice,initPriceText,lineDx,lineDy,canvasWidth
     /// 价格显示在左还是右边 ，canvas 一半
     if(lineDx<canvasWidth/2){
       right = canvasWidth;
-      left = canvasWidth - initPriceText.width;
+      left = canvasWidth - initPriceText.width-margin*2;
     }
 
-    var lineDyPriceReact = Rect.fromLTRB(left, top, right, bottom);
-    canvas.drawRect(lineDyPriceReact, linePaint);
-    initPriceText.paint(canvas, Offset(left, top));
+    var lineDyPriceReact = RRect.fromLTRBR(left, top, right, bottom,Radius.circular(1.8));
+    canvas.drawRRect(lineDyPriceReact, linePaint);
+    initPriceText.paint(canvas, Offset(left+margin, top));
   }
+}
+
+
+drawDashLine(Canvas canvas,Offset startOffset,Offset endOffset, {dashLength:5,color='dddddd',strokeWidth:1.0}){
+  final Paint black = Paint()
+    ..color = Color(int.parse('0xFF$color'))
+    ..strokeWidth = strokeWidth
+    ..style = PaintingStyle.stroke;
+
+  var xpos = endOffset.dx - startOffset.dx; //得到横向的宽度;
+  var ypos = endOffset.dy - startOffset.dy; //得到纵向的高度;
+  Path p = Path();
+  var numDashes = sqrt(xpos * xpos + ypos * ypos) ~/ dashLength;
+  //利用正切获取斜边的长度除以虚线长度，得到要分为多少段;
+  for(var i=0; i<numDashes; i++){
+    if(i % 2 == 0){
+      //有了横向宽度和多少段，得出每一段是多长，起点 + 每段长度 * i = 要绘制的起点；
+      p.moveTo(startOffset.dx + (xpos/numDashes) * i, startOffset.dy + (ypos/numDashes) * i);
+    }else{
+      p.lineTo(startOffset.dx + (xpos/numDashes) * i, startOffset.dy + (ypos/numDashes) * i);
+    }
+  }
+
+  canvas.drawPath(p, black);
+}
+
+/// 生成纵轴文字的TextPainter
+TextPainter textPainter = TextPainter(
+  textDirection: TextDirection.ltr,
+  maxLines: 1,
+);
+
+
+TextPainter newVerticalAxisTextPainter(String text) {
+  return textPainter
+    ..text = TextSpan(
+      text: text,
+      style: new TextStyle(
+          color: KLineConfig.EQUAL_PRICE_COLOR,
+          fontSize: 13.0,
+          fontWeight: FontWeight.w500
+      ),
+    );
+}
+
+TextPainter priceVerticalAxisTextPainter(String text) {
+  return textPainter
+    ..text = TextSpan(
+      text: text,
+      style: new TextStyle(
+        color: KLineConfig.CROSS_TEXT_COLOR,
+        fontSize: 13.0,
+      ),
+    );
+}
+
+TextPainter priceTextPainter(String text) {
+  return textPainter
+    ..text = TextSpan(
+      text: text,
+      style: new TextStyle(
+          color: KLineConfig.ARROW_COLOR,
+          fontSize: 10.0,
+          fontWeight: FontWeight.w500
+      ),
+    );
 }

@@ -33,8 +33,8 @@ class DayKLineComponent extends StatelessWidget{
 
 class MyView extends CustomPainter{
   Paint _linePaint;
+  Paint crossPricePaint;
   Paint TextPaint;
-  Paint _EqualLinePaint;
   double initPrice;
   List kLineOffsets = []; /// k线位置[[dx,dy]]
   double lineWidth = KLineConfig.CROSS_LINE_WIDTH;/// 线的宽度  譬如十字坐标
@@ -65,83 +65,28 @@ class MyView extends CustomPainter{
     Rect rect2 = Rect.fromLTRB(0,0,canvasWidth,canvasHeight);
     canvas.drawRect(rect2, TextPaint);
 
-
     _linePaint = new Paint();
-
-    /// 生成纵轴文字的TextPainter
-    TextPainter textPainter = TextPainter(
-      textDirection: TextDirection.ltr,
-      maxLines: 1,
-    );
-
-    TextPainter _newVerticalAxisTextPainter(String text) {
-      return textPainter
-        ..text = TextSpan(
-          text: text,
-          style: new TextStyle(
-            color: KLineConfig.EQUAL_PRICE_COLOR,
-            fontSize: 13.0,
-          ),
-        );
-    }
-
-    TextPainter _priceVerticalAxisTextPainter(String text) {
-      return textPainter
-        ..text = TextSpan(
-          text: text,
-          style: new TextStyle(
-            color: KLineConfig.CROSS_TEXT_COLOR,
-            fontSize: 13.0,
-          ),
-        );
-    }
-
-    TextPainter dd(String text) {
-      return textPainter
-        ..text = TextSpan(
-          text: text,
-          style: new TextStyle(
-            color: KLineConfig.EQUAL_PRICE_COLOR,
-            fontSize: 6.0,
-          ),
-        );
-    }
-
-    TextPainter priceTextPainter(String text) {
-      return textPainter
-        ..text = TextSpan(
-          text: text,
-          style: new TextStyle(
-            color: KLineConfig.ARROW_COLOR,
-            fontSize: 8.0,
-          ),
-        );
-    }
-
-    _EqualLinePaint = new Paint()
-      ..color = KLineConfig.EQUAL_LINE_COLOR
-      ..style=PaintingStyle.stroke
-      ..strokeWidth =1.0;
-
-    double _EqualWidth = canvasWidth;
-    double _EqualHeight = canvasHeight;
-    canvas.drawLine(new Offset(_EqualWidth/4, 0),
-        new Offset(_EqualWidth/4, canvasHeight), _EqualLinePaint);
-    canvas.drawLine(new Offset(_EqualWidth/4*2, 0),
-        new Offset(_EqualWidth/4*2, canvasHeight), _EqualLinePaint);
-    canvas.drawLine(new Offset(_EqualWidth/4*3, 0),
-        new Offset(_EqualWidth/4*3, canvasHeight), _EqualLinePaint);
-
-    canvas.drawLine(new Offset(0, _EqualHeight/4),
-        new Offset(canvasWidth, _EqualHeight/4), _EqualLinePaint);
-    canvas.drawLine(new Offset(0, _EqualHeight/4*2),
-        new Offset(canvasWidth, _EqualHeight/4*2), _EqualLinePaint);
-    canvas.drawLine(new Offset(0, _EqualHeight/4*3),
-        new Offset(canvasWidth, _EqualHeight/4*3), _EqualLinePaint);
-
-
-
     _linePaint..strokeWidth =1.3;
+
+    // 区域等分线三横三竖
+    drawDashLine(canvas,new Offset(canvasWidth/4, 0),
+        new Offset(canvasWidth/4, canvasHeight));
+    drawDashLine(canvas,new Offset(canvasWidth/4*2, 0),
+        new Offset(canvasWidth/4*2, canvasHeight));
+    drawDashLine(canvas,new Offset(canvasWidth/4*3, 0),
+        new Offset(canvasWidth/4*3, canvasHeight));
+
+
+    drawDashLine(canvas,new Offset(0, canvasHeight/4),
+        new Offset(canvasWidth, canvasHeight/4));
+    drawDashLine(canvas,new Offset(0, canvasHeight/4*2),
+        new Offset(canvasWidth, canvasHeight/4*2));
+    drawDashLine(canvas,new Offset(0, canvasHeight/4*3),
+        new Offset(canvasWidth, canvasHeight/4*3));
+
+    // 区域等分线三横三竖 --end
+
+
 
     canvasModel.showKLineData.asMap().forEach((i, line) {
       if(i==canvasModel.kLineListInfo.maxIndex){
@@ -197,22 +142,22 @@ class MyView extends CustomPainter{
 
 
     // 标注五段等分价格
-    var initPriceText = _newVerticalAxisTextPainter(initPrice.toStringAsFixed(2))..layout();
-    initPriceText.paint(canvas, Offset(0, canvasHeight/2- initPriceText.height / 2));
+    var initPriceText = newVerticalAxisTextPainter(initPrice.toStringAsFixed(2))..layout();
+    initPriceText.paint(canvas, Offset(KLineConfig.EQUAL_PRICE_MARGIN, canvasHeight/2- initPriceText.height / 2));
 
-    var dayMinPriceText = _newVerticalAxisTextPainter(canvasModel.kLineListInfo.minPrice.toStringAsFixed(2))..layout();
-    dayMinPriceText.paint(canvas, Offset(0, canvasHeight-dayMinPriceText.height));
+    var dayMinPriceText = newVerticalAxisTextPainter(canvasModel.kLineListInfo.minPrice.toStringAsFixed(2))..layout();
+    dayMinPriceText.paint(canvas, Offset(KLineConfig.EQUAL_PRICE_MARGIN, canvasHeight-dayMinPriceText.height));
 
-    var dayMaxPriceText = _newVerticalAxisTextPainter(canvasModel.kLineListInfo.maxPrice.toStringAsFixed(2))..layout();
-    dayMaxPriceText.paint(canvas, Offset(0, 0));
+    var dayMaxPriceText = newVerticalAxisTextPainter(canvasModel.kLineListInfo.maxPrice.toStringAsFixed(2))..layout();
+    dayMaxPriceText.paint(canvas, Offset(KLineConfig.EQUAL_PRICE_MARGIN, 0));
 
     double price1 = (canvasModel.kLineListInfo.maxPrice+initPrice)/2;
-    var priceText1 = _newVerticalAxisTextPainter(price1.toStringAsFixed(2))..layout();
-    priceText1.paint(canvas, Offset(0, _EqualHeight/4-priceText1.height/2));
+    var priceText1 = newVerticalAxisTextPainter(price1.toStringAsFixed(2))..layout();
+    priceText1.paint(canvas, Offset(KLineConfig.EQUAL_PRICE_MARGIN, canvasHeight/4-priceText1.height/2));
 
     double price2 = (canvasModel.kLineListInfo.minPrice+initPrice)/2;
-    var priceText2 = _newVerticalAxisTextPainter(price2.toStringAsFixed(2))..layout();
-    priceText2.paint(canvas, Offset(0, _EqualHeight/4*3-priceText2.height/2));
+    var priceText2 = newVerticalAxisTextPainter(price2.toStringAsFixed(2))..layout();
+    priceText2.paint(canvas, Offset(KLineConfig.EQUAL_PRICE_MARGIN, canvasHeight/4*3-priceText2.height/2));
     // 标注五段等分价格 ---end
     List<Point> ma5PointList = [];
     List<Point> ma10PointList = [];
@@ -326,6 +271,11 @@ class MyView extends CustomPainter{
       _linePaint..strokeWidth = lineWidth;
       _linePaint..color = KLineConfig.CROSS_LINE_COLOR;
 
+
+      crossPricePaint = new Paint();
+      crossPricePaint..strokeWidth =lineWidth;
+      crossPricePaint..color =KLineConfig.CROSS_TEXT_BG_COLOR;
+
       /// 修正dy 上下边界
       if(canvasModel.onTapDownDtails.dy<0){
         lineDy = 0.0;
@@ -359,8 +309,9 @@ class MyView extends CustomPainter{
           Code.eventBus.fire(KLineDataInEvent(data));
 
           lineDyPrice = (canvasModel.kLineListInfo.maxPrice-canvasModel.kLineListInfo.minPrice)*((canvasHeight-lineDy)/canvasHeight)+canvasModel.kLineListInfo.minPrice;
-          var initPriceText = _priceVerticalAxisTextPainter(lineDyPrice.toStringAsFixed(2))..layout();
-          drawPrice(canvas,lineDyPrice,initPriceText,lineDx,lineDy,canvasWidth,canvasHeight,_linePaint);
+          var initPriceText = priceVerticalAxisTextPainter(lineDyPrice.toStringAsFixed(2))..layout();
+
+          drawPrice(canvas,lineDyPrice,initPriceText,lineDx,lineDy,canvasWidth,canvasHeight,crossPricePaint);
           return;
         }
         else if(canvasModel.onTapDownDtails.dx>kLineOffsets[kLineLength-1][0]){
@@ -372,8 +323,8 @@ class MyView extends CustomPainter{
               new Offset(lineDx,canvasHeight ), _linePaint);
 
           lineDyPrice = (canvasModel.kLineListInfo.maxPrice-canvasModel.kLineListInfo.minPrice)*((canvasHeight-lineDy)/canvasHeight)+canvasModel.kLineListInfo.minPrice;
-          var initPriceText = _priceVerticalAxisTextPainter(lineDyPrice.toStringAsFixed(2))..layout();
-          drawPrice(canvas,lineDyPrice,initPriceText,lineDx,lineDy,canvasWidth,canvasHeight,_linePaint);
+          var initPriceText = priceVerticalAxisTextPainter(lineDyPrice.toStringAsFixed(2))..layout();
+          drawPrice(canvas,lineDyPrice,initPriceText,lineDx,lineDy,canvasWidth,canvasHeight,crossPricePaint);
           return ;
         }
       }
