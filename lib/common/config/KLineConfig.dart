@@ -26,13 +26,13 @@ class KLineConfig {
 
 
   static const CROSS_LINE_COLOR = Colors.black; // 十字线颜色
-  static const CROSS_LINE_WIDTH = 1.4; // 十字线宽度
+  static const CROSS_LINE_WIDTH = 1.0; // 十字线宽度
   static const CROSS_TEXT_COLOR = Colors.white; // 十字线指定价格颜色
   static const CROSS_TEXT_BG_COLOR = Color(0xFF6ba7f1); // 十字线指定价格颜色
 
 
-  static const KLINE_UP_COLOR = Colors.red; // k线涨颜色
-  static const KLINE_DOWN_COLOR = Colors.green; // k线跌颜色
+  static const KLINE_UP_COLOR = Color(0xFFe93030); // k线涨颜色
+  static const KLINE_DOWN_COLOR = Color(0xFF306612); // k线跌颜色
 
 
   static const BOLL_MA_COLOR = Color(0xFF3badf5); // boll ma线颜色

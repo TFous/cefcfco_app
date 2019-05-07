@@ -436,7 +436,7 @@ TextPainter priceVerticalAxisTextPainter(String text) {
       text: text,
       style: new TextStyle(
         color: KLineConfig.CROSS_TEXT_COLOR,
-        fontSize: 13.0,
+        fontSize: 10.0,
       ),
     );
 }
