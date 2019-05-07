@@ -363,6 +363,8 @@ class DayKLineState extends State<DayKLine> {
       isScale = true;
       setState(() {
         _canvasModel.isShowCross = false;  //两个手指的时候不显示十字坐标
+
+        bollModel.isShowCross = false;  //两个手指的时候不显示十字坐标
       });
     }else{
       isScale = false;
@@ -420,6 +422,8 @@ class DayKLineState extends State<DayKLine> {
     }else{
       setState(() {
         _canvasModel.onTapDownDtails = details.position - _canvasOffset;
+
+        bollModel.onTapDownDtails = details.position - _canvasOffset1;
       });
     }
     /// 缩放动作
@@ -442,6 +446,12 @@ class DayKLineState extends State<DayKLine> {
         _canvasModel.isShowCross = !_canvasModel.isShowCross;
         if(_canvasModel.isShowCross){
           _canvasModel.onTapDownDtails = details.position - _canvasOffset;
+        }
+
+
+        bollModel.isShowCross = !bollModel.isShowCross;
+        if(bollModel.isShowCross){
+          bollModel.onTapDownDtails = details.position - _canvasOffset1;
         }
       });
     }
