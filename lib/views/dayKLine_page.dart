@@ -486,7 +486,7 @@ class DayKLineState extends State<DayKLine> {
               height: figureComponentHeight ,
               child: Listener(
                   child: ClipRect(
-                    child: new VolumeComponent(bollModel,isVolume),
+                    child: new VolumeComponent(_canvasModel,isVolume),
                   ),
                   onPointerDown: _handelOnPointerDownVolume,
               ),

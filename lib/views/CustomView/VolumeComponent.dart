@@ -1,8 +1,11 @@
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:cefcfco_app/common/config/KLineConfig.dart';
 import 'package:cefcfco_app/common/model/BollListModel.dart';
 import 'package:cefcfco_app/common/model/CanvasBollModel.dart';
+import 'package:cefcfco_app/common/model/CanvasModel.dart';
+import 'package:cefcfco_app/common/model/KLineModel.dart';
 import 'package:cefcfco_app/common/net/Code.dart';
 import 'package:cefcfco_app/common/utils/KLineDataInEvent.dart';
 import 'package:cefcfco_app/common/utils/KLineUtils.dart';
@@ -12,7 +15,7 @@ import 'package:flutter/rendering.dart';
 
 /// @author xiaolei.teng
 class VolumeComponent extends StatelessWidget{
-  CanvasBollModel canvasModel;
+  CanvasModel canvasModel;
   bool isVolume;
   VolumeComponent(this.canvasModel,this.isVolume);
 
@@ -36,7 +39,7 @@ class MyView extends CustomPainter{
   double initPrice;
   List kLineOffsets = []; /// k线位置[[dx,dy]]
   double lineWidth = KLineConfig.CROSS_LINE_WIDTH;/// 线的宽度  譬如十字坐标
-  CanvasBollModel canvasModel;
+  CanvasModel canvasModel;
   bool isVolume;
 
   MyView(this.canvasModel,this.isVolume);
@@ -69,15 +72,15 @@ class MyView extends CustomPainter{
 
     // 区域等分线三横三竖 --end
 
-    double volume = 0.0; // 成交量
-    double turnover = 0.0;
+    double maxVolume = 0.0; // 成交量
+    double maxTurnover = 0.0;
     canvasModel.showKLineData.forEach((item){
-      if(item.volume>volume){
-        volume = item.volume;
+      if(item.volume>maxVolume){
+        maxVolume = item.volume;
       }
 
-      if(item.turnover>turnover){
-        turnover = item.turnover;
+      if(item.turnover>maxTurnover){
+        maxTurnover = item.turnover;
       }
     });
 
@@ -91,11 +94,11 @@ class MyView extends CustomPainter{
       double left = kLineDistance*i+canvasModel.kLineMargin;
       double right = kLineDistance*i+kLineDistance;
       if(isVolume){
-        top = priceToPositionDy(line.volume,canvasHeight,volume,0);
-        bottom = priceToPositionDy(line.volume,canvasHeight,volume,0);
+        top = priceToPositionDy(line.volume,canvasHeight,maxVolume,0);
+        bottom = priceToPositionDy(line.volume,canvasHeight,maxVolume,0);
       }else{
-        top = priceToPositionDy(line.turnover,canvasHeight,turnover,0);
-        bottom = priceToPositionDy(line.turnover,canvasHeight,turnover,0);
+        top = priceToPositionDy(line.turnover,canvasHeight,maxTurnover,0);
+        bottom = priceToPositionDy(line.turnover,canvasHeight,maxTurnover,0);
       }
 
 
@@ -118,10 +121,56 @@ class MyView extends CustomPainter{
 
     });
 
+    // 成交量均线及其信息
+
+    if(!canvasModel.isShowCross){
+      var volumeText = volumeTextPainter(isVolume?'成交量':'成交额',KLineConfig.VOLUME_MAX_COLOR)..layout();
+      volumeText.paint(canvas, Offset(KLineConfig.EQUAL_PRICE_MARGIN,0.0));
+    }
+    var volumeMaxNum = volumeTextPainter(isVolume?priceToWan(maxVolume):priceToYi(maxTurnover),KLineConfig.VOLUME_MAX_COLOR)..layout();
+    volumeMaxNum.paint(canvas, Offset(canvasWidth-volumeMaxNum.width-KLineConfig.EQUAL_PRICE_MARGIN,0.0));
 
 
 
 
+
+
+
+    List<Point> ma5PointList = [];
+    List<Point> ma10PointList = [];
+    BollListModel m5;
+    BollListModel m10;
+
+    if(isVolume){
+      m5 = getBollDataList(canvasModel.allKLineData,canvasModel.day5Data, 5,canvasModel.showKLineData,'volume');
+      m10 = getBollDataList(canvasModel.allKLineData,canvasModel.day10Data, 10,canvasModel.showKLineData,'volume');
+    }else{
+      m5 = getBollDataList(canvasModel.allKLineData,canvasModel.day5Data, 5,canvasModel.showKLineData,'turnover');
+      m10 = getBollDataList(canvasModel.allKLineData,canvasModel.day10Data, 10,canvasModel.showKLineData,'turnover');
+    }
+
+    /// 五日均线
+    if(canvasModel.day5Data.isNotEmpty){
+      TextPaint.color = KLineConfig.VOLUME_M5_COLOR;
+      m5.list.forEach((item){
+        double dx = getDx(canvasModel, item.positionIndex);
+        double maDy = priceToPositionDy(item.ma, canvasHeight,isVolume?maxVolume:maxTurnover,0);
+        ma5PointList.add(new Point(dx, maDy));
+      });
+      drawSmoothLine(canvas,TextPaint,ma5PointList);
+    }
+    /// 十日均线
+    if(canvasModel.day10Data.isNotEmpty){
+      TextPaint.color = KLineConfig.VOLUME_M10_COLOR;
+      m10.list.forEach((item){
+        double dx = getDx(canvasModel, item.positionIndex);
+        double maDy = priceToPositionDy(item.ma, canvasHeight, isVolume?maxVolume:maxTurnover,0);
+        ma10PointList.add(new Point(dx, maDy));
+      });
+      drawSmoothLine(canvas,TextPaint,ma10PointList);
+    }
+
+    // 成交量均线及其信息---end
     /// 点击后画的十字
     if(canvasModel.onTapDownDtails!=null && canvasModel.isShowCross){
       _linePaint..strokeWidth = lineWidth;
@@ -150,8 +199,42 @@ class MyView extends CustomPainter{
               new Offset(lineDx, 0),
               new Offset(lineDx,canvasHeight ), _linePaint);
 
-//          var data = kLineOffsets[i][2];
+
 //          Code.eventBus.fire(KLineDataInEvent(data));
+          if(canvasModel.isShowCross){
+            KLineModel data = kLineOffsets[i][2];
+            Color color;
+            if(data.endPrice>data.startPrice){
+              color = KLineConfig.KLINE_UP_COLOR;
+            }else{
+              color = KLineConfig.KLINE_DOWN_COLOR;
+            }
+            var volumeText = volumeTextPainter(isVolume?'量:${priceToWan(data.volume)}':'额:${priceToYi(data.turnover)}',color)..layout();
+            volumeText.paint(canvas, Offset(KLineConfig.EQUAL_PRICE_MARGIN,0.0));
+
+            var turnoverRate = volumeTextPainter('换手率:${data.turnoverRate}',KLineConfig.TURNOVER_RATE_COLOR)..layout();
+            turnoverRate.paint(canvas, Offset(canvasWidth/5*3+8,0.0)); // 换手率字太长，加了8像素好看点
+
+            var m5Text;
+            var m10Text;
+            m5.list.forEach((item){
+              double dx = getDx(canvasModel, item.positionIndex);
+              if(dx==lineDx){
+                m5Text = volumeTextPainter(isVolume?'M5:${priceToWan(item.ma)}':'M5:${priceToYi(item.ma)}',KLineConfig.VOLUME_M5_COLOR)..layout();
+                m5Text.paint(canvas, Offset(canvasWidth/5,0.0));
+              }
+            });
+
+            m10.list.forEach((item){
+              double dx = getDx(canvasModel, item.positionIndex);
+              if(dx==lineDx){
+                m10Text = volumeTextPainter(isVolume?'M10:${priceToWan(item.ma)}':'M10:${priceToYi(item.ma)}',KLineConfig.VOLUME_M10_COLOR)..layout();
+                m10Text.paint(canvas, Offset(canvasWidth/5*2,0.0));
+              }
+            });
+
+
+          }
 
           return;
         }

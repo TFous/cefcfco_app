@@ -475,3 +475,24 @@ TextPainter priceTextPainter(String text) {
       ),
     );
 }
+
+TextPainter volumeTextPainter(String text,Color color) {
+  return textPainter
+    ..text = TextSpan(
+      text: text,
+      style: new TextStyle(
+          color: color,
+          fontSize: 11.0,
+          fontWeight: FontWeight.w600
+      ),
+    );
+}
+
+
+String priceToWan(double num){
+  return (num/10000).toStringAsFixed(2)+'万';
+}
+
+String priceToYi(double num){
+  return (num/100000000).toStringAsFixed(2)+'亿';
+}
