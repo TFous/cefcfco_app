@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:cefcfco_app/common/config/KLineConfig.dart';
+import 'package:cefcfco_app/common/model/BollListModel.dart';
 import 'package:cefcfco_app/common/model/CanvasBollModel.dart';
 import 'package:cefcfco_app/common/net/Code.dart';
 import 'package:cefcfco_app/common/utils/KLineDataInEvent.dart';
@@ -116,6 +117,8 @@ class MyView extends CustomPainter{
       canvas.drawRect(kLineReact, _linePaint);
 
     });
+
+
 
 
 

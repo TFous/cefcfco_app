@@ -160,15 +160,23 @@ int getMillisecondsSinceEpoch() {
 
 /// MA=N日内的收盘价之和除以N(kLineDatas.length)
 /// 传入多少数据，计算多少数据的平均数
-double getMA(List<KLineModel> kLineDatas) {
+/// 目前没有反射，只能这样有if else 了
+double getMA(List<KLineModel> kLineDatas,String attr) {
   int length = kLineDatas.length;
   double total = 0.0;
   int i = 0;
   for (; i < length; i++) {
-    total += kLineDatas[i].endPrice;
+    if(attr=='endPrice'){
+      total += kLineDatas[i].endPrice;
+    }else if(attr=='volume'){
+      total += kLineDatas[i].volume;
+    }else if(attr=='turnover'){
+      total += kLineDatas[i].turnover;
+    }
   }
   return total / length;
 }
+
 
 double getVariance(c, ma) {
   double num = c - ma;
@@ -197,23 +205,32 @@ double getDx(CanvasModel canvasModel, int lineIndex) {
 }
 
 /// length 几日
-double getMdData(List<KLineModel> list, int length) {
+double getMdData(List<KLineModel> list, int length,String attr) {
   double addAll = 0; // 累加总数，用于计算平均数
   double allVariance = 0; // 累加差值，用于计算md
   list.asMap().forEach((index, num) {
-    addAll += num.endPrice;
+    double item;
+    if(attr=='endPrice'){
+      item =num.endPrice;
+    }else if(attr=='volume'){
+      item =num.volume;
+    }else if(attr=='turnover'){
+      item =num.turnover;
+    }
+
+    addAll += item;
     double ma = addAll / (index + 1);
-    double a = getVariance(num.endPrice, ma);
+    double a = getVariance(item, ma);
     allVariance += a;
   });
   return sqrt(allVariance / length);
 }
 
-BollModel getBollData(List<KLineModel> slotDatas, int positionIndex) {
+BollModel getBollData(List<KLineModel> slotDatas, int positionIndex,String attr) {
   int length = slotDatas.length;
 
-  double mb = getMA(slotDatas); // 这里放也就是ma,平均数
-  double md = getMdData(slotDatas, length);
+  double mb = getMA(slotDatas,attr); // 这里放也就是ma,平均数
+  double md = getMdData(slotDatas, length,attr);
 
   double up = getUP(mb, md);
   double dn = getDN(mb, md);
@@ -229,7 +246,9 @@ BollModel getBollData(List<KLineModel> slotDatas, int positionIndex) {
 BollListModel getBollDataList(
     List<KLineModel> allKLineData,
     List<KLineModel> auxiliaryDatas,
-    int n, List<KLineModel> kLineData) {
+    int n,
+    List<KLineModel> kLineData,
+    [String attr = 'endPrice']) {
   KLineInfoModel kLineListInfo= getKLineInfoModel(kLineData);
   int length = auxiliaryDatas.length; //28  20  9
   int i = 0;
@@ -252,7 +271,7 @@ BollListModel getBollDataList(
         }
       }
 
-      BollModel bollData = getBollData(listForN, index);
+      BollModel bollData = getBollData(listForN, index,attr);
       list.add(bollData);
 
       // 存储最大的up
@@ -281,7 +300,10 @@ BollListModel getBollDataList(
 
     }
   }
-
+  // 当计算前多少日均值时，均值数据量小于 均值日期，均值是算不出来的，最大最小值就是当前屏幕kline 的 最大最小值
+  if(length<n){
+    return new BollListModel([], kLineListInfo.maxPrice, kLineListInfo.minPrice);
+  }
   return new BollListModel(list, maxUP, minDN);
 }
 
@@ -291,11 +313,12 @@ BollPositonsModel bollDataToPosition(
     int n,
     List<KLineModel> kLineData,
     double canvasHeight,
-    CanvasModel canvasModel) {
+    CanvasModel canvasModel,
+    {attr:'endPrice'}) {
   List<Point> maPointList = [];
   List<Point> upPointList = [];
   List<Point> dnPointList = [];
-  BollListModel bollList = getBollDataList(allKLineData,auxiliaryDatas, n, kLineData);
+  BollListModel bollList = getBollDataList(allKLineData,auxiliaryDatas, n, kLineData,attr);
 //  print('///////////////////////////');
 //  print('item.positionIndex ${kLineData.first.kLineDate}  dx-- (${kLineData.last.kLineDate})');
   int length = bollList.list.length;

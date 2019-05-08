@@ -43,4 +43,8 @@ class KLineConfig {
   static const BLOCK_A_COLOR = Colors.brown; // 区块 颜色
   static const BLOCK_B_COLOR = Colors.deepPurple; // 区块 颜色
 
+
+  static const VOLUME_M5_COLOR = Color(0xFF333333); // 成交量5日均线 颜色
+  static const VOLUME_M10_COLOR = Color(0xFFff7037); // 成交量10日均线 颜色
+  static const TURNOVE_RRATE_COLOR = Color(0xFF3badf5); // 换手率 颜色
 }

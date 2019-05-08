@@ -3,7 +3,6 @@ import 'dart:ui';
 import 'package:cefcfco_app/common/model/KLineModel.dart';
 
 class CanvasBollModel{
-  List<KLineModel> historyData; // 存储本次处理的原始数据
   List<KLineModel> showKLineData;
   List<Point> maPointList;
   List<Point> upPointList;
@@ -16,7 +15,6 @@ class CanvasBollModel{
   bool isShowCross;
 
   CanvasBollModel(
-      this.historyData,
       this.showKLineData,
       this.maPointList,
       this.upPointList,

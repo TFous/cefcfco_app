@@ -42,7 +42,7 @@ class MyView extends CustomPainter{
   @override
   void paint(Canvas canvas, Size size) {
     double kLineDistance = canvasModel.kLineWidth + canvasModel.kLineMargin;
-    double initPrice = (canvasModel.dayMaxPrice+canvasModel.dayMinPrice)/2;
+//    double initPrice = (canvasModel.dayMaxPrice+canvasModel.dayMinPrice)/2;
 
     TextPaint = new Paint()
     ..color = KLineConfig.WRAP_BORDER_COLOR
@@ -58,7 +58,7 @@ class MyView extends CustomPainter{
     canvas.drawRect(rect2, TextPaint);
 
     _linePaint = new Paint();
-
+    _linePaint..strokeWidth =1.3;
 
     // 区域等分线三横三竖
 
@@ -67,8 +67,6 @@ class MyView extends CustomPainter{
 
     // 区域等分线三横三竖 --end
 
-
-    _linePaint..strokeWidth =1.3;
     canvasModel.showKLineData.asMap().forEach((i, line) {
 
       double startPrice = line.startPrice;

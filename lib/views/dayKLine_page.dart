@@ -59,7 +59,7 @@ class DayKLineState extends State<DayKLine> {
 
   CanvasModel _canvasModel = new CanvasModel([],[],[],[],[],[],new KLineInfoModel(0, 0, 0, 0),7.0,2.0,null,false);
 
-  CanvasBollModel bollModel = new CanvasBollModel([], [],[],[],[],0.0,0.0,7.0,2.0,null,false);
+  CanvasBollModel bollModel = new CanvasBollModel([],[],[],[],0.0,0.0,7.0,2.0,null,false);
 
   Offset _canvasOffset = Offset.zero;
   double _scale = 0.90;
@@ -140,7 +140,6 @@ class DayKLineState extends State<DayKLine> {
 
     BollPositonsModel bollData = bollDataToPosition(allKLineData,day20Datas,20,newList,figureComponentHeight,newCanvasModel);
     CanvasBollModel newBollModel = new CanvasBollModel(
-        bollData.historyData,
         newList,
         bollData.maPointList,
         bollData.upPointList,
@@ -207,7 +206,6 @@ class DayKLineState extends State<DayKLine> {
 
     BollPositonsModel bollData = bollDataToPosition(allKLineData,day20Datas,20,newList,100,newCanvasModel);
     CanvasBollModel newBollModel = new CanvasBollModel(
-        bollData.historyData,
         newList,
         bollData.maPointList,
         bollData.upPointList,
@@ -261,7 +259,6 @@ class DayKLineState extends State<DayKLine> {
 
         BollPositonsModel bollData = bollDataToPosition(allKLineData,day20Datas,20,newList,figureComponentHeight,newCanvasModel);
         CanvasBollModel newBollModel = new CanvasBollModel(
-            bollData.historyData,
             newList,
             bollData.maPointList,
             bollData.upPointList,
@@ -304,10 +301,10 @@ class DayKLineState extends State<DayKLine> {
               _canvasModel.kLineMargin,
               _canvasModel.onTapDownDtails,
               _canvasModel.isShowCross);
-
+          
           BollPositonsModel bollData = bollDataToPosition(allKLineData,day20Datas,20,newList,figureComponentHeight,newCanvasModel);
+
           CanvasBollModel newBollModel = new CanvasBollModel(
-              bollData.historyData,
               newList,
               bollData.maPointList,
               bollData.upPointList,
@@ -430,9 +427,6 @@ class DayKLineState extends State<DayKLine> {
         }
 
         bollModel.isShowCross = !bollModel.isShowCross;
-//        if(bollModel.isShowCross){
-//          bollModel.onTapDownDtails = details.position;
-//        }
       });
     }
 

@@ -28,6 +28,8 @@ class KLineModel {
 
   double turnover;  // 成交额
 
+  String turnoverRate;  // 换手率
+
   @override
   toString(){
     return 'kLineDate--->$kLineDate-->$endPrice';
@@ -40,7 +42,8 @@ class KLineModel {
     this.maxPrice,
     this.minPrice,
     this.volume,
-    this.turnover
+    this.turnover,
+    this.turnoverRate
   );
 
   factory KLineModel.fromJson(Map<String, dynamic> json) => _$RepositoryFromJson(json);

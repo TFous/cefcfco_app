@@ -14,7 +14,8 @@ KLineModel _$RepositoryFromJson(Map<String, dynamic> json) {
       (json['maxPrice'] as num)?.toDouble(),
       (json['minPrice'] as num)?.toDouble(),
       (json['volume'] as num)?.toDouble(),
-      (json['turnover'] as num)?.toDouble());
+      (json['turnover'] as num)?.toDouble(),
+      (json['turnoverRate'] as String)?.toString());
 }
 
 Map<String, dynamic> _$RepositoryToJson(KLineModel instance) =>
@@ -25,5 +26,6 @@ Map<String, dynamic> _$RepositoryToJson(KLineModel instance) =>
       'maxPrice': instance.maxPrice,
       'minPrice': instance.minPrice,
       'volume': instance.volume,
-      'turnover': instance.turnover
+      'turnover': instance.turnover,
+      'turnoverRate': instance.turnoverRate
     };
