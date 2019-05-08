@@ -52,7 +52,9 @@ List<KLineModel> mockData(kLine){
       "startPrice":double.parse(arr[1]),
       "endPrice":double.parse(arr[2]),
       "maxPrice":double.parse(arr[3]),
-      "minPrice":double.parse(arr[4])
+      "minPrice":double.parse(arr[4]),
+      "volume":double.parse(arr[5]),
+      "turnover":double.parse(arr[6])
     };
 
     list.add(KLineModel.fromJson(providerMap));

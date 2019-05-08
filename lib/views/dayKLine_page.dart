@@ -28,6 +28,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:cefcfco_app/views/CustomView/DayKLineComponent.dart';
 import 'package:cefcfco_app/views/CustomView/FigureComponent.dart';
+import 'package:cefcfco_app/views/CustomView/VolumeComponent.dart';
 import 'package:cefcfco_app/common/utils/globals.dart' as globals;
 import 'package:cefcfco_app/common/utils/KLineUtils.dart';
 import 'package:cefcfco_app/common/utils/mockData.dart' as mockData;
@@ -46,22 +47,21 @@ class DayKLineState extends State<DayKLine> {
   double minKLineWidth = 4.0;
   double maxKLineWidth = 26.0;
   double figureComponentHeight = 100.0;
-  double kLineComponentHeight = 230.0;
+  double kLineComponentHeight = 200.0;
   double canvasWidth;  /// 画布长度，用于计算渲染数据条数
   int maxKlineNum; /// 当前klin最大容量个数
   double dragDistance = 2; /// 滑动距离，用于判断多长距离请求一次
   double scaleDistance = 18.0; /// 滑动距离，用于判断多长距离请求一次
   ReadHistoryDbProvider provider = new ReadHistoryDbProvider('DB_DayKLine',Config.KLINE_DAY);
   GlobalKey anchorKey = GlobalKey();
-  GlobalKey anchorKey1 = GlobalKey();
 
+  bool isVolume = true;
 
   CanvasModel _canvasModel = new CanvasModel([],[],[],[],[],[],new KLineInfoModel(0, 0, 0, 0),7.0,2.0,null,false);
 
   CanvasBollModel bollModel = new CanvasBollModel([], [],[],[],[],0.0,0.0,7.0,2.0,null,false);
 
   Offset _canvasOffset = Offset.zero;
-  Offset _canvasOffset1 = Offset.zero;
   double _scale = 0.90;
   StreamSubscription stream;
 
@@ -274,8 +274,8 @@ class DayKLineState extends State<DayKLine> {
             _canvasModel.isShowCross);
 
         setState(() {
-            _canvasModel = newCanvasModel;
-            bollModel = newBollModel;
+          bollModel = newBollModel;
+          _canvasModel = newCanvasModel;
         });
       }
     }else{  /// 向右滑动，旧数据
@@ -320,21 +320,24 @@ class DayKLineState extends State<DayKLine> {
               _canvasModel.isShowCross);
 
           setState(() {
-            _canvasModel = newCanvasModel;
             bollModel = newBollModel;
+            _canvasModel = newCanvasModel;
           });
         }
     }
   }
 
+  void  _handelOnPointerDownVolume(PointerDownEvent details) {
+      setState(() {
+        isVolume = !isVolume;
+      });
+  }
 
   /// 开始触摸
   void _handelOnPointerDown(PointerDownEvent details) {
     /// 元素位置
     RenderBox renderBox = anchorKey.currentContext.findRenderObject();
     _canvasOffset =  renderBox.localToGlobal(Offset.zero);
-    RenderBox renderBox1 = anchorKey1.currentContext.findRenderObject();
-    _canvasOffset1 =  renderBox1.localToGlobal(Offset.zero);
 
     startTouchTime = getMillisecondsSinceEpoch();
     startPosition = details.position;
@@ -344,9 +347,7 @@ class DayKLineState extends State<DayKLine> {
     if(pointerDownPositions.length>=2){
       isScale = true;
       setState(() {
-        _canvasModel.isShowCross = false;  //两个手指的时候不显示十字坐标
-
-        bollModel.isShowCross = false;  //两个手指的时候不显示十字坐标
+        bollModel.isShowCross=_canvasModel.isShowCross = false;  //两个手指的时候不显示十字坐标
       });
     }else{
       isScale = false;
@@ -403,9 +404,7 @@ class DayKLineState extends State<DayKLine> {
       }
     }else{
       setState(() {
-        _canvasModel.onTapDownDtails = details.position - _canvasOffset;
-
-        bollModel.onTapDownDtails = details.position - _canvasOffset1;
+        bollModel.onTapDownDtails = _canvasModel.onTapDownDtails = details.position - _canvasOffset;
       });
     }
     /// 缩放动作
@@ -432,7 +431,7 @@ class DayKLineState extends State<DayKLine> {
 
         bollModel.isShowCross = !bollModel.isShowCross;
         if(bollModel.isShowCross){
-          bollModel.onTapDownDtails = details.position - _canvasOffset1;
+          bollModel.onTapDownDtails = details.position;
         }
       });
     }
@@ -491,171 +490,180 @@ class DayKLineState extends State<DayKLine> {
             Container(
               margin: EdgeInsets.symmetric(horizontal: globals.horizontalDistance),
               height: figureComponentHeight ,
-              child: ClipRect(
-                key: anchorKey1,
-                child: new FigureComponent(bollModel),
+              child: Listener(
+                  child: ClipRect(
+                    child: new VolumeComponent(bollModel,isVolume),
+                  ),
+                  onPointerDown: _handelOnPointerDownVolume,
               ),
             ),
             Container(
-                height: 120,
-                padding: EdgeInsets.symmetric(vertical: globals.sidesDistance),
-                child: SingleChildScrollView(
-                    child: Column(
-                      children: <Widget>[
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: globals.sidesDistance),
-                          decoration: new BoxDecoration(
-                            border: new Border(
-                                bottom: BorderSide(color: Color(0xFFf2f2f2))),
-                            color: Colors.white,
-                          ),
-                          child: ListTile(
-                            title: new Row(
-                                children: <Widget>[
-                                  Expanded(
-                                    child: Text(
-                                        repository != null ? repository.kLineDate
-                                            .toString(): '00',
-                                        textAlign: TextAlign.left,
-                                        style: TextStyle(
-                                            color: Color(0xFF333333))),
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                      '时间',
-                                      textAlign: TextAlign.right,
-                                      style: TextStyle(fontSize: 13.0,
-                                          color: Color(0xFF999999),
-                                          fontWeight: null),),
-                                  ),
-                                ]
-                            ),
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: globals.sidesDistance),
-                          decoration: new BoxDecoration(
-                            border: new Border(
-                                bottom: BorderSide(color: Color(0xFFf2f2f2))),
-                            color: Colors.white,
-                          ),
-                          child: ListTile(
-                            title: new Row(
-                                children: <Widget>[
-                                  Expanded(
-                                    child: Text(
-                                        repository != null ? repository.startPrice
-                                            .toStringAsFixed(2) : '00',
-                                        textAlign: TextAlign.left,
-                                        style: TextStyle(
-                                            color: Color(0xFF333333))),
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                      "当前分钟开盘价格", textAlign: TextAlign.right,
-                                      style: TextStyle(fontSize: 13.0,
-                                          color: Color(0xFF999999),
-                                          fontWeight: null),),
-                                  ),
-                                ]
-                            ),
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: globals.sidesDistance),
-                          decoration: new BoxDecoration(
-                            border: new Border(
-                                bottom: BorderSide(color: Color(0xFFf2f2f2))),
-                            color: Colors.white,
-                          ),
-                          child: ListTile(
-                            title: new Row(
-                                children: <Widget>[
-                                  Expanded(
-                                    child: Text(
-                                        repository != null ? repository.endPrice
-                                            .toStringAsFixed(2) : '00',
-                                        textAlign: TextAlign.left,
-                                        style: TextStyle(
-                                            color: Color(0xFF333333))),
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                      "当前分钟收盘价格", textAlign: TextAlign.right,
-                                      style: TextStyle(fontSize: 13.0,
-                                          color: Color(0xFF999999),
-                                          fontWeight: null),),
-                                  ),
-                                ]
-                            ),
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: globals.sidesDistance),
-                          decoration: new BoxDecoration(
-                            border: new Border(
-                                bottom: BorderSide(color: Color(0xFFf2f2f2))),
-                            color: Colors.white,
-                          ),
-                          child: ListTile(
-                            title: new Row(
-                                children: <Widget>[
-                                  Expanded(
-                                    child: Text(
-                                        repository != null ? repository.maxPrice
-                                            .toStringAsFixed(2) : '00',
-                                        textAlign: TextAlign.left,
-                                        style: TextStyle(
-                                            color: Color(0xFF333333))),
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                      "当前分钟最高价格", textAlign: TextAlign.right,
-                                      style: TextStyle(fontSize: 13.0,
-                                          color: Color(0xFF999999),
-                                          fontWeight: null),),
-                                  ),
-                                ]
-                            ),
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: globals.sidesDistance),
-                          decoration: new BoxDecoration(
-                            border: new Border(
-                                bottom: BorderSide(color: Color(0xFFf2f2f2))),
-                            color: Colors.white,
-                          ),
-                          child: ListTile(
-                            title: new Row(
-                                children: <Widget>[
-                                  Expanded(
-                                    child: Text(
-                                        repository != null ? repository.minPrice
-                                            .toStringAsFixed(2) : '00',
-                                        textAlign: TextAlign.left,
-                                        style: TextStyle(
-                                            color: Color(0xFF333333))),
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                      "当前分钟最低价格", textAlign: TextAlign.right,
-                                      style: TextStyle(fontSize: 13.0, color: Color(0xFF999999),
-                                          fontWeight: null),),
-                                  ),
-                                ]
-                            ),
-                          ),
-                        ),
-                      ],
-                    )
-                )
+              margin: EdgeInsets.symmetric(vertical: globals.sidesDistance,horizontal: globals.horizontalDistance),
+              height: figureComponentHeight ,
+              child: ClipRect(
+                child: new FigureComponent(bollModel),
+              ),
             ),
+//            Container(
+//                height: 20,
+//                padding: EdgeInsets.symmetric(vertical: globals.sidesDistance),
+//                child: SingleChildScrollView(
+//                    child: Column(
+//                      children: <Widget>[
+//                        Container(
+//                          padding: EdgeInsets.symmetric(
+//                              horizontal: globals.sidesDistance),
+//                          decoration: new BoxDecoration(
+//                            border: new Border(
+//                                bottom: BorderSide(color: Color(0xFFf2f2f2))),
+//                            color: Colors.white,
+//                          ),
+//                          child: ListTile(
+//                            title: new Row(
+//                                children: <Widget>[
+//                                  Expanded(
+//                                    child: Text(
+//                                        repository != null ? repository.kLineDate
+//                                            .toString(): '00',
+//                                        textAlign: TextAlign.left,
+//                                        style: TextStyle(
+//                                            color: Color(0xFF333333))),
+//                                  ),
+//                                  Expanded(
+//                                    child: Text(
+//                                      '时间',
+//                                      textAlign: TextAlign.right,
+//                                      style: TextStyle(fontSize: 13.0,
+//                                          color: Color(0xFF999999),
+//                                          fontWeight: null),),
+//                                  ),
+//                                ]
+//                            ),
+//                          ),
+//                        ),
+//                        Container(
+//                          padding: EdgeInsets.symmetric(
+//                              horizontal: globals.sidesDistance),
+//                          decoration: new BoxDecoration(
+//                            border: new Border(
+//                                bottom: BorderSide(color: Color(0xFFf2f2f2))),
+//                            color: Colors.white,
+//                          ),
+//                          child: ListTile(
+//                            title: new Row(
+//                                children: <Widget>[
+//                                  Expanded(
+//                                    child: Text(
+//                                        repository != null ? repository.startPrice
+//                                            .toStringAsFixed(2) : '00',
+//                                        textAlign: TextAlign.left,
+//                                        style: TextStyle(
+//                                            color: Color(0xFF333333))),
+//                                  ),
+//                                  Expanded(
+//                                    child: Text(
+//                                      "当前分钟开盘价格", textAlign: TextAlign.right,
+//                                      style: TextStyle(fontSize: 13.0,
+//                                          color: Color(0xFF999999),
+//                                          fontWeight: null),),
+//                                  ),
+//                                ]
+//                            ),
+//                          ),
+//                        ),
+//                        Container(
+//                          padding: EdgeInsets.symmetric(
+//                              horizontal: globals.sidesDistance),
+//                          decoration: new BoxDecoration(
+//                            border: new Border(
+//                                bottom: BorderSide(color: Color(0xFFf2f2f2))),
+//                            color: Colors.white,
+//                          ),
+//                          child: ListTile(
+//                            title: new Row(
+//                                children: <Widget>[
+//                                  Expanded(
+//                                    child: Text(
+//                                        repository != null ? repository.endPrice
+//                                            .toStringAsFixed(2) : '00',
+//                                        textAlign: TextAlign.left,
+//                                        style: TextStyle(
+//                                            color: Color(0xFF333333))),
+//                                  ),
+//                                  Expanded(
+//                                    child: Text(
+//                                      "当前分钟收盘价格", textAlign: TextAlign.right,
+//                                      style: TextStyle(fontSize: 13.0,
+//                                          color: Color(0xFF999999),
+//                                          fontWeight: null),),
+//                                  ),
+//                                ]
+//                            ),
+//                          ),
+//                        ),
+//                        Container(
+//                          padding: EdgeInsets.symmetric(
+//                              horizontal: globals.sidesDistance),
+//                          decoration: new BoxDecoration(
+//                            border: new Border(
+//                                bottom: BorderSide(color: Color(0xFFf2f2f2))),
+//                            color: Colors.white,
+//                          ),
+//                          child: ListTile(
+//                            title: new Row(
+//                                children: <Widget>[
+//                                  Expanded(
+//                                    child: Text(
+//                                        repository != null ? repository.maxPrice
+//                                            .toStringAsFixed(2) : '00',
+//                                        textAlign: TextAlign.left,
+//                                        style: TextStyle(
+//                                            color: Color(0xFF333333))),
+//                                  ),
+//                                  Expanded(
+//                                    child: Text(
+//                                      "当前分钟最高价格", textAlign: TextAlign.right,
+//                                      style: TextStyle(fontSize: 13.0,
+//                                          color: Color(0xFF999999),
+//                                          fontWeight: null),),
+//                                  ),
+//                                ]
+//                            ),
+//                          ),
+//                        ),
+//                        Container(
+//                          padding: EdgeInsets.symmetric(
+//                              horizontal: globals.sidesDistance),
+//                          decoration: new BoxDecoration(
+//                            border: new Border(
+//                                bottom: BorderSide(color: Color(0xFFf2f2f2))),
+//                            color: Colors.white,
+//                          ),
+//                          child: ListTile(
+//                            title: new Row(
+//                                children: <Widget>[
+//                                  Expanded(
+//                                    child: Text(
+//                                        repository != null ? repository.minPrice
+//                                            .toStringAsFixed(2) : '00',
+//                                        textAlign: TextAlign.left,
+//                                        style: TextStyle(
+//                                            color: Color(0xFF333333))),
+//                                  ),
+//                                  Expanded(
+//                                    child: Text(
+//                                      "当前分钟最低价格", textAlign: TextAlign.right,
+//                                      style: TextStyle(fontSize: 13.0, color: Color(0xFF999999),
+//                                          fontWeight: null),),
+//                                  ),
+//                                ]
+//                            ),
+//                          ),
+//                        ),
+//                      ],
+//                    )
+//                )
+//            ),
 //          ListMenus(menusList: menusList)
           ],
         ),

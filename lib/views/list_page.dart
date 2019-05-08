@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:cefcfco_app/common/utils/globals.dart' as globals;
 
 import 'package:cefcfco_app/views/dayKLine_page.dart';
-import 'package:cefcfco_app/views/minKline_page.dart';
 
 class ListPage extends StatefulWidget {
   @override

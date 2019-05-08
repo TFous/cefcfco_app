@@ -10,9 +10,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 /// @author xiaolei.teng
-class FigureComponent extends StatelessWidget{
+class VolumeComponent extends StatelessWidget{
   CanvasBollModel canvasModel;
-  FigureComponent(this.canvasModel);
+  bool isVolume;
+  VolumeComponent(this.canvasModel,this.isVolume);
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +22,7 @@ class FigureComponent extends StatelessWidget{
       height: size.height,
       width: size.width,
       child: CustomPaint(
-          painter: MyView(canvasModel)
+          painter: MyView(canvasModel,isVolume)
       ),
     );
   }
@@ -35,14 +36,14 @@ class MyView extends CustomPainter{
   List kLineOffsets = []; /// k线位置[[dx,dy]]
   double lineWidth = KLineConfig.CROSS_LINE_WIDTH;/// 线的宽度  譬如十字坐标
   CanvasBollModel canvasModel;
+  bool isVolume;
 
-  MyView(this.canvasModel);
+  MyView(this.canvasModel,this.isVolume);
 
 
   @override
   void paint(Canvas canvas, Size size) {
     double kLineDistance = canvasModel.kLineWidth + canvasModel.kLineMargin;
-    double initPrice = (canvasModel.dayMaxPrice+canvasModel.dayMinPrice)/2;
 
     TextPaint = new Paint()
     ..color = KLineConfig.WRAP_BORDER_COLOR
@@ -58,7 +59,7 @@ class MyView extends CustomPainter{
     canvas.drawRect(rect2, TextPaint);
 
     _linePaint = new Paint();
-
+    _linePaint..strokeWidth =1.3;
 
     // 区域等分线三横三竖
 
@@ -67,22 +68,35 @@ class MyView extends CustomPainter{
 
     // 区域等分线三横三竖 --end
 
+    double volume = 0.0; // 成交量
+    double turnover = 0.0;
+    canvasModel.showKLineData.forEach((item){
+      if(item.volume>volume){
+        volume = item.volume;
+      }
 
-    _linePaint..strokeWidth =1.3;
+      if(item.turnover>turnover){
+        turnover = item.turnover;
+      }
+    });
+
     canvasModel.showKLineData.asMap().forEach((i, line) {
 
       double startPrice = line.startPrice;
       double endPrice = line.endPrice;
-      double maxPrice = line.maxPrice;
-      double minPrice = line.minPrice;
 
       double top;
       double bottom;
       double left = kLineDistance*i+canvasModel.kLineMargin;
       double right = kLineDistance*i+kLineDistance;
+      if(isVolume){
+        top = priceToPositionDy(line.volume,canvasHeight,volume,0);
+        bottom = priceToPositionDy(line.volume,canvasHeight,volume,0);
+      }else{
+        top = priceToPositionDy(line.turnover,canvasHeight,turnover,0);
+        bottom = priceToPositionDy(line.turnover,canvasHeight,turnover,0);
+      }
 
-      top = priceToPositionDy(startPrice,canvasHeight,canvasModel.dayMaxPrice,canvasModel.dayMinPrice);
-      bottom = priceToPositionDy(endPrice,canvasHeight,canvasModel.dayMaxPrice,canvasModel.dayMinPrice);
 
       if(endPrice>startPrice){
         _linePaint..color = KLineConfig.KLINE_UP_COLOR;
@@ -93,35 +107,16 @@ class MyView extends CustomPainter{
       Rect kLineReact;
       if (top == bottom) {
         /// 如果开始价格等于结束价格，显示的是一条横线
-        kLineReact = Rect.fromLTRB(left, top + 1, right, bottom - 1);
+        kLineReact = Rect.fromLTRB(left, top + 1, right, canvasHeight);
       } else {
-        kLineReact = Rect.fromLTRB(left, top, right, bottom);
+        kLineReact = Rect.fromLTRB(left, top, right, canvasHeight);
       }
       kLineOffsets.add([left,right,line]);
 
       canvas.drawRect(kLineReact, _linePaint);
 
-      double maxTop = priceToPositionDy(maxPrice,canvasHeight,canvasModel.dayMaxPrice,canvasModel.dayMinPrice);
-      double minBottom = priceToPositionDy(minPrice,canvasHeight,canvasModel.dayMaxPrice,canvasModel.dayMinPrice);
-
-      canvas.drawLine(
-          new Offset((left + right) / 2, maxTop),
-          new Offset((left + right) / 2, minBottom),
-          _linePaint);
     });
 
-
-    /// boll 线
-    if(canvasModel.maPointList.isNotEmpty){
-      TextPaint.color = KLineConfig.BOLL_MA_COLOR;
-      drawSmoothLine(canvas,TextPaint,canvasModel.maPointList);
-
-      TextPaint.color = KLineConfig.BOLL_UP_COLOR;
-      drawSmoothLine(canvas,TextPaint,canvasModel.upPointList);
-
-      TextPaint.color = KLineConfig.BOLL_DN_COLOR;
-      drawSmoothLine(canvas,TextPaint,canvasModel.dnPointList);
-    }
 
 
     /// 点击后画的十字
@@ -139,12 +134,6 @@ class MyView extends CustomPainter{
       }
 
 
-
-      /// 横线
-//      canvas.drawLine(
-//          new Offset(0, lineDy),
-//          new Offset(canvasWidth,lineDy), _linePaint);
-
       /// 修正dx 为每个klin 的中心
       var kLineLength = kLineOffsets.length;
       var i = 0;
@@ -158,13 +147,9 @@ class MyView extends CustomPainter{
               new Offset(lineDx, 0),
               new Offset(lineDx,canvasHeight ), _linePaint);
 
-          var data = kLineOffsets[i][2];
+//          var data = kLineOffsets[i][2];
+//          Code.eventBus.fire(KLineDataInEvent(data));
 
-          Code.eventBus.fire(KLineDataInEvent(data));
-
-//          lineDyPrice = (canvasModel.dayMaxPrice-canvasModel.dayMinPrice)*((canvasHeight-lineDy)/canvasHeight)+canvasModel.dayMinPrice;
-//          var initPriceText = priceVerticalAxisTextPainter(lineDyPrice.toStringAsFixed(2))..layout();
-//          drawPrice(canvas,lineDyPrice,initPriceText,lineDx,lineDy,canvasWidth,canvasHeight);
           return;
         }
         else if(canvasModel.onTapDownDtails.dx>kLineOffsets[kLineLength-1][0]){
@@ -175,9 +160,7 @@ class MyView extends CustomPainter{
               new Offset(lineDx, 0),
               new Offset(lineDx,canvasHeight ), _linePaint);
 
-//          lineDyPrice = (canvasModel.dayMaxPrice-canvasModel.dayMinPrice)*((canvasHeight-lineDy)/canvasHeight)+canvasModel.dayMinPrice;
-//          var initPriceText = priceVerticalAxisTextPainter(lineDyPrice.toStringAsFixed(2))..layout();
-//          drawPrice(canvas,lineDyPrice,initPriceText,lineDx,lineDy,canvasWidth,canvasHeight);
+
           return ;
         }
       }

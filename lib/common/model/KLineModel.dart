@@ -24,6 +24,10 @@ class KLineModel {
 //  @JsonKey(name: "min_price")
   double minPrice;
 
+  double volume;  // 成交量
+
+  double turnover;  // 成交额
+
   @override
   toString(){
     return 'kLineDate--->$kLineDate-->$endPrice';
@@ -34,7 +38,9 @@ class KLineModel {
     this.startPrice,
     this.endPrice,
     this.maxPrice,
-    this.minPrice
+    this.minPrice,
+    this.volume,
+    this.turnover
   );
 
   factory KLineModel.fromJson(Map<String, dynamic> json) => _$RepositoryFromJson(json);
