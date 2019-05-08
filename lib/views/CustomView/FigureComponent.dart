@@ -108,6 +108,12 @@ class MyView extends CustomPainter{
           new Offset((left + right) / 2, maxTop),
           new Offset((left + right) / 2, minBottom),
           _linePaint);
+
+      // 标注每个线的序号
+//      var iText = priceTextPainter(i.toStringAsFixed(0))..layout();
+//      iText.paint(canvas, Offset(left, maxTop));
+      // 标注每个线的序号 ---end
+
     });
 
 

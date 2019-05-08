@@ -40,7 +40,7 @@ class KLineConfig {
   static const BOLL_DN_COLOR = Color(0xFF319b1c); // boll dn线颜色
 
 
-  static const BLOCK_A_COLOR = Colors.greenAccent; // 区块 颜色
+  static const BLOCK_A_COLOR = Colors.brown; // 区块 颜色
   static const BLOCK_B_COLOR = Colors.deepPurple; // 区块 颜色
 
 }

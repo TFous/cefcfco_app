@@ -134,7 +134,7 @@ class MyView extends CustomPainter{
 
 
       // 标注每个线的序号
-//      var iText = dd(i.toStringAsFixed(0))..layout();
+//      var iText = priceTextPainter(i.toStringAsFixed(0))..layout();
 //      iText.paint(canvas, Offset(left, maxTop));
       // 标注每个线的序号 ---end
 

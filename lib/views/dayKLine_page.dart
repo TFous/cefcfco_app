@@ -85,7 +85,7 @@ class DayKLineState extends State<DayKLine> {
   initState(){
     super.initState();
     allKLineData = mockData.mockData(globals.kLine);
-    print('所有数据长度----${allKLineData.length}');
+//    print('所有数据长度----${allKLineData.length}');
 
     // evenbus内不能用setstate,不然无限刷新
     stream = Code.eventBus.on<KLineDataInEvent>().listen((event) {
@@ -214,8 +214,8 @@ class DayKLineState extends State<DayKLine> {
         bollData.dnPointList,
         bollData.maxUP,
         bollData.minDN,
-        _canvasModel.kLineWidth,
-        _canvasModel.kLineMargin,
+        kLineWidth,
+        kLineMargin,
         _canvasModel.onTapDownDtails,
         _canvasModel.isShowCross);
 
@@ -426,13 +426,13 @@ class DayKLineState extends State<DayKLine> {
       setState(() {
         _canvasModel.isShowCross = !_canvasModel.isShowCross;
         if(_canvasModel.isShowCross){
-          _canvasModel.onTapDownDtails = details.position - _canvasOffset;
+          bollModel.onTapDownDtails = _canvasModel.onTapDownDtails = details.position - _canvasOffset;
         }
 
         bollModel.isShowCross = !bollModel.isShowCross;
-        if(bollModel.isShowCross){
-          bollModel.onTapDownDtails = details.position;
-        }
+//        if(bollModel.isShowCross){
+//          bollModel.onTapDownDtails = details.position;
+//        }
       });
     }
 
