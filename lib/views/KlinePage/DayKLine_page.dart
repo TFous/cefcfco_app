@@ -13,7 +13,7 @@
 
 
 import 'dart:async';
-
+import 'package:cefcfco_app/common/utils/router_config.dart' as routerConfig;
 import 'package:cefcfco_app/common/config/Config.dart';
 import 'package:cefcfco_app/common/model/BollPositonsModel.dart';
 import 'package:cefcfco_app/common/model/CanvasBollModel.dart';
@@ -24,6 +24,8 @@ import 'package:cefcfco_app/common/net/Code.dart';
 import 'package:cefcfco_app/common/provider/repos/ReadHistoryDbProvider.dart';
 import 'package:cefcfco_app/common/utils/KLineDataInEvent.dart';
 import 'package:cefcfco_app/common/utils/MockDayData.dart';
+import 'package:cefcfco_app/routers/application.dart';
+import 'package:fluro/fluro.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -74,7 +76,7 @@ class DayKLineState extends State<DayKLine> {
   Offset startPosition;// 开始接触位置
   Offset endPosition;// 结束接触位置
   int startTouchTime;// 开始接触时间
-  int endTouchTime;// 开始接触时间
+  int endTouchTime;// 结束接触时间
   int minTouchTime = 150; // 最短接触时间，接触到滑动小于：出现十字左边，显示价格，否则滑动klin
   bool isMoveKLin = false;  // 是否在移动klin
   bool isScale = false;  // 是否缩放
@@ -354,6 +356,7 @@ class DayKLineState extends State<DayKLine> {
 
   /// 移动
   Future _handelOnPointerMove(details) async {
+
     endPosition = details.position;
     /// 滑动Klin, 两个手指的时候不能滑动
     if (!_canvasModel.isShowCross && !isScale) {
@@ -445,11 +448,11 @@ class DayKLineState extends State<DayKLine> {
     }
     return new Scaffold(
       appBar: new AppBar(
-        automaticallyImplyLeading: false,
+//        automaticallyImplyLeading: false,
         //设置标题栏的背景颜色
         title: new Title(
           child: new Text(
-            '行情',
+            'K线图',
             style: new TextStyle(
               fontSize: 20.0,
               color: Colors.white,

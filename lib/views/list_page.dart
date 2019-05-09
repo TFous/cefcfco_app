@@ -1,5 +1,10 @@
+import 'package:cefcfco_app/components/list_menus.dart';
+import 'package:cefcfco_app/components/list_menus_item.dart';
+import 'package:cefcfco_app/routers/application.dart';
+import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:cefcfco_app/common/utils/globals.dart' as globals;
+import 'package:cefcfco_app/common/utils/router_config.dart' as routerConfig;
 
 import 'package:cefcfco_app/views/dayKLine_page.dart';
 
@@ -14,17 +19,91 @@ class ListPageState extends State<ListPage> with AutomaticKeepAliveClientMixin,S
   final List<Tab> myTabs = <Tab>[
     new Tab(text: '日行情'),
     new Tab(text: '分钟行情'),
-    new Tab(text: 'Tab3'),
-    new Tab(text: 'Tab4'),
-    new Tab(text: 'Tab5'),
-    new Tab(text: 'Tab6'),
-    new Tab(text: 'Tab7'),
-    new Tab(text: 'Tab8'),
-    new Tab(text: 'Tab9'),
-    new Tab(text: 'Tab10'),
-    new Tab(text: 'Tab11'),
   ];
-
+  final List list = [
+    {
+      'title': '平安银行',
+      'icon': Icon(Icons.assignment, color: Color(0xfff49c2e)),
+      'onTapCallBack': (context) =>
+      {
+      Application.router.navigateTo(
+          context,routerConfig.dayKlinePage,
+          transition: TransitionType.fadeIn)
+      },
+    }, {
+      'title': '伊利股份',
+      'icon': Icon(Icons.keyboard,color: Color(0xff108ee9)),
+      'onTapCallBack': (context) =>
+      {
+      Application.router.navigateTo(
+          context,routerConfig.dayKlinePage,
+          transition: TransitionType.fadeIn)
+      },
+    }, {
+      'title': '分时图',
+      'icon': Icon(Icons.assessment,color: Color(0xff108ee9)),
+      'onTapCallBack': (context) =>
+      {
+      Application.router.navigateTo(
+          context,routerConfig.minKlinePage,
+          transition: TransitionType.fadeIn)
+      },
+    },{
+      'title': '账单',
+      'icon': Icon(Icons.assignment, color: Color(0xfff49c2e)),
+      'onTapCallBack': (context) =>
+      {
+      Application.router.navigateTo(
+          context,routerConfig.dayKlinePage,
+          transition: TransitionType.fadeIn)
+      },
+    }, {
+      'title': '输入相关',
+      'icon': Icon(Icons.keyboard,color: Color(0xff108ee9)),
+      'onTapCallBack': (context) =>
+      {
+      Application.router.navigateTo(
+          context,routerConfig.dayKlinePage,
+          transition: TransitionType.fadeIn)
+      },
+    }, {
+      'title': '统计',
+      'icon': Icon(Icons.assessment,color: Color(0xff108ee9)),
+      'onTapCallBack': (context) =>
+      {
+      Application.router.navigateTo(
+          context,routerConfig.dayKlinePage,
+          transition: TransitionType.fadeIn)
+      },
+    },{
+      'title': '账单',
+      'icon': Icon(Icons.assignment, color: Color(0xfff49c2e)),
+      'onTapCallBack': (context) =>
+      {
+      Application.router.navigateTo(
+          context,routerConfig.dayKlinePage,
+          transition: TransitionType.fadeIn)
+      },
+    }, {
+      'title': '输入相关',
+      'icon': Icon(Icons.keyboard,color: Color(0xff108ee9)),
+      'onTapCallBack': (context) =>
+      {
+      Application.router.navigateTo(
+          context,routerConfig.dayKlinePage,
+          transition: TransitionType.fadeIn)
+      },
+    }, {
+      'title': '统计',
+      'icon': Icon(Icons.assessment,color: Color(0xff108ee9)),
+      'onTapCallBack': (context) =>
+      {
+      Application.router.navigateTo(
+          context,routerConfig.dayKlinePage,
+          transition: TransitionType.fadeIn)
+      },
+    }];
+  List<ListMenusItem> menusList = [];
   @override
   bool get wantKeepAlive => true;
 
@@ -36,6 +115,12 @@ class ListPageState extends State<ListPage> with AutomaticKeepAliveClientMixin,S
         vsync: this,     //动画效果的异步处理，默认格式，背下来即可
         length: myTabs.length      //需要控制的Tab页数量
     );
+
+
+    for(var i=0;i<list.length;i++){
+      ListMenusItem cellData =new ListMenusItem.fromJson(list[i]);
+      menusList.add(cellData);
+    }
   }
 
   _getUserName() async {
@@ -77,37 +162,17 @@ class ListPageState extends State<ListPage> with AutomaticKeepAliveClientMixin,S
             ),
           ],
         ),
-      body: new Scaffold(
-        appBar: new AppBar(
-          automaticallyImplyLeading: false,
-          //设置标题栏的背景颜色
-          title: new TabBar(
-            controller: _tabController,
-            tabs: myTabs,    //使用Tab类型的数组呈现Tab标签
-            indicatorColor: Colors.white,
-            isScrollable: true,
-          ),
-          elevation: 0,
-          primary: true,
-        ),
-        body: new TabBarView(
-          controller: _tabController,
-          children: myTabs.map((Tab tab) {    //遍历List<Tab>类型的对象myTabs并提取其属性值作为子控件的内容
-            return Builder(
-              builder: (BuildContext context) {
-//                if(tab.text == '日行情'){
-////                  return DayKLine();
-//                }else if(tab.text == '分钟行情'){
-//                  return MinKLine();
-//                }else
-                  {
-                  return new Text(tab.text);
-                }
-              },
-            ); //使用参数值
-          }).toList(),
-        ),
-      )
+      body: SingleChildScrollView(
+        child: new Container(
+            decoration: new BoxDecoration(
+              color: Colors.white,
+            ),
+            child: Column(
+              children: <Widget>[
+                ListMenus(menusList: menusList)
+              ],
+            )),
+      ),
 //      bottomNavigationBar: new HomeBottomNavigationBar(tabData:globals.homePageTabData,activeIndex:1),
     );
   }

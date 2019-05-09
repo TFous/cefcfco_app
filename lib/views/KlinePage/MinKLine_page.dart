@@ -24,6 +24,8 @@ import 'package:cefcfco_app/common/net/Code.dart';
 import 'package:cefcfco_app/common/provider/repos/ReadHistoryDbProvider.dart';
 import 'package:cefcfco_app/common/utils/KLineDataInEvent.dart';
 import 'package:cefcfco_app/common/utils/MockDayData.dart';
+import 'package:cefcfco_app/routers/application.dart';
+import 'package:fluro/fluro.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -33,15 +35,15 @@ import 'package:cefcfco_app/views/CustomView/VolumeComponent.dart';
 import 'package:cefcfco_app/common/utils/globals.dart' as globals;
 import 'package:cefcfco_app/common/utils/KLineUtils.dart';
 import 'package:cefcfco_app/common/utils/mockData.dart' as mockData;
-
-class DayKLine extends StatefulWidget {
+import 'package:cefcfco_app/common/utils/router_config.dart' as routerConfig;
+class MinKLine extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    return DayKLineState();
+    return MinKLineState();
   }
 }
 
-class DayKLineState extends State<DayKLine> {
+class MinKLineState extends State<MinKLine> {
   bool isOnce = true;
   int subscript = 0;
   double onHorizontalDragDistance = 0.0; /// 滑动距离
@@ -49,6 +51,9 @@ class DayKLineState extends State<DayKLine> {
   double maxKLineWidth = 26.0;
   double figureComponentHeight = 100.0;
   double kLineComponentHeight = 200.0;
+
+//  double changePageDistances = 0.0;
+
   double canvasWidth;  /// 画布长度，用于计算渲染数据条数
   int maxKlineNum; /// 当前klin最大容量个数
   double dragDistance = 2; /// 滑动距离，用于判断多长距离请求一次
@@ -354,6 +359,22 @@ class DayKLineState extends State<DayKLine> {
 
   /// 移动
   Future _handelOnPointerMove(details) async {
+
+
+//    var moveTouchTime = getMillisecondsSinceEpoch();
+//    changePageDistances += details.delta.dx;
+//    print('changePageDistances----$changePageDistances---time---${moveTouchTime-startTouchTime}');
+//    if(moveTouchTime-startTouchTime< minTouchTime && changePageDistances > 150){
+//      changePageDistances = 0;
+//      pointerNum = 0;
+//      pointerDownPositions.clear();
+//      Application.router.navigateTo(
+//          context,routerConfig.dayKlinePage,
+//          transition: TransitionType.fadeIn);
+//    }
+
+
+
     endPosition = details.position;
     /// 滑动Klin, 两个手指的时候不能滑动
     if (!_canvasModel.isShowCross && !isScale) {
@@ -445,11 +466,11 @@ class DayKLineState extends State<DayKLine> {
     }
     return new Scaffold(
       appBar: new AppBar(
-        automaticallyImplyLeading: false,
+//        automaticallyImplyLeading: false,
         //设置标题栏的背景颜色
         title: new Title(
           child: new Text(
-            '行情',
+            '分时图',
             style: new TextStyle(
               fontSize: 20.0,
               color: Colors.white,
@@ -489,13 +510,6 @@ class DayKLineState extends State<DayKLine> {
                     child: new VolumeComponent(_canvasModel,isVolume),
                   ),
                   onPointerDown: _handelOnPointerDownVolume,
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.symmetric(vertical: globals.sidesDistance,horizontal: globals.horizontalDistance),
-              height: figureComponentHeight ,
-              child: ClipRect(
-                child: new FigureComponent(bollModel),
               ),
             ),
             Container(

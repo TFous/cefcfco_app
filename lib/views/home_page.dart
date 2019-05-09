@@ -70,11 +70,12 @@ class _MyHomePageState extends State<AppPage>
           physics: new NeverScrollableScrollPhysics(), // 禁用滑动
           controller: controller,
           children: <Widget>[
-        new DayKLine(),
+            new DayKLine(),
 //        new AboutPage(),
-        new ListPage(),
-        new UserPage(),
-      ]),
+            new ListPage(),
+            new UserPage(),
+
+          ]),
       bottomNavigationBar: new HomeBottomNavigationBar(
           tabData: globals.homePageTabData,
           indexIsChangingCallBack: refshTabState,
