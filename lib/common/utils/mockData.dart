@@ -3,6 +3,7 @@ library mockData;
 import 'dart:math';
 
 import 'package:cefcfco_app/common/model/KLineModel.dart';
+import 'package:cefcfco_app/common/model/MInLineModel.dart';
 
 //* `lines`: K线图, 依次是: 时间(ms), 开盘价, 最高价, 最低价, 收盘价, 成交量
 
@@ -59,6 +60,22 @@ List<KLineModel> mockData(kLine){
     };
 
     list.add(KLineModel.fromJson(providerMap));
+  });
+  return list;
+}
+
+
+List<MInLineModel> mockMinData(kLine){
+  List<MInLineModel> list = [];
+
+  kLine.forEach((item) {
+    Map<String, dynamic> providerMap = {
+      "time":item[0],
+      "price":item[1],
+      "volume":item[2],
+    };
+
+    list.add(MInLineModel.fromJson(providerMap));
   });
   return list;
 }

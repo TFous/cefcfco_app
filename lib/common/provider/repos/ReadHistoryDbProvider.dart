@@ -7,11 +7,7 @@ import 'package:cefcfco_app/common/config/Config.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:cefcfco_app/common/utils/CodeUtils.dart';
 
-/**
- * 本地已读历史表
- * Created by guoshuyu
- * Date: 2018-08-07
- */
+
 /// 如果是分钟图，则分别是 时间，
 /// 当前分钟开盘价格，
 /// 当前分钟收盘价格，

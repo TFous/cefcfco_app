@@ -1,10 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
 
-/**
- * Created by guoshuyu
- * Date: 2018-07-31
- */
-
 part 'KLineModel.g.dart';
 
 @JsonSerializable()
@@ -46,9 +41,9 @@ class KLineModel {
     this.turnoverRate
   );
 
-  factory KLineModel.fromJson(Map<String, dynamic> json) => _$RepositoryFromJson(json);
+  factory KLineModel.fromJson(Map<String, dynamic> json) => _$KLineModelFromJson(json);
 
-  Map<String, dynamic> toJson() => _$RepositoryToJson(this);
+  Map<String, dynamic> toJson() => _$KLineModelToJson(this);
 
   KLineModel.empty();
 }

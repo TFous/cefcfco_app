@@ -1,10 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-/**
- * 数据库表
- * Created by guoshuyu
- * Date: 2018-08-03
- */
+
 import 'package:cefcfco_app/common/provider/SqlManager.dart';
 import 'package:meta/meta.dart';
 import 'package:sqflite/sqflite.dart';

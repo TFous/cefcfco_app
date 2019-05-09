@@ -3,12 +3,6 @@ import 'dart:io';
 
 import 'package:sqflite/sqflite.dart';
 
-/**
- * 数据库管理
- * Created by guoshuyu
- * Date: 2018-08-03
- */
-
 class SqlManager {
   static const _VERSION = 1;
 
