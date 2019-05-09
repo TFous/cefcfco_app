@@ -201,6 +201,7 @@ class MyView extends CustomPainter{
 
 
 //          Code.eventBus.fire(KLineDataInEvent(data));
+
           if(canvasModel.isShowCross){
             KLineModel data = kLineOffsets[i][2];
             Color color;
@@ -215,23 +216,15 @@ class MyView extends CustomPainter{
             var turnoverRate = volumeTextPainter('换手率:${data.turnoverRate}',KLineConfig.TURNOVER_RATE_COLOR)..layout();
             turnoverRate.paint(canvas, Offset(canvasWidth/5*3+8,0.0)); // 换手率字太长，加了8像素好看点
 
-            var m5Text;
-            var m10Text;
-            m5.list.forEach((item){
-              double dx = getDx(canvasModel, item.positionIndex);
-              if(dx==lineDx){
-                m5Text = volumeTextPainter(isVolume?'M5:${priceToWan(item.ma)}':'M5:${priceToYi(item.ma)}',KLineConfig.VOLUME_M5_COLOR)..layout();
-                m5Text.paint(canvas, Offset(canvasWidth/5,0.0));
-              }
-            });
+            // 均线数据，i就是对应的存放数据index
+            var item5 = m5.list[i];
+            var m5Text = volumeTextPainter(isVolume?'M5:${priceToWan(item5.ma)}':'M5:${priceToYi(item5.ma)}',KLineConfig.VOLUME_M5_COLOR)..layout();
+            m5Text.paint(canvas, Offset(canvasWidth / 5, 0.0));
 
-            m10.list.forEach((item){
-              double dx = getDx(canvasModel, item.positionIndex);
-              if(dx==lineDx){
-                m10Text = volumeTextPainter(isVolume?'M10:${priceToWan(item.ma)}':'M10:${priceToYi(item.ma)}',KLineConfig.VOLUME_M10_COLOR)..layout();
-                m10Text.paint(canvas, Offset(canvasWidth/5*2,0.0));
-              }
-            });
+
+            var item10 = m10.list[i];
+            var m10Text = volumeTextPainter(isVolume?'M10:${priceToWan(item10.ma)}':'M10:${priceToYi(item10.ma)}',KLineConfig.VOLUME_M10_COLOR)..layout();
+            m10Text.paint(canvas, Offset(canvasWidth / 5 * 2, 0.0));
 
 
           }

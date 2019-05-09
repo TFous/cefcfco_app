@@ -411,7 +411,7 @@ void drawPrice(Canvas canvas,lineDyPrice,initPriceText,lineDx,lineDy,canvasWidth
 }
 
 
-drawDashLine(Canvas canvas,Offset startOffset,Offset endOffset, {dashLength:5,color=0xFFdddddd,strokeWidth:0.7}){
+drawDashLine(Canvas canvas,Offset startOffset,Offset endOffset, {dashLength:2,color=0xFFdddddd,strokeWidth:0.7}){
   final Paint black = Paint()
     ..color = Color(color)
     ..strokeWidth = strokeWidth
