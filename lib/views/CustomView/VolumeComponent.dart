@@ -73,14 +73,14 @@ class MyView extends CustomPainter{
     // 区域等分线三横三竖 --end
 
     double maxVolume = 0.0; // 成交量
-    double maxTurnover = 0.0;
+    double maxAmount = 0.0;
     canvasModel.showKLineData.forEach((item){
       if(item.volume>maxVolume){
         maxVolume = item.volume;
       }
 
-      if(item.amount>maxTurnover){
-        maxTurnover = item.amount;
+      if(item.amount>maxAmount){
+        maxAmount = item.amount;
       }
     });
 
@@ -97,8 +97,8 @@ class MyView extends CustomPainter{
         top = priceToPositionDy(line.volume,canvasHeight,maxVolume,0);
         bottom = priceToPositionDy(line.volume,canvasHeight,maxVolume,0);
       }else{
-        top = priceToPositionDy(line.amount,canvasHeight,maxTurnover,0);
-        bottom = priceToPositionDy(line.amount,canvasHeight,maxTurnover,0);
+        top = priceToPositionDy(line.amount,canvasHeight,maxAmount,0);
+        bottom = priceToPositionDy(line.amount,canvasHeight,maxAmount,0);
       }
 
 
@@ -127,7 +127,7 @@ class MyView extends CustomPainter{
       var volumeText = volumeTextPainter(isVolume?'成交量':'成交额',KLineConfig.VOLUME_MAX_COLOR)..layout();
       volumeText.paint(canvas, Offset(KLineConfig.EQUAL_PRICE_MARGIN,0.0));
     }
-    var volumeMaxNum = volumeTextPainter(isVolume?priceToWan(maxVolume):priceToYi(maxTurnover),KLineConfig.VOLUME_MAX_COLOR)..layout();
+    var volumeMaxNum = volumeTextPainter(isVolume?priceToWan(maxVolume):priceToYi(maxAmount),KLineConfig.VOLUME_MAX_COLOR)..layout();
     volumeMaxNum.paint(canvas, Offset(canvasWidth-volumeMaxNum.width-KLineConfig.EQUAL_PRICE_MARGIN,0.0));
 
 
@@ -145,8 +145,8 @@ class MyView extends CustomPainter{
       m5 = getBollDataList(canvasModel.allKLineData,canvasModel.day5Data, 5,canvasModel.showKLineData,'volume');
       m10 = getBollDataList(canvasModel.allKLineData,canvasModel.day10Data, 10,canvasModel.showKLineData,'volume');
     }else{
-      m5 = getBollDataList(canvasModel.allKLineData,canvasModel.day5Data, 5,canvasModel.showKLineData,'turnover');
-      m10 = getBollDataList(canvasModel.allKLineData,canvasModel.day10Data, 10,canvasModel.showKLineData,'turnover');
+      m5 = getBollDataList(canvasModel.allKLineData,canvasModel.day5Data, 5,canvasModel.showKLineData,'amount');
+      m10 = getBollDataList(canvasModel.allKLineData,canvasModel.day10Data, 10,canvasModel.showKLineData,'amount');
     }
 
     /// 五日均线
@@ -154,7 +154,7 @@ class MyView extends CustomPainter{
       TextPaint.color = KLineConfig.VOLUME_M5_COLOR;
       m5.list.forEach((item){
         double dx = getDx(canvasModel, item.positionIndex);
-        double maDy = priceToPositionDy(item.ma, canvasHeight,isVolume?maxVolume:maxTurnover,0);
+        double maDy = priceToPositionDy(item.ma, canvasHeight,isVolume?maxVolume:maxAmount,0);
         ma5PointList.add(new Point(dx, maDy));
       });
       drawSmoothLine(canvas,TextPaint,ma5PointList);
@@ -164,7 +164,7 @@ class MyView extends CustomPainter{
       TextPaint.color = KLineConfig.VOLUME_M10_COLOR;
       m10.list.forEach((item){
         double dx = getDx(canvasModel, item.positionIndex);
-        double maDy = priceToPositionDy(item.ma, canvasHeight, isVolume?maxVolume:maxTurnover,0);
+        double maDy = priceToPositionDy(item.ma, canvasHeight, isVolume?maxVolume:maxAmount,0);
         ma10PointList.add(new Point(dx, maDy));
       });
       drawSmoothLine(canvas,TextPaint,ma10PointList);
@@ -213,8 +213,8 @@ class MyView extends CustomPainter{
             var volumeText = volumeTextPainter(isVolume?'量:${priceToWan(data.volume)}':'额:${priceToYi(data.amount)}',color)..layout();
             volumeText.paint(canvas, Offset(KLineConfig.EQUAL_PRICE_MARGIN,0.0));
 
-            var turnoverRate = volumeTextPainter('换手率:${data.turn}',KLineConfig.TURNOVER_RATE_COLOR)..layout();
-            turnoverRate.paint(canvas, Offset(canvasWidth/5*3+8,0.0)); // 换手率字太长，加了8像素好看点
+            var turn = volumeTextPainter('换手率:${data.turn}',KLineConfig.TURN_COLOR)..layout();
+            turn.paint(canvas, Offset(canvasWidth/5*3+8,0.0)); // 换手率字太长，加了8像素好看点
 
             // 均线数据，i就是对应的存放数据index
             var item5 = m5.list[i];

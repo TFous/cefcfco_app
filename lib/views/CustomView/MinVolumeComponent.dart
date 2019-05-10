@@ -154,8 +154,8 @@ class MyView extends CustomPainter{
           if(canvasModel.isShowCross){
             MInLineModel data = kLineOffsets[i][1];
 
-            var turnoverRate = volumeTextPainter('换手率:${data.price}',KLineConfig.TURNOVER_RATE_COLOR)..layout();
-            turnoverRate.paint(canvas, Offset(canvasWidth/5*3+8,0.0)); // 换手率字太长，加了8像素好看点
+            var turn = volumeTextPainter('当前价格:${data.price}',KLineConfig.TURN_COLOR)..layout();
+            turn.paint(canvas, Offset(canvasWidth/5*3+8,0.0)); // 换手率字太长，加了8像素好看点
 
           }
 

@@ -46,6 +46,6 @@ class KLineConfig {
 
   static const VOLUME_M5_COLOR = Color(0xFF333333); // 成交量5日均线 颜色
   static const VOLUME_M10_COLOR = Color(0xFFff7037); // 成交量10日均线 颜色
-  static const TURNOVER_RATE_COLOR = Color(0xFF3badf5); // 换手率 颜色
+  static const TURN_COLOR = Color(0xFF3badf5); // 换手率 颜色
   static const VOLUME_MAX_COLOR = Color(0xFF666666); // 当前成交量最高值 颜色
 }
