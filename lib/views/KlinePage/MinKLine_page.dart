@@ -35,7 +35,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:cefcfco_app/views/CustomView/DayKLineComponent.dart';
 import 'package:cefcfco_app/views/CustomView/FigureComponent.dart';
-import 'package:cefcfco_app/views/CustomView/VolumeComponent.dart';
+import 'package:cefcfco_app/views/CustomView/MinVolumeComponent.dart';
 import 'package:cefcfco_app/common/utils/globals.dart' as globals;
 import 'package:cefcfco_app/common/utils/KLineUtils.dart';
 import 'package:cefcfco_app/common/utils/mockData.dart' as mockData;
@@ -56,7 +56,8 @@ class MinKLineState extends State<MinKLine> {
   double figureComponentHeight = 100.0;
   double kLineComponentHeight = 200.0;
 
-//  double changePageDistances = 0.0;
+  int minTouchTime = 150; // 最短接触时间，接触到滑动小于：出现十字左边，显示价格，否则滑动klin
+
 
   double canvasWidth;  /// 画布长度，用于计算渲染数据条数
   int maxKlineNum; /// 当前klin最大容量个数
@@ -117,7 +118,7 @@ class MinKLineState extends State<MinKLine> {
 
     canvasWidth = width;
 
-
+    _canvasModel = new MinCanvasModel(allMinLineData,12.60,null,false);
     setState(() {
 
     });
@@ -146,20 +147,6 @@ class MinKLineState extends State<MinKLine> {
   Future _handelOnPointerMove(details) async {
 
 
-//    var moveTouchTime = getMillisecondsSinceEpoch();
-//    changePageDistances += details.delta.dx;
-//    print('changePageDistances----$changePageDistances---time---${moveTouchTime-startTouchTime}');
-//    if(moveTouchTime-startTouchTime< minTouchTime && changePageDistances > 150){
-//      changePageDistances = 0;
-//      pointerNum = 0;
-//      pointerDownPositions.clear();
-//      Application.router.navigateTo(
-//          context,routerConfig.dayKlinePage,
-//          transition: TransitionType.fadeIn);
-//    }
-
-
-
     endPosition = details.position;
     /// 滑动Klin, 两个手指的时候不能滑动
     setState(() {
@@ -170,7 +157,15 @@ class MinKLineState extends State<MinKLine> {
 
   /// 结束触摸
   Future _handelOnPointerUp(details) async {
-
+    endTouchTime = getMillisecondsSinceEpoch();
+    if(endTouchTime-startTouchTime< minTouchTime ){
+      setState(() {
+        _canvasModel.isShowCross = !_canvasModel.isShowCross;
+        if(_canvasModel.isShowCross){
+          _canvasModel.onTapDownDtails = details.position - _canvasOffset;
+        }
+      });
+    }
 
   }
 
@@ -223,16 +218,16 @@ class MinKLineState extends State<MinKLine> {
                   onPointerCancel: _handelOnPointerCancel
               ),
             ),
-//            Container(
-//              margin: EdgeInsets.symmetric(horizontal: globals.horizontalDistance),
-//              height: figureComponentHeight ,
-//              child: Listener(
-//                  child: ClipRect(
-//                    child: new VolumeComponent(_canvasModel,isVolume),
-//                  ),
-//                  onPointerDown: _handelOnPointerDownVolume,
-//              ),
-//            ),
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: globals.horizontalDistance),
+              height: figureComponentHeight ,
+              child: Listener(
+                  child: ClipRect(
+                    child: new MinVolumeComponent(_canvasModel,isVolume),
+                  ),
+                  onPointerDown: _handelOnPointerDownVolume,
+              ),
+            ),
             Container(
                 height: 40,
                 padding: EdgeInsets.symmetric(vertical: globals.sidesDistance),

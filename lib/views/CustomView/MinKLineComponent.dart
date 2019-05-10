@@ -50,13 +50,15 @@ class MyView extends CustomPainter{
   void paint(Canvas canvas, Size size) {
     double maxPrice = canvasModel.initPrice*1.1;
     double minPrice = canvasModel.initPrice*0.9;
+//    double maxPrice = 13.13;
+//    double minPrice = 12.07;
 
     TextPaint = new Paint()
     ..color = KLineConfig.WRAP_BORDER_COLOR
       ..style=PaintingStyle.stroke
     ..strokeWidth =1.0;
 
-    int minLength = 240;// 全天的开盘分钟数
+    int minLength = 242;// 全天的开盘分钟数 开始的930 和结束的3.00
 
     double canvasWidth = size.width;
     double canvasHeight = size.height;
@@ -90,35 +92,43 @@ class MyView extends CustomPainter{
 
     // 区域等分线三横三竖 --end
 
-
-
-
+    TextPaint.color = KLineConfig.BOLL_MA_COLOR;
+    List<Point> maPointList= [];
     canvasModel.minLineData.asMap().forEach((i, line) {
-      double startDy = priceToPositionDy(line.price,canvasHeight,maxPrice,minPrice);
-      double endDy = priceToPositionDy(line.price,canvasHeight,maxPrice,minPrice);
-
+      double startDy;
+      double endDy;
       if(i==0){
-
-      }else if(i==239){
-
+        // 第一个点是
+      }else if(i== minLength-1){
+        startDy = priceToPositionDy(canvasModel.minLineData[i-1].price,canvasHeight,maxPrice,minPrice);
+        endDy = priceToPositionDy(line.price,canvasHeight,maxPrice,minPrice);
+        canvas.drawLine(
+            new Offset(minWidth*(i-1), startDy),
+            new Offset(canvasWidth, endDy),
+            _linePaint);
       }else{
+        startDy = priceToPositionDy(canvasModel.minLineData[i-1].price,canvasHeight,maxPrice,minPrice);
+        endDy = priceToPositionDy(line.price,canvasHeight,maxPrice,minPrice);
         canvas.drawLine(
             new Offset(minWidth*(i-1), startDy),
             new Offset(minWidth*i, endDy),
             _linePaint);
       }
 
+      // 均线
+      double maPrice = getMinMA(canvasModel.minLineData.sublist(0,i+1));
+      var dy = priceToPositionDy(maPrice.isNaN?0:maPrice,canvasHeight,maxPrice,minPrice);
+      var dx = minWidth*i;
+      maPointList.add(Point(dx, dy));
 
-
-
-
-
-      // 标注每个线的序号
-//      var iText = priceTextPainter(i.toStringAsFixed(0))..layout();
-//      iText.paint(canvas, Offset(left, maxTop));
-      // 标注每个线的序号 ---end
+      kLineOffsets.add([dx,line]);
 
     });
+
+    kLineOffsets.add([canvasWidth,canvasModel.minLineData.last]);
+
+    maPointList.add(Point(canvasWidth, maPointList.last.y));
+    drawSmoothLine(canvas,TextPaint,maPointList);
 
 
     // 标注五段等分价格
@@ -134,68 +144,67 @@ class MyView extends CustomPainter{
 
 
     /// 点击后画的十字
-//    if(canvasModel.onTapDownDtails!=null && canvasModel.isShowCross){
-//      _linePaint..strokeWidth = lineWidth;
-//      _linePaint..color = KLineConfig.CROSS_LINE_COLOR;
-//
-//
-//      crossPricePaint = new Paint();
-//      crossPricePaint..strokeWidth =lineWidth;
-//      crossPricePaint..color =KLineConfig.CROSS_TEXT_BG_COLOR;
-//
-//      /// 修正dy 上下边界
-//      if(canvasModel.onTapDownDtails.dy<0){
-//        lineDy = 0.0;
-//      }else if(canvasModel.onTapDownDtails.dy>canvasHeight){
-//        lineDy = canvasHeight;
-//      }else{
-//        lineDy = canvasModel.onTapDownDtails.dy;
-//      }
-//
-//
-//      /// 横线
-//      canvas.drawLine(
-//          new Offset(0, lineDy),
-//          new Offset(canvasWidth,lineDy), _linePaint);
-//
-//      /// 修正dx 为每个klin 的中心
-//      var kLineLength = kLineOffsets.length;
-//      var i = 0;
-//      for(;i<kLineLength;i++){
-//        var dx = kLineOffsets[i][0];
-//        lineDx = dx+canvasModel.kLineWidth/2;
-//
-//        if(dx>canvasModel.onTapDownDtails.dx){
-//          /// 竖线
-//          canvas.drawLine(
-//              new Offset(lineDx, 0),
-//              new Offset(lineDx,canvasHeight ), _linePaint);
-//
-//          var data = kLineOffsets[i][2];
-//
+    if(canvasModel.onTapDownDtails!=null && canvasModel.isShowCross){
+      _linePaint..strokeWidth = lineWidth;
+      _linePaint..color = KLineConfig.CROSS_LINE_COLOR;
+
+
+      crossPricePaint = new Paint();
+      crossPricePaint..strokeWidth =lineWidth;
+      crossPricePaint..color =KLineConfig.CROSS_TEXT_BG_COLOR;
+
+      /// 修正dy 上下边界
+      if(canvasModel.onTapDownDtails.dy<0){
+        lineDy = 0.0;
+      }else if(canvasModel.onTapDownDtails.dy>canvasHeight){
+        lineDy = canvasHeight;
+      }else{
+        lineDy = canvasModel.onTapDownDtails.dy;
+      }
+
+
+      /// 横线
+      canvas.drawLine(
+          new Offset(0, lineDy),
+          new Offset(canvasWidth,lineDy), _linePaint);
+
+      /// 修正dx 为每个klin 的中心
+      var kLineLength = kLineOffsets.length;
+      var i = 0;
+      for(;i<kLineLength;i++){
+        var dx = kLineOffsets[i][0];
+        lineDx = dx+minWidth/2;
+
+        if(dx>canvasModel.onTapDownDtails.dx){
+          /// 竖线
+          canvas.drawLine(
+              new Offset(lineDx, 0),
+              new Offset(lineDx,canvasHeight ), _linePaint);
+
+//          var data = kLineOffsets[i][1];
 //          Code.eventBus.fire(KLineDataInEvent(data));
-//
-//          lineDyPrice = (canvasModel.kLineListInfo.maxPrice-canvasModel.kLineListInfo.minPrice)*((canvasHeight-lineDy)/canvasHeight)+canvasModel.kLineListInfo.minPrice;
-//          var initPriceText = priceVerticalAxisTextPainter(lineDyPrice.toStringAsFixed(2))..layout();
-//
-//          drawPrice(canvas,lineDyPrice,initPriceText,lineDx,lineDy,canvasWidth,canvasHeight,crossPricePaint);
-//          return;
-//        }
-//        else if(canvasModel.onTapDownDtails.dx>kLineOffsets[kLineLength-1][0]){
-//          /// 最后的一个线
-//          lineDx = kLineOffsets[kLineLength-1][0]+canvasModel.kLineWidth/2;
-//          /// 竖线
-//          canvas.drawLine(
-//              new Offset(lineDx, 0),
-//              new Offset(lineDx,canvasHeight ), _linePaint);
-//
-//          lineDyPrice = (canvasModel.kLineListInfo.maxPrice-canvasModel.kLineListInfo.minPrice)*((canvasHeight-lineDy)/canvasHeight)+canvasModel.kLineListInfo.minPrice;
-//          var initPriceText = priceVerticalAxisTextPainter(lineDyPrice.toStringAsFixed(2))..layout();
-//          drawPrice(canvas,lineDyPrice,initPriceText,lineDx,lineDy,canvasWidth,canvasHeight,crossPricePaint);
-//          return ;
-//        }
-//      }
-//    }
+
+          lineDyPrice = (maxPrice-minPrice)*((canvasHeight-lineDy)/canvasHeight)+minPrice;
+          var initPriceText = priceVerticalAxisTextPainter(lineDyPrice.toStringAsFixed(2))..layout();
+
+          drawPrice(canvas,lineDyPrice,initPriceText,lineDx,lineDy,canvasWidth,canvasHeight,crossPricePaint);
+          return;
+        }
+        else if(canvasModel.onTapDownDtails.dx>kLineOffsets.last[0]){
+          /// 最后的一个线
+          lineDx = kLineOffsets.last[0]-minWidth/2;
+          /// 竖线
+          canvas.drawLine(
+              new Offset(lineDx, 0),
+              new Offset(lineDx,canvasHeight ), _linePaint);
+
+          lineDyPrice = (maxPrice-minPrice)*((canvasHeight-lineDy)/canvasHeight)+minPrice;
+          var initPriceText = priceVerticalAxisTextPainter(lineDyPrice.toStringAsFixed(2))..layout();
+          drawPrice(canvas,lineDyPrice,initPriceText,lineDx,lineDy,canvasWidth,canvasHeight,crossPricePaint);
+          return ;
+        }
+      }
+    }
 
 
 //    canvas.save();

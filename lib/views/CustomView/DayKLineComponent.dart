@@ -314,9 +314,9 @@ class MyView extends CustomPainter{
           drawPrice(canvas,lineDyPrice,initPriceText,lineDx,lineDy,canvasWidth,canvasHeight,crossPricePaint);
           return;
         }
-        else if(canvasModel.onTapDownDtails.dx>kLineOffsets[kLineLength-1][0]){
+        else if(canvasModel.onTapDownDtails.dx>kLineOffsets.last[0]){
           /// 最后的一个线
-          lineDx = kLineOffsets[kLineLength-1][0]+canvasModel.kLineWidth/2;
+          lineDx = kLineOffsets.last[0]+canvasModel.kLineWidth/2;
           /// 竖线
           canvas.drawLine(
               new Offset(lineDx, 0),

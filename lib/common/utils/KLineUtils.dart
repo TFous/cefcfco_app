@@ -8,6 +8,8 @@ import 'package:cefcfco_app/common/model/BollPositonsModel.dart';
 import 'package:cefcfco_app/common/model/CanvasModel.dart';
 import 'package:cefcfco_app/common/model/KLineInfoModel.dart';
 import 'package:cefcfco_app/common/model/KLineModel.dart';
+import 'package:cefcfco_app/common/model/MInLineModel.dart';
+import 'package:cefcfco_app/common/model/MinCanvasModel.dart';
 import 'package:cefcfco_app/common/utils/monotonex.dart';
 import 'package:flutter/material.dart';
 /*
@@ -177,6 +179,15 @@ double getMA(List<KLineModel> kLineDatas,String attr) {
   return total / length;
 }
 
+double getMinMA(List<MInLineModel> kLineDatas) {
+  int length = kLineDatas.length;
+  double total = 0.0;
+  int i = 0;
+  for (; i < length; i++) {
+    total += kLineDatas[i].price;
+  }
+  return total / length;
+}
 
 double getVariance(c, ma) {
   double num = c - ma;
