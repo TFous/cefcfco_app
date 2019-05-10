@@ -49,14 +49,14 @@ List<KLineModel> mockData(kLine){
   kLine.forEach((item) {
     var arr = item.split(',');
     Map<String, dynamic> providerMap = {
-      "kLineDate":'${arr[0]}',
-      "startPrice":double.parse(arr[1]),
-      "endPrice":double.parse(arr[2]),
-      "maxPrice":double.parse(arr[3]),
-      "minPrice":double.parse(arr[4]),
+      "date":'${arr[0]}',
+      "open":double.parse(arr[1]),
+      "close":double.parse(arr[2]),
+      "high":double.parse(arr[3]),
+      "low":double.parse(arr[4]),
       "volume":double.parse(arr[5]),
-      "turnover":double.parse(arr[6]),
-      "turnoverRate":arr[7]
+      "amount":double.parse(arr[6]),
+      "turn":arr[7]
     };
 
     list.add(KLineModel.fromJson(providerMap));

@@ -95,10 +95,10 @@ class MyView extends CustomPainter{
         minItem = line;
       }
 
-      double startPrice = line.startPrice;
-      double endPrice = line.endPrice;
-      double maxPrice = line.maxPrice;
-      double minPrice = line.minPrice;
+      double startPrice = line.open;
+      double endPrice = line.close;
+      double maxPrice = line.high;
+      double minPrice = line.low;
 
 
       double left = kLineDistance*i+canvasModel.kLineMargin;
@@ -240,12 +240,12 @@ class MyView extends CustomPainter{
     _linePaint.color = KLineConfig.ARROW_COLOR;
     _linePaint..strokeWidth =0.8;
 
-    var top = priceToPositionDy(maxItem.maxPrice,canvasHeight,canvasModel.kLineListInfo.maxPrice,canvasModel.kLineListInfo.minPrice);
-    var bottom = priceToPositionDy(minItem.minPrice,canvasHeight,canvasModel.kLineListInfo.maxPrice,canvasModel.kLineListInfo.minPrice);
+    var top = priceToPositionDy(maxItem.high,canvasHeight,canvasModel.kLineListInfo.maxPrice,canvasModel.kLineListInfo.minPrice);
+    var bottom = priceToPositionDy(minItem.low,canvasHeight,canvasModel.kLineListInfo.maxPrice,canvasModel.kLineListInfo.minPrice);
     var max = kLineDistance*canvasModel.kLineListInfo.maxIndex;
     var min = kLineDistance*canvasModel.kLineListInfo.minIndex;
 
-    var maxPriceText = priceTextPainter(maxItem.maxPrice.toStringAsFixed(2))
+    var maxPriceText = priceTextPainter(maxItem.high.toStringAsFixed(2))
       ..layout();
     if(canvasModel.kLineListInfo.maxIndex > kLineLength/2){
       drawArrow(canvas, _linePaint, Offset(max-KLineConfig.ARROW_WIDTH+kLineDistance/2,top),Offset(max+kLineDistance/2,top));
@@ -255,7 +255,7 @@ class MyView extends CustomPainter{
       maxPriceText.paint(canvas, Offset(max+KLineConfig.ARROW_WIDTH+kLineDistance/2,top-maxPriceText.height/2));
     }
 
-    var minPriceText = priceTextPainter(minItem.minPrice.toStringAsFixed(2))
+    var minPriceText = priceTextPainter(minItem.low.toStringAsFixed(2))
       ..layout();
     if(canvasModel.kLineListInfo.minIndex > kLineLength/2){
       drawArrow(canvas, _linePaint, Offset(min-KLineConfig.ARROW_WIDTH+kLineDistance/2,bottom),Offset(min+kLineDistance/2,bottom));

@@ -247,7 +247,7 @@ class MinKLineState extends State<MinKLine> {
                                 children: <Widget>[
                                   Expanded(
                                     child: Text(
-                                        repository != null ? repository.kLineDate
+                                        repository != null ? repository.date
                                             .toString(): '00',
                                         textAlign: TextAlign.left,
                                         style: TextStyle(
@@ -278,7 +278,7 @@ class MinKLineState extends State<MinKLine> {
                                 children: <Widget>[
                                   Expanded(
                                     child: Text(
-                                        repository != null ? repository.startPrice
+                                        repository != null ? repository.open
                                             .toStringAsFixed(2) : '00',
                                         textAlign: TextAlign.left,
                                         style: TextStyle(
@@ -308,7 +308,7 @@ class MinKLineState extends State<MinKLine> {
                                 children: <Widget>[
                                   Expanded(
                                     child: Text(
-                                        repository != null ? repository.endPrice
+                                        repository != null ? repository.close
                                             .toStringAsFixed(2) : '00',
                                         textAlign: TextAlign.left,
                                         style: TextStyle(
@@ -338,7 +338,7 @@ class MinKLineState extends State<MinKLine> {
                                 children: <Widget>[
                                   Expanded(
                                     child: Text(
-                                        repository != null ? repository.maxPrice
+                                        repository != null ? repository.high
                                             .toStringAsFixed(2) : '00',
                                         textAlign: TextAlign.left,
                                         style: TextStyle(
@@ -368,7 +368,7 @@ class MinKLineState extends State<MinKLine> {
                                 children: <Widget>[
                                   Expanded(
                                     child: Text(
-                                        repository != null ? repository.minPrice
+                                        repository != null ? repository.low
                                             .toStringAsFixed(2) : '00',
                                         textAlign: TextAlign.left,
                                         style: TextStyle(

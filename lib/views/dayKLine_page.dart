@@ -184,7 +184,7 @@ class DayKLineState extends State<DayKLine> {
     }
     var kLineDistance = kLineWidth + kLineMargin;
     var minLeve = width ~/ kLineDistance;
-    var lastItemTime = _canvasModel.showKLineData.last.kLineDate;
+    var lastItemTime = _canvasModel.showKLineData.last.date;
 
     List<KLineModel> newList = getScaleDatasByLastTime(allKLineData,lastItemTime, minLeve);
     List<KLineModel> day5Datas = getScaleDatasByLastTime(allKLineData,lastItemTime, minLeve,averageDay: 5);
@@ -232,7 +232,7 @@ class DayKLineState extends State<DayKLine> {
       if(onHorizontalDragDistance.abs()>dragDistance){
         onHorizontalDragDistance = 0 ;
         /// 如果是最后时间则没有数据
-        if(_canvasModel.showKLineData.last.kLineDate == lastData.kLineDate){
+        if(_canvasModel.showKLineData.last.date == lastData.date){
           return ;
         }
 
@@ -276,7 +276,7 @@ class DayKLineState extends State<DayKLine> {
         });
       }
     }else{  /// 向右滑动，旧数据
-      if(_canvasModel.showKLineData.first.kLineDate == firstData.kLineDate){
+      if(_canvasModel.showKLineData.first.date == firstData.date){
         return;
       }
         if(onHorizontalDragDistance.abs()>dragDistance){
@@ -517,7 +517,7 @@ class DayKLineState extends State<DayKLine> {
                                 children: <Widget>[
                                   Expanded(
                                     child: Text(
-                                        repository != null ? repository.kLineDate
+                                        repository != null ? repository.date
                                             .toString(): '00',
                                         textAlign: TextAlign.left,
                                         style: TextStyle(
@@ -548,8 +548,8 @@ class DayKLineState extends State<DayKLine> {
                                 children: <Widget>[
                                   Expanded(
                                     child: Text(
-                                        repository != null ? repository.startPrice
-                                            .toStringAsFixed(2) : '00',
+                                        repository != null ? repository.open
+                                  .toStringAsFixed(2) : '00',
                                         textAlign: TextAlign.left,
                                         style: TextStyle(
                                             color: Color(0xFF333333))),
@@ -578,8 +578,8 @@ class DayKLineState extends State<DayKLine> {
                                 children: <Widget>[
                                   Expanded(
                                     child: Text(
-                                        repository != null ? repository.endPrice
-                                            .toStringAsFixed(2) : '00',
+                                        repository != null ? repository.close
+                                    .toStringAsFixed(2) : '00',
                                         textAlign: TextAlign.left,
                                         style: TextStyle(
                                             color: Color(0xFF333333))),
@@ -608,7 +608,7 @@ class DayKLineState extends State<DayKLine> {
                                 children: <Widget>[
                                   Expanded(
                                     child: Text(
-                                        repository != null ? repository.maxPrice
+                                        repository != null ? repository.high
                                             .toStringAsFixed(2) : '00',
                                         textAlign: TextAlign.left,
                                         style: TextStyle(
@@ -638,8 +638,8 @@ class DayKLineState extends State<DayKLine> {
                                 children: <Widget>[
                                   Expanded(
                                     child: Text(
-                                        repository != null ? repository.minPrice
-                                            .toStringAsFixed(2) : '00',
+                                        repository != null ? repository.low
+                                           .toStringAsFixed(2) : '00',
                                         textAlign: TextAlign.left,
                                         style: TextStyle(
                                             color: Color(0xFF333333))),

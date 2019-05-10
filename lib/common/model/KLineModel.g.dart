@@ -8,24 +8,24 @@ part of 'KLineModel.dart';
 
 KLineModel _$KLineModelFromJson(Map<String, dynamic> json) {
   return KLineModel(
-      json['kLineDate'] as String,
-      (json['startPrice'] as num)?.toDouble(),
-      (json['endPrice'] as num)?.toDouble(),
-      (json['maxPrice'] as num)?.toDouble(),
-      (json['minPrice'] as num)?.toDouble(),
+      json['date'] as String,
+      (json['open'] as num)?.toDouble(),
+      (json['close'] as num)?.toDouble(),
+      (json['high'] as num)?.toDouble(),
+      (json['low'] as num)?.toDouble(),
       (json['volume'] as num)?.toDouble(),
-      (json['turnover'] as num)?.toDouble(),
-      json['turnoverRate'] as String);
+      (json['amount'] as num)?.toDouble(),
+      json['turn'] as String);
 }
 
 Map<String, dynamic> _$KLineModelToJson(KLineModel instance) =>
     <String, dynamic>{
-      'kLineDate': instance.kLineDate,
-      'startPrice': instance.startPrice,
-      'endPrice': instance.endPrice,
-      'maxPrice': instance.maxPrice,
-      'minPrice': instance.minPrice,
+      'date': instance.date,
+      'open': instance.open,
+      'close': instance.close,
+      'high': instance.high,
+      'low': instance.low,
       'volume': instance.volume,
-      'turnover': instance.turnover,
-      'turnoverRate': instance.turnoverRate
+      'amount': instance.amount,
+      'turn': instance.turn
     };

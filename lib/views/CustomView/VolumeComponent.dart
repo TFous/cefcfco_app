@@ -79,15 +79,15 @@ class MyView extends CustomPainter{
         maxVolume = item.volume;
       }
 
-      if(item.turnover>maxTurnover){
-        maxTurnover = item.turnover;
+      if(item.amount>maxTurnover){
+        maxTurnover = item.amount;
       }
     });
 
     canvasModel.showKLineData.asMap().forEach((i, line) {
 
-      double startPrice = line.startPrice;
-      double endPrice = line.endPrice;
+      double startPrice = line.open;
+      double endPrice = line.close;
 
       double top;
       double bottom;
@@ -97,8 +97,8 @@ class MyView extends CustomPainter{
         top = priceToPositionDy(line.volume,canvasHeight,maxVolume,0);
         bottom = priceToPositionDy(line.volume,canvasHeight,maxVolume,0);
       }else{
-        top = priceToPositionDy(line.turnover,canvasHeight,maxTurnover,0);
-        bottom = priceToPositionDy(line.turnover,canvasHeight,maxTurnover,0);
+        top = priceToPositionDy(line.amount,canvasHeight,maxTurnover,0);
+        bottom = priceToPositionDy(line.amount,canvasHeight,maxTurnover,0);
       }
 
 
@@ -205,15 +205,15 @@ class MyView extends CustomPainter{
           if(canvasModel.isShowCross){
             KLineModel data = kLineOffsets[i][2];
             Color color;
-            if(data.endPrice>data.startPrice){
+            if(data.close>data.open){
               color = KLineConfig.KLINE_UP_COLOR;
             }else{
               color = KLineConfig.KLINE_DOWN_COLOR;
             }
-            var volumeText = volumeTextPainter(isVolume?'量:${priceToWan(data.volume)}':'额:${priceToYi(data.turnover)}',color)..layout();
+            var volumeText = volumeTextPainter(isVolume?'量:${priceToWan(data.volume)}':'额:${priceToYi(data.amount)}',color)..layout();
             volumeText.paint(canvas, Offset(KLineConfig.EQUAL_PRICE_MARGIN,0.0));
 
-            var turnoverRate = volumeTextPainter('换手率:${data.turnoverRate}',KLineConfig.TURNOVER_RATE_COLOR)..layout();
+            var turnoverRate = volumeTextPainter('换手率:${data.turn}',KLineConfig.TURNOVER_RATE_COLOR)..layout();
             turnoverRate.paint(canvas, Offset(canvasWidth/5*3+8,0.0)); // 换手率字太长，加了8像素好看点
 
             // 均线数据，i就是对应的存放数据index

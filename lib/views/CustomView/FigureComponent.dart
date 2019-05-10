@@ -69,10 +69,10 @@ class MyView extends CustomPainter{
 
     canvasModel.showKLineData.asMap().forEach((i, line) {
 
-      double startPrice = line.startPrice;
-      double endPrice = line.endPrice;
-      double maxPrice = line.maxPrice;
-      double minPrice = line.minPrice;
+      double startPrice = line.open;
+      double endPrice = line.close;
+      double maxPrice = line.high;
+      double minPrice = line.low;
 
       double top;
       double bottom;

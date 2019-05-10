@@ -26,7 +26,7 @@ List<KLineModel> getScaleDatasByLastTime(List<KLineModel> allData,String lastIte
   int i=0;
   if(averageDay!=null){
     for(;i<dataLength;i++){
-      if(allData[i].kLineDate == lastItemTime){
+      if(allData[i].date == lastItemTime){
         /// 当最后的index（前面数据的条数）小于 要获取的条数
         if(i<length){
           list = allData.sublist(0,length);
@@ -41,7 +41,7 @@ List<KLineModel> getScaleDatasByLastTime(List<KLineModel> allData,String lastIte
     }
   }else{
     for(;i<dataLength;i++){
-      if(allData[i].kLineDate == lastItemTime){
+      if(allData[i].date == lastItemTime){
         /// 当最后的index（前面数据的条数）小于 要获取的条数
         if(i<length){
           list = allData.sublist(0,length);
@@ -68,17 +68,17 @@ KLineInfoModel getKLineInfoModel(List<KLineModel> lineData) {
   for (; i < length; i++) {
     KLineModel item = lineData[i];
     if (maxPrice != 0.0) {
-      if (maxPrice < item.maxPrice) {
-        maxPrice = item.maxPrice;
+      if (maxPrice < item.high) {
+        maxPrice = item.high;
         maxIndex = i;
       }
-      if (minPrice > item.minPrice) {
-        minPrice = item.minPrice;
+      if (minPrice > item.low) {
+        minPrice = item.low;
         minIndex = i;
       }
     } else {
-      maxPrice = item.maxPrice;
-      minPrice = item.minPrice;
+      maxPrice = item.high;
+      minPrice = item.low;
       maxIndex = i;
       minIndex = i;
     }
@@ -107,10 +107,10 @@ List<KLineModel> getKLineData(List<KLineModel> allData,
     if (direction == 'right') {
       //向右滑动，数据向前拿⬅
       for (int i = 0; i < allDataLength; i++) {
-        if (historyFirstItem.kLineDate == allData[i].kLineDate) {
+        if (historyFirstItem.date == allData[i].date) {
           if(i==0){
             for (int j = 0; j < allDataLength; j++) {
-              if (historyLastItem.kLineDate == allData[j].kLineDate) {
+              if (historyLastItem.date == allData[j].date) {
                 list = allData.sublist(0, j);
               }
             }
@@ -125,7 +125,7 @@ List<KLineModel> getKLineData(List<KLineModel> allData,
     } else {
       // 向左滑动，数据向后→
       for (int i = 0; i < allDataLength; i++) {
-        if (historyLastItem.kLineDate == allData[i].kLineDate) {
+        if (historyLastItem.date == allData[i].date) {
           // 等于最后一个
           if(i==allDataLength-1){
             list = allData.sublist(i-length, i);
@@ -168,12 +168,12 @@ double getMA(List<KLineModel> kLineDatas,String attr) {
   double total = 0.0;
   int i = 0;
   for (; i < length; i++) {
-    if(attr=='endPrice'){
-      total += kLineDatas[i].endPrice;
+    if(attr=='close'){
+      total += kLineDatas[i].close;
     }else if(attr=='volume'){
       total += kLineDatas[i].volume;
-    }else if(attr=='turnover'){
-      total += kLineDatas[i].turnover;
+    }else if(attr=='amount'){
+      total += kLineDatas[i].amount;
     }
   }
   return total / length;
@@ -221,12 +221,12 @@ double getMdData(List<KLineModel> list, int length,String attr) {
   double allVariance = 0; // 累加差值，用于计算md
   list.asMap().forEach((index, num) {
     double item;
-    if(attr=='endPrice'){
-      item =num.endPrice;
+    if(attr=='close'){
+      item =num.close;
     }else if(attr=='volume'){
       item =num.volume;
-    }else if(attr=='turnover'){
-      item =num.turnover;
+    }else if(attr=='amount'){
+      item =num.amount;
     }
 
     addAll += item;
@@ -259,7 +259,7 @@ BollListModel getBollDataList(
     List<KLineModel> auxiliaryDatas,
     int n,
     List<KLineModel> kLineData,
-    [String attr = 'endPrice']) {
+    [String attr = 'close']) {
   KLineInfoModel kLineListInfo= getKLineInfoModel(kLineData);
   int length = auxiliaryDatas.length; //28  20  9
   int i = 0;
@@ -277,7 +277,7 @@ BollListModel getBollDataList(
       List<KLineModel> listForN = auxiliaryDatas.sublist(i-n, i);
       KLineModel last = listForN.last;
       for(var p=0;p<kLineDataLength;p++){
-        if(last.kLineDate==kLineData[p].kLineDate){
+        if(last.date==kLineData[p].date){
           index = p;
         }
       }
@@ -325,7 +325,7 @@ BollPositonsModel bollDataToPosition(
     List<KLineModel> kLineData,
     double canvasHeight,
     CanvasModel canvasModel,
-    {attr:'endPrice'}) {
+    {attr:'close'}) {
   List<Point> maPointList = [];
   List<Point> upPointList = [];
   List<Point> dnPointList = [];

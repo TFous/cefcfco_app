@@ -5,40 +5,40 @@ part 'KLineModel.g.dart';
 @JsonSerializable()
 class KLineModel {
 //  @JsonKey(name: "k_line_date")
-  String kLineDate;
+  String date;
 
 //  @JsonKey(name: "start_price")
-  double startPrice;
+  double open;
 
 //  @JsonKey(name: "end_price")
-  double endPrice;
+  double close;
 
 //  @JsonKey(name: "max_price")
-  double maxPrice;
+  double high;
 
 //  @JsonKey(name: "min_price")
-  double minPrice;
+  double low;
 
   double volume;  // 成交量
 
-  double turnover;  // 成交额
+  double amount;  // 成交额
 
-  String turnoverRate;  // 换手率
+  String turn;  // 换手率
 
   @override
   toString(){
-    return 'kLineDate--->$kLineDate-->$endPrice';
+    return 'kLineDate--->$date-->$close';
   }
 
   KLineModel(
-    this.kLineDate,
-    this.startPrice,
-    this.endPrice,
-    this.maxPrice,
-    this.minPrice,
+    this.date,
+    this.open,
+    this.close,
+    this.high,
+    this.low,
     this.volume,
-    this.turnover,
-    this.turnoverRate
+    this.amount,
+    this.turn
   );
 
   factory KLineModel.fromJson(Map<String, dynamic> json) => _$KLineModelFromJson(json);
