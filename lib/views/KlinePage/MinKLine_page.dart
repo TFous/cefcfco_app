@@ -228,21 +228,61 @@ class MinKLineState extends State<MinKLine> {
     }
     return new Scaffold(
       appBar: new AppBar(
-//        automaticallyImplyLeading: false,
+        leading: Builder(
+          builder: (BuildContext context) {
+            return IconButton(
+              icon: const Icon(Icons.arrow_back_ios),
+              iconSize: 16,
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            );
+          },
+        ),
+        automaticallyImplyLeading: false,
         //设置标题栏的背景颜色
         title: new Title(
-          child: new Text(
-            widget.title,
-            style: new TextStyle(
-              fontSize: 20.0,
-              color: Colors.white,
-            ),
+          child: new Row(
+              children: <Widget>[
+                Expanded(
+                  child: new Icon(Icons.arrow_left),
+                ),
+                Expanded(
+                  child: Column(
+                    children: <Widget>[
+                  Container(
+                      padding: EdgeInsets.symmetric(vertical: 3.0),
+                      child: Text(
+                          widget.title,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 18.0,
+                              color: Colors.white,
+                              fontWeight: null)),
+                  ),
+                      Text(
+                    widget.code,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 13.0,
+                        color: Colors.white,
+                        fontWeight: null))
+                  ]),
+                ),
+                Expanded(
+                  child: new Icon(Icons.arrow_right),
+                ),
+              ]
           ),
-          color: Colors
-              .white, //设置标题栏文字的颜色(new title的时候color不能为null不然会报错一般可以不用new title 直接new text,不过最终的文字里面还是以里面new text的style样式文字颜色为准)
+          color: Colors .white, //设置标题栏文字的颜色(new title的时候color不能为null不然会报错一般可以不用new title 直接new text,不过最终的文字里面还是以里面new text的style样式文字颜色为准)
         ),
-//          centerTitle: true,//设置标题居中
+        centerTitle: true,//设置标题居中
         elevation: 0,
+        actions: <Widget>[
+          //设置显示在右边的控件
+          new Padding(
+            child: new Icon(Icons.search),
+            padding: EdgeInsets.all(10.0),
+          ),
+        ],
         //设置标题栏下面阴影的高度
 //        brightness:Brightness.dark,//设置明暗模式（不过写了没看出变化，后面再看）
         primary: true,
