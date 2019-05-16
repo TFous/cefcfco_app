@@ -23,11 +23,13 @@ import 'package:cefcfco_app/common/model/KLineModel.dart';
 import 'package:cefcfco_app/common/model/MInLineModel.dart';
 import 'package:cefcfco_app/common/model/MinCanvasModel.dart';
 import 'package:cefcfco_app/common/net/Code.dart';
+import 'package:cefcfco_app/common/net/ResultData.dart';
 import 'package:cefcfco_app/common/provider/repos/ReadHistoryDbProvider.dart';
 import 'package:cefcfco_app/common/utils/KLineDataInEvent.dart';
 import 'package:cefcfco_app/common/utils/MockDayData.dart';
 import 'package:cefcfco_app/common/utils/MockMinData.dart';
 import 'package:cefcfco_app/routers/application.dart';
+import 'package:cefcfco_app/services/get_dustry_list.dart';
 import 'package:cefcfco_app/views/CustomView/MinKLineComponent.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/cupertino.dart';
@@ -41,6 +43,13 @@ import 'package:cefcfco_app/common/utils/KLineUtils.dart';
 import 'package:cefcfco_app/common/utils/mockData.dart' as mockData;
 import 'package:cefcfco_app/common/utils/router_config.dart' as routerConfig;
 class MinKLine extends StatefulWidget {
+
+  String title;
+  String code;
+  String stkUniCode;
+
+  MinKLine({this.title,this.code,this.stkUniCode});
+
   @override
   State<StatefulWidget> createState() {
     return MinKLineState();
@@ -88,9 +97,9 @@ class MinKLineState extends State<MinKLine> {
 
 
   @override
-  initState(){
+  initState() {
     super.initState();
-    allMinLineData = mockData.mockMinData(MockMinData.list000001);
+//    allMinLineData = mockData.mockMinData(MockMinData.list000001);
 //    print('所有数据长度----${allKLineData.length}');
 
     // evenbus内不能用setstate,不然无限刷新
@@ -112,13 +121,50 @@ class MinKLineState extends State<MinKLine> {
     }
   }
 
+//  List<MInLineModel> setMinData(){
+//    List<MInLineModel> list = [];
+//    List kLineData = getMinuteData(widget.stkUniCode);
+//    print(kLineData);
+//    kLineData.forEach((item) {
+//      print(kLineData);
+//      Map<String, dynamic> providerMap = {
+//        "time":item['timeStamp'],
+//        "price":item['curPrice'],
+//        "volume":item['tradeVol'],
+//      };
+//
+//      list.add(MInLineModel.fromJson(providerMap));
+//    });
+//    print(list[0].price);
+//    return list;
+//  }
+
+  Future<List<MInLineModel>> getMinuteData(stkUniCode) async {
+    ResultData result = await SinaDustryServices.getMinuteData(stkUniCode);
+    var now = new DateTime.now().toString().split(' ')[0];
+    List<MInLineModel> list = [];
+    List kLineData = result.data['data'][now];
+    kLineData.forEach((item) {
+      Map<String, dynamic> providerMap = {
+        "time":item['timeStamp'],
+        "price":item['curPrice'],
+        "volume":item['tradeVol'],
+      };
+
+      list.add(MInLineModel.fromJson(providerMap));
+    });
+    print(list[0].price);
+    return list;
+  }
+
 
   /// 获取初始化 画布数据
   initCanvasData(width) async{
-
     canvasWidth = width;
-
-    _canvasModel = new MinCanvasModel(allMinLineData,12.60,null,false);
+    List<MInLineModel> allMinLineData = await getMinuteData(widget.stkUniCode);
+    ResultData result = await SinaDustryServices.getCodeData(widget.stkUniCode);
+    var openPrice = result.data['data']['openPrice'];
+    _canvasModel = new MinCanvasModel(allMinLineData,openPrice,null,false);
     setState(() {
 
     });
@@ -186,7 +232,7 @@ class MinKLineState extends State<MinKLine> {
         //设置标题栏的背景颜色
         title: new Title(
           child: new Text(
-            '分时图',
+            widget.title,
             style: new TextStyle(
               fontSize: 20.0,
               color: Colors.white,

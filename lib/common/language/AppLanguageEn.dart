@@ -4,4 +4,7 @@ class AppLanguageEn extends AppLanguageBase {
   @override
   String dongtai = 'dongtai';
 
+  @override
+  String title = 'HXQH';
+
 }

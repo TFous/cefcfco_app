@@ -8,6 +8,7 @@ import 'package:cefcfco_app/routers/application.dart';
 import 'package:cefcfco_app/views/about_page.dart';
 import 'package:cefcfco_app/views/dayKline_page.dart';
 import 'package:cefcfco_app/views/user_page.dart';
+import 'package:cefcfco_app/views/list_dustry_page.dart';
 
 import 'package:cefcfco_app/common/utils/globals.dart' as globals;
 
@@ -70,7 +71,9 @@ class _MyHomePageState extends State<AppPage>
           physics: new NeverScrollableScrollPhysics(), // 禁用滑动
           controller: controller,
           children: <Widget>[
-            new DayKLine(),
+
+            new ListDustryPage(),
+//            new DayKLine(),
 //        new AboutPage(),
             new ListPage(),
             new UserPage(),

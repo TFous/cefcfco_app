@@ -26,13 +26,13 @@ class Request {
   }
 
   static void setHttpsVerification() {
-    (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
-        (client) {
-      client.badCertificateCallback =
-          (X509Certificate cert, String host, int port) {
-        return true;
-      };
-    };
+//    (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+//        (client) {
+//      client.badCertificateCallback =
+//          (X509Certificate cert, String host, int port) {
+//        return true;
+//      };
+//    };
   }
 
   static Future get(String url,
@@ -45,8 +45,8 @@ class Request {
       response = await dio.get(url,queryParameters: params,options:options);
     } on DioError catch (e) {
       if (e.response != null && scaffoldKey != null) {
-        var code = common.getCatchErrCode(e.response, scaffoldKey);
-        return code;
+//        var code = common.getCatchErrCode(e.response, scaffoldKey);
+        return response.statusCode;
       }
     }
     return response.data;

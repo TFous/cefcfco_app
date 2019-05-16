@@ -6,6 +6,12 @@ String identityUrl = 'https://identity-wucc.apps.dev-cefcfco.com';
 String wuccUrl = 'https://admin-wucc.apps.dev-cefcfco.com';
 String keyValueUrl = 'https://api-platform.apps.dev-cefcfco.com';
 
+
+// 新浪财经行业分类列表
+String minuteUrl = 'https://stock.caixin.com/cgi/StockRealTimeLineFiveData';
+String dustryUrl = 'https://stock.caixin.com/cgi';
+
+
 String scope = 'openid role ewip permission roledatapermission';
 String grantType = 'password';
 String clientId = 'test';

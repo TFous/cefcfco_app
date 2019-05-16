@@ -101,7 +101,6 @@ num getCatchErrCode(response,scaffoldKey){
   }else{
     var code = response.statusCode.toString();
     var errMsg = codeMessage[code];
-    showInSnackBar(errMsg,scaffoldKey);
   }
   return code;
 }

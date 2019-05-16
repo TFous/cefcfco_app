@@ -48,8 +48,8 @@ class MyView extends CustomPainter{
 
   @override
   void paint(Canvas canvas, Size size) {
-    double maxPrice = canvasModel.initPrice*1.1;
-    double minPrice = canvasModel.initPrice*0.9;
+    double maxPrice = canvasModel.initPrice*1.11;
+    double minPrice = canvasModel.initPrice*0.91;
 //    double maxPrice = 13.13;
 //    double minPrice = 12.07;
 
@@ -58,7 +58,7 @@ class MyView extends CustomPainter{
       ..style=PaintingStyle.stroke
     ..strokeWidth =1.0;
 
-    int minLength = 242;// 全天的开盘分钟数 开始的930 和结束的3.00
+    int minLength = 241;// 全天的开盘分钟数 开始的930 和结束的3.00
 
     double canvasWidth = size.width;
     double canvasHeight = size.height;
