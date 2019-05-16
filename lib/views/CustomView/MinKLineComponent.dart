@@ -49,7 +49,8 @@ class MyView extends CustomPainter{
   @override
   void paint(Canvas canvas, Size size) {
     double maxPrice = canvasModel.initPrice*1.11;
-    double minPrice = canvasModel.initPrice*0.91;
+    double minPrice = canvasModel.initPrice*0.89;
+
 //    double maxPrice = 13.13;
 //    double minPrice = 12.07;
 
@@ -125,9 +126,9 @@ class MyView extends CustomPainter{
 
     });
 
-    kLineOffsets.add([canvasWidth,canvasModel.minLineData.last]);
+//    kLineOffsets.add([canvasWidth,canvasModel.minLineData.last]);
 
-    maPointList.add(Point(canvasWidth, maPointList.last.y));
+//    maPointList.add(Point(canvasWidth, maPointList.last.y));
     drawSmoothLine(canvas,TextPaint,maPointList);
 
 

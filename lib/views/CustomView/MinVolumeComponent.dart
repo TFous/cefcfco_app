@@ -58,7 +58,7 @@ class MyView extends CustomPainter{
     double canvasWidth = size.width;
     double canvasHeight = size.height;
 
-    int minLength = 242;// 全天的开盘分钟数 开始的930 和结束的3.00
+    int minLength = 241;// 全天的开盘分钟数 开始的930 和结束的3.00
     double minWidth = canvasWidth/minLength;
     
     double lineDyPrice;  //横线指的价格

@@ -163,7 +163,7 @@ class MinKLineState extends State<MinKLine> {
     canvasWidth = width;
     List<MInLineModel> allMinLineData = await getMinuteData(widget.stkUniCode);
     ResultData result = await SinaDustryServices.getCodeData(widget.stkUniCode);
-    var openPrice = result.data['data']['openPrice'];
+    var openPrice = result.data['data']['preClosePrice'];
     _canvasModel = new MinCanvasModel(allMinLineData,openPrice,null,false);
     setState(() {
 
