@@ -28,6 +28,7 @@ import 'package:cefcfco_app/common/provider/repos/ReadHistoryDbProvider.dart';
 import 'package:cefcfco_app/common/utils/KLineDataInEvent.dart';
 import 'package:cefcfco_app/common/utils/MockDayData.dart';
 import 'package:cefcfco_app/common/utils/MockMinData.dart';
+import 'package:cefcfco_app/common/utils/common.dart';
 import 'package:cefcfco_app/routers/application.dart';
 import 'package:cefcfco_app/services/get_dustry_list.dart';
 import 'package:cefcfco_app/views/CustomView/MinKLineComponent.dart';
@@ -79,7 +80,30 @@ class MinKLineState extends State<MinKLine> {
 
   MinCanvasModel _canvasModel = new MinCanvasModel([],12.60,null,false);
 
-
+  Map varietyMsg ={
+    "changeRate": -5.93080724876442,
+    "curPrice": 5.71,
+    "floatValue": 4346402288.74,
+    "hasCollected": false,
+    "highPrice": 6.07,
+    "highPrice52w": 8.58,
+    "lowPrice": 5.67,
+    "lowPrice52w": 2.56,
+    "openPrice": 6.01,
+    "preClosePrice": 6.07,
+    "priceBookRatio": 2.6836490106687974,
+    "priceEarningRatio": -45.826645264847514,
+    "priceUpdown1": -0.3600000000000003,
+    "sortIndex": 0,
+    "stkCode": "002177.SZ",
+    "stkShortName": "御银股份",
+    "stkUniCode": 101000303,
+    "totValue": 4346402288.74,
+    "tradeAmut": 271312887.66,
+    "tradeVol": 463893,
+    "turnoverRate": 6.094302492114419,
+    "type": "A"
+  }; // 品种详情
   CanvasBollModel bollModel = new CanvasBollModel([],[],[],[],0.0,0.0,7.0,2.0,null,false);
   Offset _canvasOffset = Offset.zero;
   StreamSubscription stream;
@@ -119,6 +143,7 @@ class MinKLineState extends State<MinKLine> {
       stream = null;
       _canvasModel = null;
     }
+    isOnce = true;
   }
 
 //  List<MInLineModel> setMinData(){
@@ -140,20 +165,29 @@ class MinKLineState extends State<MinKLine> {
 //  }
 
   Future<List<MInLineModel>> getMinuteData(stkUniCode) async {
-    ResultData result = await SinaDustryServices.getMinuteData(stkUniCode);
-    var now = new DateTime.now().toString().split(' ')[0];
-    List<MInLineModel> list = [];
-    List kLineData = result.data['data'][now];
-    kLineData.forEach((item) {
-      Map<String, dynamic> providerMap = {
-        "time":item['timeStamp'],
-        "price":item['curPrice'],
-        "volume":item['tradeVol'],
-      };
+    var now = new DateTime.now();
 
-      list.add(MInLineModel.fromJson(providerMap));
+    if (now.hour < 9 || (now.hour == 9 && now.minute < 30)) {
+      return [];
+    }
+
+
+    ResultData result = await SinaDustryServices.getMinuteData(stkUniCode);
+    var date = now.toString().split(' ')[0];
+    List<MInLineModel> list = [];
+    List kLineData = result.data['data'][date];
+    kLineData.forEach((item) {
+      if(item['curPrice']!=0 && item['curPrice']!= null){
+        Map<String, dynamic> providerMap = {
+          "time":item['timeStamp'],
+          "price":item['curPrice'],
+          "volume":item['tradeVol'],
+        };
+
+        list.add(MInLineModel.fromJson(providerMap));
+      }
     });
-    print(list[0].price);
+    print('list[0].price----${list.length}');
     return list;
   }
 
@@ -163,7 +197,15 @@ class MinKLineState extends State<MinKLine> {
     canvasWidth = width;
     List<MInLineModel> allMinLineData = await getMinuteData(widget.stkUniCode);
     ResultData result = await SinaDustryServices.getCodeData(widget.stkUniCode);
+
+    ResultData dayKResult = await SinaDustryServices.getDataByCode(widget.code.split('.')[0]);
+
+    Map dayKdata = parseJsonForString(dayKResult.data);
+    print(5555555555);
+    print(dayKdata);
+
     var openPrice = result.data['data']['preClosePrice'];
+    varietyMsg = result.data['data'];
     _canvasModel = new MinCanvasModel(allMinLineData,openPrice,null,false);
     setState(() {
 
@@ -290,6 +332,211 @@ class MinKLineState extends State<MinKLine> {
       body: Container(
         child: Column(
           children: <Widget>[
+            Container(
+                margin: EdgeInsets.symmetric(vertical: globals.sidesDistance,
+                    horizontal: globals.horizontalDistance),
+                child: Stack(
+                  alignment:Alignment.bottomRight ,
+                  children: <Widget>[
+                  new Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: Column(
+                            children: <Widget>[
+                            Text( varietyMsg['curPrice'].toString(),
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontSize: 26.0,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w500)),
+                              Text( "${varietyMsg['priceUpdown1'].toStringAsFixed(2)}  ${varietyMsg['changeRate'].toStringAsFixed(2)}%",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(fontSize: 13.0,
+                                      color: Colors.black,
+                                      fontWeight: null)),
+                          ],),
+                        ),
+                        Expanded(
+                          child: Column(
+                              children: <Widget>[
+                                new Row(
+                                    children: <Widget>[
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 4,),
+                                        child: Text(
+                                            "高",
+                                            textAlign: TextAlign.left,
+                                            style: TextStyle(fontSize: 16.0,
+                                                color: Color(0xFF666666),
+                                                fontWeight: FontWeight.w600)),
+                                      )
+                                      ,
+                                      Container(
+                                        child: Text(
+                                            varietyMsg['highPrice'].toStringAsFixed(2),
+                                            textAlign: TextAlign.right,
+                                            style: TextStyle(
+                                                height: 1.2,
+                                                fontSize: 16.0,
+                                                color: Colors.red,
+                                                fontWeight: FontWeight.w700)),
+                                      )
+
+                                    ]),
+                                new Row(
+                                    children: <Widget>[
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 4,),
+                                        child: Text(
+                                            "低",
+                                            textAlign: TextAlign.left,
+                                            style: TextStyle(fontSize: 16.0,
+                                                color: Color(0xFF666666),
+                                                fontWeight: FontWeight.w600)),
+                                      )
+                                      ,
+                                      Container(
+                                        child: Text(
+                                            varietyMsg['lowPrice'].toStringAsFixed(2),
+                                            textAlign: TextAlign.right,
+                                            style: TextStyle(
+                                                height: 1.2,
+                                                fontSize: 16.0,
+                                                color: Colors.green,
+                                                fontWeight: FontWeight.w700)),
+                                      )
+
+                                    ]),
+                              ]),
+                        ),
+                        Expanded(
+                          child: Column(
+                              children: <Widget>[
+                                new Row(
+                                    children: <Widget>[
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 4,),
+                                        child: Text(
+                                            "开",
+                                            textAlign: TextAlign.left,
+                                            style: TextStyle(fontSize: 16.0,
+                                                color: Color(0xFF666666),
+                                                fontWeight: FontWeight.w600)),
+                                      )
+                                      ,
+                                      Container(
+                                        child: Text(
+                                            varietyMsg['openPrice'].toStringAsFixed(2),
+                                            textAlign: TextAlign.right,
+                                            style: TextStyle(
+                                                height: 1.2,
+                                                fontSize: 16.0,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.w700)),
+                                      )
+
+                                    ]),
+                                new Row(
+                                    children: <Widget>[
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 4,),
+                                        child: Text(
+                                            "换",
+                                            textAlign: TextAlign.left,
+                                            style: TextStyle(fontSize: 16.0,
+                                                color: Color(0xFF666666),
+                                                fontWeight: FontWeight.w600)),
+                                      )
+                                      ,
+                                      Container(
+                                        child: Text(
+                                            varietyMsg['openPrice'].toStringAsFixed(2),
+                                            textAlign: TextAlign.right,
+                                            style: TextStyle(
+                                                height: 1.2,
+                                                fontSize: 16.0,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.w700)),
+                                      )
+
+                                    ]),
+                              ]),
+                        ),
+                        Expanded(
+                          child: Column(
+                              children: <Widget>[
+                                new Row(
+                                    children: <Widget>[
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 4,),
+                                        child: Text(
+                                            "量",
+                                            textAlign: TextAlign.left,
+                                            style: TextStyle(fontSize: 16.0,
+                                                color: Color(0xFF666666),
+                                                fontWeight: FontWeight.w600)),
+                                      )
+                                      ,
+                                      Container(
+                                        padding: EdgeInsets.fromLTRB(0,0,12,0),
+                                        child: Text(
+                                            "27.55",
+                                            textAlign: TextAlign.right,
+                                            style: TextStyle(
+                                                height: 1.2,
+                                                fontSize: 16.0,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.w700)),
+                                      )
+
+                                    ]),
+                                new Row(
+                                    children: <Widget>[
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 4,),
+                                        child: Text(
+                                            "额",
+                                            textAlign: TextAlign.left,
+                                            style: TextStyle(fontSize: 16.0,
+                                                color: Color(0xFF666666),
+                                                fontWeight: FontWeight.w600)),
+                                      )
+                                      ,
+                                      Container(
+                                        padding: EdgeInsets.fromLTRB(0,0,12,0),
+                                        child: Text(
+                                            "27.55",
+                                            textAlign: TextAlign.right,
+                                            style: TextStyle(
+                                                height: 1.2,
+                                                fontSize: 16.0,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.w700)),
+                                      )
+
+                                    ]),
+                              ]),
+                        ),
+                      ]),
+                    Positioned(
+                        right: -12.0,
+                        bottom: -22.0,
+                        child: new IconButton(
+                          icon: const Icon(Icons.network_cell),
+                          iconSize: 8,
+                          color: Colors.black26,
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                        )
+                    ),
+                ],)
+            ),
             Container(
               height: kLineComponentHeight,
               margin: EdgeInsets.symmetric(vertical: globals.sidesDistance,horizontal: globals.horizontalDistance),

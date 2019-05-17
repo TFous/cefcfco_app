@@ -12,6 +12,9 @@ String minuteUrl = 'https://stock.caixin.com/cgi/StockRealTimeLineFiveData';
 String dustryUrl = 'https://stock.caixin.com/cgi';
 
 
+String kUrl = 'http://pdfm.eastmoney.com/EM_UBG_PDTI_Fast/api/js';
+
+
 String scope = 'openid role ewip permission roledatapermission';
 String grantType = 'password';
 String clientId = 'test';

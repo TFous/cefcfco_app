@@ -8,14 +8,11 @@ class A{
     }
 }
 void main() {
-    final Map<String,String> tabs= {
-        "行业":"industry",
-        "沪深A股":"all",
-        "沪市A股":"sh",
-        "深市A股":"sz",
-        "创业板":"gem",
-        "中小板":"sme"
-    };
-    var now = new DateTime.now();
-    print(now.toString().split(' ')[0]);
+    String a = '{"Status":0}';
+    Map parseJsonForString(String jsonString) {
+        Map decoded = jsonDecode(jsonString);
+        return decoded;
+    }
+    Map decoded = jsonDecode(a);
+    print(decoded is Map);
 }

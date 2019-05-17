@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:ui';
 
 import 'package:cefcfco_app/common/language/AppLanguageBase.dart';
@@ -103,4 +104,11 @@ num getCatchErrCode(response,scaffoldKey){
     var errMsg = codeMessage[code];
   }
   return code;
+}
+
+Map parseJsonForString(String jsonpString) {
+  var text = jsonpString.split('({')[1].split('})')[0];
+
+  Map decoded = jsonDecode('{$text}');
+  return decoded;
 }

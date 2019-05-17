@@ -26,4 +26,23 @@ class SinaDustryServices {
     return response;
   }
 
+  /// 6 k 为日数据
+  /// 5 r 为分时
+  static Future getDataByCode(String code,{type:"k",rtntype='6'}) async {
+    String codeText;
+    if(code[0]=='6'){
+      codeText = '${code}1';
+    }else if(code[0]=='3'){
+      codeText = '${code}2';
+    }else{
+      codeText = '${code}2';
+    }
+    var url = '${globals.kUrl}?rtntype=$rtntype&id=$codeText&type=$type';
+    var response = await Request.netFetch(
+        url);
+    return response;
+  }
+
+
+
 }

@@ -1,6 +1,7 @@
 import 'package:cefcfco_app/components/homeBottomNavigationBar.dart';
 import 'package:cefcfco_app/components/search_input.dart';
 import 'package:cefcfco_app/views/list_page.dart';
+import 'package:cefcfco_app/views/show_variety_page.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -74,8 +75,8 @@ class _MyHomePageState extends State<AppPage>
 
             new ListDustryPage(),
 //            new DayKLine(),
-//        new AboutPage(),
-            new ListPage(),
+        new ShowVarietyPage(),
+//            new ListPage(),
             new UserPage(),
 
           ]),
