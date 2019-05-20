@@ -8,6 +8,7 @@ import 'package:cefcfco_app/redux/ThemeRedux.dart';
 import 'package:cefcfco_app/common/utils/common.dart';
 import 'package:cefcfco_app/routers/application.dart';
 import 'package:cefcfco_app/views/KlinePage/MinKLine_page.dart';
+import 'package:cefcfco_app/views/show_variety_page.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:cefcfco_app/common/utils/globals.dart' as globals;
@@ -122,7 +123,7 @@ class ListDustryPageState extends State<ListDustryPage> with AutomaticKeepAliveC
                               enabled: true,
                               onTap: () {
                                 Navigator.push(context, new MaterialPageRoute(builder: (BuildContext context){
-                                  return new AppWrap( child:new MinKLine(title:dustryList[i].name,code:dustryList[i].code,stkUniCode:dustryList[i].stkUniCode));
+                                  return new AppWrap( child:new ShowVarietyPage(title:dustryList[i].name,code:dustryList[i].code,stkUniCode:dustryList[i].stkUniCode));
                                 }));
                               },
                               // item onTap 点击事件

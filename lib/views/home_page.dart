@@ -74,8 +74,8 @@ class _MyHomePageState extends State<AppPage>
           children: <Widget>[
 
             new ListDustryPage(),
-//            new DayKLine(),
-        new ShowVarietyPage(),
+            new DayKLine(),
+//        new ShowVarietyPage(),
 //            new ListPage(),
             new UserPage(),
 

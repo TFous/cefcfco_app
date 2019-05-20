@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:cefcfco_app/common/language/AppLanguageBase.dart';
 import 'package:cefcfco_app/common/localization/DefaultLocalizations.dart';
+import 'package:cefcfco_app/redux/IsFocusCanvasRedux.dart';
 import 'package:cefcfco_app/redux/LocaleRedux.dart';
 import 'package:cefcfco_app/redux/ThemeRedux.dart';
 import 'package:cefcfco_app/common/style/theme.dart';
@@ -75,6 +76,12 @@ class CommonUtils{
 
   static AppLanguageBase getLocale(BuildContext context) {
     return LanguageLocalizations.of(context).currentLocalized;
+  }
+
+
+
+  static setIsFocus(Store store, bool isFocus) {
+    store.dispatch(new ChangeIsFocusAction(isFocus));
   }
 
 }

@@ -35,8 +35,12 @@ import 'package:cefcfco_app/views/CustomView/VolumeComponent.dart';
 import 'package:cefcfco_app/common/utils/globals.dart' as globals;
 import 'package:cefcfco_app/common/utils/KLineUtils.dart';
 import 'package:cefcfco_app/common/utils/mockData.dart' as mockData;
+import 'package:cefcfco_app/common/utils/common.dart';
 
 class DayKLine extends StatefulWidget {
+  var store;
+  DayKLine({this.store});
+
   @override
   State<StatefulWidget> createState() {
     return DayKLineState();
@@ -327,9 +331,13 @@ class DayKLineState extends State<DayKLine> {
   }
 
   void  _handelOnPointerDownVolume(PointerDownEvent details) {
-      setState(() {
+//    CommonUtils.setIsFocus(widget.store,false);
+
+    setState(() {
         isVolume = !isVolume;
       });
+  }
+  Future  _handelOnPointerUp1(details) async{
   }
 
   /// 开始触摸
@@ -412,9 +420,16 @@ class DayKLineState extends State<DayKLine> {
 
   /// 结束触摸
   Future _handelOnPointerUp(details) async {
+
     pointerNum--;
     pointerDownPositions.remove(details.pointer);
     pointerMovePositions.remove(details.pointer);
+
+
+//    if(pointerDownPositions.length==0){
+//      CommonUtils.setIsFocus(widget.store,false);
+//    }
+
 
     if(pointerDownPositions.length<2){
       isScale = false;
@@ -446,224 +461,42 @@ class DayKLineState extends State<DayKLine> {
       initCanvasData(width-globals.horizontalDistance*2);
       isOnce = false;
     }
-    return new Scaffold(
-      appBar: new AppBar(
-//        automaticallyImplyLeading: false,
-        //设置标题栏的背景颜色
-        title: new Title(
-          child: new Text(
-            'K线图',
-            style: new TextStyle(
-              fontSize: 20.0,
-              color: Colors.white,
+    return Container(
+      child: Column(
+        children: <Widget>[
+          Container(
+            height: kLineComponentHeight,
+            margin: EdgeInsets.symmetric(vertical: globals.sidesDistance,horizontal: globals.horizontalDistance),
+            child: Listener(
+                child: ClipRect(
+                  key: anchorKey,
+                  child: new DayKLineComponent(_canvasModel),
+                ),
+                onPointerDown: _handelOnPointerDown,
+                onPointerUp: _handelOnPointerUp,
+                onPointerMove: _handelOnPointerMove,
+                onPointerCancel: _handelOnPointerCancel
             ),
           ),
-          color: Colors
-              .white, //设置标题栏文字的颜色(new title的时候color不能为null不然会报错一般可以不用new title 直接new text,不过最终的文字里面还是以里面new text的style样式文字颜色为准)
-        ),
-//          centerTitle: true,//设置标题居中
-        elevation: 0,
-        //设置标题栏下面阴影的高度
-//        brightness:Brightness.dark,//设置明暗模式（不过写了没看出变化，后面再看）
-        primary: true,
-      ),
-      body: Container(
-        child: Column(
-          children: <Widget>[
-            Container(
-              height: kLineComponentHeight,
-              margin: EdgeInsets.symmetric(vertical: globals.sidesDistance,horizontal: globals.horizontalDistance),
-              child: Listener(
-                  child: ClipRect(
-                    key: anchorKey,
-                    child: new DayKLineComponent(_canvasModel),
-                  ),
-                  onPointerDown: _handelOnPointerDown,
-                  onPointerUp: _handelOnPointerUp,
-                  onPointerMove: _handelOnPointerMove,
-                  onPointerCancel: _handelOnPointerCancel
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: globals.horizontalDistance),
-              height: figureComponentHeight ,
-              child: Listener(
-                  child: ClipRect(
-                    child: new VolumeComponent(_canvasModel,isVolume),
-                  ),
-                  onPointerDown: _handelOnPointerDownVolume,
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.symmetric(vertical: globals.sidesDistance,horizontal: globals.horizontalDistance),
-              height: figureComponentHeight ,
+          Container(
+            margin: EdgeInsets.symmetric(horizontal: globals.horizontalDistance),
+            height: figureComponentHeight ,
+            child: Listener(
               child: ClipRect(
-                child: new FigureComponent(bollModel),
+                child: new VolumeComponent(_canvasModel,isVolume),
               ),
+              onPointerDown: _handelOnPointerDownVolume,
+              onPointerUp: _handelOnPointerUp1,
             ),
-            Container(
-                height: 40,
-                padding: EdgeInsets.symmetric(vertical: globals.sidesDistance),
-                child: SingleChildScrollView(
-                    child: Column(
-                      children: <Widget>[
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: globals.sidesDistance),
-                          decoration: new BoxDecoration(
-                            border: new Border(
-                                bottom: BorderSide(color: Color(0xFFf2f2f2))),
-                            color: Colors.white,
-                          ),
-                          child: ListTile(
-                            title: new Row(
-                                children: <Widget>[
-                                  Expanded(
-                                    child: Text(
-                                        repository != null ? repository.date
-                                            .toString(): '00',
-                                        textAlign: TextAlign.left,
-                                        style: TextStyle(
-                                            color: Color(0xFF333333))),
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                      '时间',
-                                      textAlign: TextAlign.right,
-                                      style: TextStyle(fontSize: 13.0,
-                                          color: Color(0xFF999999),
-                                          fontWeight: null),),
-                                  ),
-                                ]
-                            ),
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: globals.sidesDistance),
-                          decoration: new BoxDecoration(
-                            border: new Border(
-                                bottom: BorderSide(color: Color(0xFFf2f2f2))),
-                            color: Colors.white,
-                          ),
-                          child: ListTile(
-                            title: new Row(
-                                children: <Widget>[
-                                  Expanded(
-                                    child: Text(
-                                        repository != null ? repository.open
-                                            .toStringAsFixed(2) : '00',
-                                        textAlign: TextAlign.left,
-                                        style: TextStyle(
-                                            color: Color(0xFF333333))),
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                      "当前分钟开盘价格", textAlign: TextAlign.right,
-                                      style: TextStyle(fontSize: 13.0,
-                                          color: Color(0xFF999999),
-                                          fontWeight: null),),
-                                  ),
-                                ]
-                            ),
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: globals.sidesDistance),
-                          decoration: new BoxDecoration(
-                            border: new Border(
-                                bottom: BorderSide(color: Color(0xFFf2f2f2))),
-                            color: Colors.white,
-                          ),
-                          child: ListTile(
-                            title: new Row(
-                                children: <Widget>[
-                                  Expanded(
-                                    child: Text(
-                                        repository != null ? repository.close
-                                            .toStringAsFixed(2) : '00',
-                                        textAlign: TextAlign.left,
-                                        style: TextStyle(
-                                            color: Color(0xFF333333))),
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                      "当前分钟收盘价格", textAlign: TextAlign.right,
-                                      style: TextStyle(fontSize: 13.0,
-                                          color: Color(0xFF999999),
-                                          fontWeight: null),),
-                                  ),
-                                ]
-                            ),
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: globals.sidesDistance),
-                          decoration: new BoxDecoration(
-                            border: new Border(
-                                bottom: BorderSide(color: Color(0xFFf2f2f2))),
-                            color: Colors.white,
-                          ),
-                          child: ListTile(
-                            title: new Row(
-                                children: <Widget>[
-                                  Expanded(
-                                    child: Text(
-                                        repository != null ? repository.high
-                                            .toStringAsFixed(2) : '00',
-                                        textAlign: TextAlign.left,
-                                        style: TextStyle(
-                                            color: Color(0xFF333333))),
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                      "当前分钟最高价格", textAlign: TextAlign.right,
-                                      style: TextStyle(fontSize: 13.0,
-                                          color: Color(0xFF999999),
-                                          fontWeight: null),),
-                                  ),
-                                ]
-                            ),
-                          ),
-                        ),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: globals.sidesDistance),
-                          decoration: new BoxDecoration(
-                            border: new Border(
-                                bottom: BorderSide(color: Color(0xFFf2f2f2))),
-                            color: Colors.white,
-                          ),
-                          child: ListTile(
-                            title: new Row(
-                                children: <Widget>[
-                                  Expanded(
-                                    child: Text(
-                                        repository != null ? repository.low
-                                            .toStringAsFixed(2) : '00',
-                                        textAlign: TextAlign.left,
-                                        style: TextStyle(
-                                            color: Color(0xFF333333))),
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                      "当前分钟最低价格", textAlign: TextAlign.right,
-                                      style: TextStyle(fontSize: 13.0, color: Color(0xFF999999),
-                                          fontWeight: null),),
-                                  ),
-                                ]
-                            ),
-                          ),
-                        ),
-                      ],
-                    )
-                )
+          ),
+          Container(
+            margin: EdgeInsets.symmetric(vertical: globals.sidesDistance,horizontal: globals.horizontalDistance),
+            height: figureComponentHeight ,
+            child: ClipRect(
+              child: new FigureComponent(bollModel),
             ),
-//          ListMenus(menusList: menusList)
-          ],
-        ),
+          )
+        ],
       ),
     );
 

@@ -37,6 +37,7 @@ class _MyAppState extends State<MyApp>{
     ///初始化数据
     initialState: new AppStates(
         themeData: CommonUtils.getThemeData(Colors.teal),
+        isFocus: false,
         locale: Locale('zh', 'CH')),
   );
 

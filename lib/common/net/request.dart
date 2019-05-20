@@ -33,7 +33,7 @@ class Request {
     var accessToken = await getAuthorization();
     var defaultHeaders = {
       "timeoutMs": 15000,
-      "Authorization": accessToken??options.headers['Authorization'],
+      "Authorization": options!=null?options.headers['Authorization']:'',
     };
     //没有网络
     var connectivityResult = await (new Connectivity().checkConnectivity());
