@@ -1,8 +1,12 @@
 import 'dart:convert';
 
 import 'package:cefcfco_app/common/model/SinaDustryModel.dart';
+import 'package:cefcfco_app/common/model/dd.dart';
 import 'package:cefcfco_app/common/net/Code.dart';
 import 'package:cefcfco_app/common/net/ResultData.dart';
+import 'package:cefcfco_app/common/utils/HandelOnPointerDownEvent.dart';
+import 'package:cefcfco_app/common/utils/HandelOnPointerMoveEvent.dart';
+import 'package:cefcfco_app/common/utils/HandelOnPointerUpEvent.dart';
 import 'package:cefcfco_app/components/AppWrap.dart';
 import 'package:cefcfco_app/redux/AppState.dart';
 import 'package:cefcfco_app/redux/ThemeRedux.dart';
@@ -34,7 +38,7 @@ class ShowVarietyPageState extends State<ShowVarietyPage> with AutomaticKeepAliv
 
 
   List<SinaDustryModel> dustryList = [];
-
+  bool isFocus = true;
 //  final List<String> tabs= ["行业","沪深A股","沪市A股","深市A股","创业板","中小板"];
   final Map<String,String> tabs= {
     "分时":"all",
@@ -100,7 +104,17 @@ class ShowVarietyPageState extends State<ShowVarietyPage> with AutomaticKeepAliv
   void dispose() {
     super.dispose();
   }
+  void  _handelOnPointerDownVolume(PointerDownEvent details) {
+    setState(() {
+      isFocus = true;
+    });
 
+  }
+  Future  _handelOnPointerUp1(details) async{
+    setState(() {
+      isFocus = false;
+    });
+  }
   initData() async{
     ResultData result = await SinaDustryServices.getCodeData(widget.stkUniCode);
     setState(() {
@@ -109,324 +123,457 @@ class ShowVarietyPageState extends State<ShowVarietyPage> with AutomaticKeepAliv
     });
   }
 
+
+  void _handelOnPointerDown(PointerDownEvent details){
+    if(details.position.dy>300){
+      print('PointerDownEvent--------$details');
+//      setState((){
+//        isFocus = true;
+//      });
+    }
+
+    Code.eventBus.fire(HandelOnPointerDownEvent(details));
+
+  }
+
+  Future _handelOnPointerUp(PointerUpEvent details) async {
+//    setState((){
+//      isFocus = false;
+//    });
+
+    Code.eventBus.fire(HandelOnPointerUpEvent(details));
+  }
+  Future _handelOnPointerMove(PointerMoveEvent details) async {
+    Code.eventBus.fire(HandelOnPointerMoveEvent(details));
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return new StoreBuilder<AppStates>(builder: (context, store) {
-      return new Scaffold(
-          key: _scaffoldKey,
-          appBar: new AppBar(
-            leading: Builder(
-              builder: (BuildContext context) {
-                return IconButton(
-                  icon: const Icon(Icons.arrow_back_ios),
-                  iconSize: 16,
-                  onPressed: () {
-                    Navigator.pop(context);
+
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints viewportConstraints) {
+        return new StoreBuilder<AppStates>(builder: (context, store) {
+          return new Scaffold(
+              key: _scaffoldKey,
+              appBar: new AppBar(
+                leading: Builder(
+                  builder: (BuildContext context) {
+                    return IconButton(
+                      icon: const Icon(Icons.arrow_back_ios),
+                      iconSize: 16,
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    );
                   },
-                );
-              },
-            ),
-            automaticallyImplyLeading: false,
-            //设置标题栏的背景颜色
-            title: new Title(
-              child: new Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: new Icon(Icons.arrow_left),
-                    ),
-                    Expanded(
-                      child: Column(
-                          children: <Widget>[
-                            Container(
-                              padding: EdgeInsets.symmetric(vertical: 3.0),
-                              child: Text(
-                                  widget.title,
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(fontSize: 18.0,
-                                      color: Colors.white,
-                                      fontWeight: null)),
-                            ),
-                            Text(
-                                widget.code,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontSize: 13.0,
-                                    color: Colors.white,
-                                    fontWeight: null))
-                          ]),
-                    ),
-                    Expanded(
-                      child: new Icon(Icons.arrow_right),
-                    ),
-                  ]
-              ),
-              color: Colors .white, //设置标题栏文字的颜色(new title的时候color不能为null不然会报错一般可以不用new title 直接new text,不过最终的文字里面还是以里面new text的style样式文字颜色为准)
-            ),
-            centerTitle: true,//设置标题居中
-            elevation: 0,
-            actions: <Widget>[
-              //设置显示在右边的控件
-              new Padding(
-                child: new Icon(Icons.search),
-                padding: EdgeInsets.all(10.0),
-              ),
-            ],
-            //设置标题栏下面阴影的高度
-//        brightness:Brightness.dark,//设置明暗模式（不过写了没看出变化，后面再看）
-            primary: true,
-          ),
-          body: Container(
-            child: SingleChildScrollView(
-//              physics: NeverScrollableScrollPhysics(), // 禁用滑动
-              physics: store.state.isFocus?new NeverScrollableScrollPhysics():AlwaysScrollableScrollPhysics(), // 禁用滑动
-              child: Column(children: <Widget>[
-                Container(
-                    margin: EdgeInsets.symmetric(vertical: globals.sidesDistance,
-                        horizontal: globals.horizontalDistance),
-                    child: Stack(
-                      alignment:Alignment.bottomRight ,
+                ),
+                automaticallyImplyLeading: false,
+                //设置标题栏的背景颜色
+                title: new Title(
+                  child: new Row(
                       children: <Widget>[
-                        new Row(
-                            children: <Widget>[
-                              Expanded(
-                                child: Column(
-                                  children: <Widget>[
-                                    Text( varietyMsg['curPrice'].toString(),
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(fontSize: 26.0,
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.w500)),
-                                    Text( "${varietyMsg['priceUpdown1'].toStringAsFixed(2)}  ${varietyMsg['changeRate'].toStringAsFixed(2)}%",
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(fontSize: 13.0,
-                                            color: Colors.black,
-                                            fontWeight: null)),
-                                  ],),
-                              ),
-                              Expanded(
-                                child: Column(
-                                    children: <Widget>[
-                                      new Row(
-                                          children: <Widget>[
-                                            Container(
-                                              padding: EdgeInsets.symmetric(
-                                                horizontal: 4,),
-                                              child: Text(
-                                                  "高",
-                                                  textAlign: TextAlign.left,
-                                                  style: TextStyle(fontSize: 16.0,
-                                                      color: Color(0xFF666666),
-                                                      fontWeight: FontWeight.w600)),
-                                            )
-                                            ,
-                                            Container(
-                                              child: Text(
-                                                  varietyMsg['highPrice'].toStringAsFixed(2),
-                                                  textAlign: TextAlign.right,
-                                                  style: TextStyle(
-                                                      height: 1.2,
-                                                      fontSize: 16.0,
-                                                      color: Colors.red,
-                                                      fontWeight: FontWeight.w700)),
-                                            )
-
-                                          ]),
-                                      new Row(
-                                          children: <Widget>[
-                                            Container(
-                                              padding: EdgeInsets.symmetric(
-                                                horizontal: 4,),
-                                              child: Text(
-                                                  "低",
-                                                  textAlign: TextAlign.left,
-                                                  style: TextStyle(fontSize: 16.0,
-                                                      color: Color(0xFF666666),
-                                                      fontWeight: FontWeight.w600)),
-                                            )
-                                            ,
-                                            Container(
-                                              child: Text(
-                                                  varietyMsg['lowPrice'].toStringAsFixed(2),
-                                                  textAlign: TextAlign.right,
-                                                  style: TextStyle(
-                                                      height: 1.2,
-                                                      fontSize: 16.0,
-                                                      color: Colors.green,
-                                                      fontWeight: FontWeight.w700)),
-                                            )
-
-                                          ]),
-                                    ]),
-                              ),
-                              Expanded(
-                                child: Column(
-                                    children: <Widget>[
-                                      new Row(
-                                          children: <Widget>[
-                                            Container(
-                                              padding: EdgeInsets.symmetric(
-                                                horizontal: 4,),
-                                              child: Text(
-                                                  "开",
-                                                  textAlign: TextAlign.left,
-                                                  style: TextStyle(fontSize: 16.0,
-                                                      color: Color(0xFF666666),
-                                                      fontWeight: FontWeight.w600)),
-                                            )
-                                            ,
-                                            Container(
-                                              child: Text(
-                                                  varietyMsg['openPrice'].toStringAsFixed(2),
-                                                  textAlign: TextAlign.right,
-                                                  style: TextStyle(
-                                                      height: 1.2,
-                                                      fontSize: 16.0,
-                                                      color: Colors.black,
-                                                      fontWeight: FontWeight.w700)),
-                                            )
-
-                                          ]),
-                                      new Row(
-                                          children: <Widget>[
-                                            Container(
-                                              padding: EdgeInsets.symmetric(
-                                                horizontal: 4,),
-                                              child: Text(
-                                                  "换",
-                                                  textAlign: TextAlign.left,
-                                                  style: TextStyle(fontSize: 16.0,
-                                                      color: Color(0xFF666666),
-                                                      fontWeight: FontWeight.w600)),
-                                            )
-                                            ,
-                                            Container(
-                                              child: Text(
-                                                  varietyMsg['openPrice'].toStringAsFixed(2),
-                                                  textAlign: TextAlign.right,
-                                                  style: TextStyle(
-                                                      height: 1.2,
-                                                      fontSize: 16.0,
-                                                      color: Colors.black,
-                                                      fontWeight: FontWeight.w700)),
-                                            )
-
-                                          ]),
-                                    ]),
-                              ),
-                              Expanded(
-                                child: Column(
-                                    children: <Widget>[
-                                      new Row(
-                                          children: <Widget>[
-                                            Container(
-                                              padding: EdgeInsets.symmetric(
-                                                horizontal: 4,),
-                                              child: Text(
-                                                  "量",
-                                                  textAlign: TextAlign.left,
-                                                  style: TextStyle(fontSize: 16.0,
-                                                      color: Color(0xFF666666),
-                                                      fontWeight: FontWeight.w600)),
-                                            )
-                                            ,
-                                            Container(
-                                              padding: EdgeInsets.fromLTRB(0,0,12,0),
-                                              child: Text(
-                                                  "27.55",
-                                                  textAlign: TextAlign.right,
-                                                  style: TextStyle(
-                                                      height: 1.2,
-                                                      fontSize: 16.0,
-                                                      color: Colors.black,
-                                                      fontWeight: FontWeight.w700)),
-                                            )
-
-                                          ]),
-                                      new Row(
-                                          children: <Widget>[
-                                            Container(
-                                              padding: EdgeInsets.symmetric(
-                                                horizontal: 4,),
-                                              child: Text(
-                                                  "额",
-                                                  textAlign: TextAlign.left,
-                                                  style: TextStyle(fontSize: 16.0,
-                                                      color: Color(0xFF666666),
-                                                      fontWeight: FontWeight.w600)),
-                                            )
-                                            ,
-                                            Container(
-                                              padding: EdgeInsets.fromLTRB(0,0,12,0),
-                                              child: Text(
-                                                  "27.55",
-                                                  textAlign: TextAlign.right,
-                                                  style: TextStyle(
-                                                      height: 1.2,
-                                                      fontSize: 16.0,
-                                                      color: Colors.black,
-                                                      fontWeight: FontWeight.w700)),
-                                            )
-
-                                          ]),
-                                    ]),
-                              ),
-                            ]),
-                        Positioned(
-                            right: -12.0,
-                            bottom: -22.0,
-                            child: new IconButton(
-                              icon: const Icon(Icons.network_cell),
-                              iconSize: 8,
-                              color: Colors.black26,
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                            )
+                        Expanded(
+                          child: new Icon(Icons.arrow_left),
                         ),
-                      ],)
-                ),
-                Container(
-                  height: 600,
-                  child: new Scaffold(
-                    appBar: new AppBar(
-                      automaticallyImplyLeading: false,
-                      //设置标题栏的背景颜色
-                      title: new TabBar(
-                        controller: _tabController,
-                        tabs: myTabs,    //使用Tab类型的数组呈现Tab标签
-                        indicatorColor: Colors.white,
-                        isScrollable: true,
-                      ),
-                      elevation: 0,
-                      primary: true,
-                    ),
-                    body: Container(
-                      child: new TabBarView(
-                        physics: new NeverScrollableScrollPhysics(), // 禁用滑动
-                        controller: _tabController,
-                        children: myTabs.map((Tab tab) {    //遍历List<Tab>类型的对象myTabs并提取其属性值作为子控件的内容
-                          return Builder(
-                            builder: (BuildContext context){
-                              if (tab.text == '分时') {
-                                return MinKLine(openPrice:openPrice,stkUniCode: widget.stkUniCode);
-                              }else if (tab.text == '日K') {
-                                return DayKLine(store: store,);
-                              }else{
-                                return Text('123');
-                              }
-                            },
-                          );
-                        }).toList(),
-                      ),
-                    ),
+                        Expanded(
+                          child: Column(
+                              children: <Widget>[
+                                Container(
+                                  padding: EdgeInsets.symmetric(vertical: 3.0),
+                                  child: Text(
+                                      widget.title,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(fontSize: 18.0,
+                                          color: Colors.white,
+                                          fontWeight: null)),
+                                ),
+                                Text(
+                                    widget.code,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(fontSize: 13.0,
+                                        color: Colors.white,
+                                        fontWeight: null))
+                              ]),
+                        ),
+                        Expanded(
+                          child: new Icon(Icons.arrow_right),
+                        ),
+                      ]
                   ),
+                  color: Colors .white, //设置标题栏文字的颜色(new title的时候color不能为null不然会报错一般可以不用new title 直接new text,不过最终的文字里面还是以里面new text的style样式文字颜色为准)
                 ),
-                Text('66666666666')
-              ],),
-            ),
-          )//      bottomNavigationBar: new HomeBottomNavigationBar(tabData:globals.homePageTabData,activeIndex:1),
-      );
-    });
+                centerTitle: true,//设置标题居中
+                elevation: 0,
+                actions: <Widget>[
+                  //设置显示在右边的控件
+                  new Padding(
+                    child: new Icon(Icons.search),
+                    padding: EdgeInsets.all(10.0),
+                  ),
+                ],
+                //设置标题栏下面阴影的高度
+//        brightness:Brightness.dark,//设置明暗模式（不过写了没看出变化，后面再看）
+                primary: true,
+              ),
+              body:Listener(
+                onPointerDown: _handelOnPointerDown,
+                onPointerUp: _handelOnPointerUp,
+                onPointerMove: _handelOnPointerMove,
+                child: Container(
+                  child: NotificationListener(
+                      onNotification: (TestNotification note) {
+                        setState(() {
+                          isFocus = note.isFoucs;
+                        });
+                      },
+                      child: CustomScrollView(
+//                  physics: NeverScrollableScrollPhysics(), // 禁用滑动
+                          physics: isFocus?new NeverScrollableScrollPhysics():new ClampingScrollPhysics(), // 禁用滑动
+                          slivers: <Widget>[
+                            SliverToBoxAdapter(
+                              child: Column(children: <Widget>[
+                                new Text(isFocus?"true":"false"),
+                                Container(
+                                    margin: EdgeInsets.symmetric(
+                                        vertical: globals.sidesDistance,
+                                        horizontal: globals
+                                            .horizontalDistance),
+                                    child: Stack(
+                                      alignment: Alignment.bottomRight,
+                                      children: <Widget>[
+                                        new Row(
+                                            children: <Widget>[
+                                              Expanded(
+                                                child: Column(
+                                                  children: <Widget>[
+                                                    Text(
+                                                        varietyMsg['curPrice']
+                                                            .toString(),
+                                                        textAlign: TextAlign
+                                                            .center,
+                                                        style: TextStyle(
+                                                            fontSize: 26.0,
+                                                            color: Colors
+                                                                .black,
+                                                            fontWeight: FontWeight
+                                                                .w500)),
+                                                    Text(
+                                                        "${varietyMsg['priceUpdown1']
+                                                            .toStringAsFixed(
+                                                            2)}  ${varietyMsg['changeRate']
+                                                            .toStringAsFixed(
+                                                            2)}%",
+                                                        textAlign: TextAlign
+                                                            .center,
+                                                        style: TextStyle(
+                                                            fontSize: 13.0,
+                                                            color: Colors
+                                                                .black,
+                                                            fontWeight: null)),
+                                                  ],),
+                                              ),
+                                              Expanded(
+                                                child: Column(
+                                                    children: <Widget>[
+                                                      new Row(
+                                                          children: <Widget>[
+                                                            Container(
+                                                              padding: EdgeInsets
+                                                                  .symmetric(
+                                                                horizontal: 4,),
+                                                              child: Text(
+                                                                  "高",
+                                                                  textAlign: TextAlign
+                                                                      .left,
+                                                                  style: TextStyle(
+                                                                      fontSize: 16.0,
+                                                                      color: Color(
+                                                                          0xFF666666),
+                                                                      fontWeight: FontWeight
+                                                                          .w600)),
+                                                            )
+                                                            ,
+                                                            Container(
+                                                              child: Text(
+                                                                  varietyMsg['highPrice']
+                                                                      .toStringAsFixed(
+                                                                      2),
+                                                                  textAlign: TextAlign
+                                                                      .right,
+                                                                  style: TextStyle(
+                                                                      height: 1.2,
+                                                                      fontSize: 16.0,
+                                                                      color: Colors
+                                                                          .red,
+                                                                      fontWeight: FontWeight
+                                                                          .w700)),
+                                                            )
+
+                                                          ]),
+                                                      new Row(
+                                                          children: <Widget>[
+                                                            Container(
+                                                              padding: EdgeInsets
+                                                                  .symmetric(
+                                                                horizontal: 4,),
+                                                              child: Text(
+                                                                  "低",
+                                                                  textAlign: TextAlign
+                                                                      .left,
+                                                                  style: TextStyle(
+                                                                      fontSize: 16.0,
+                                                                      color: Color(
+                                                                          0xFF666666),
+                                                                      fontWeight: FontWeight
+                                                                          .w600)),
+                                                            )
+                                                            ,
+                                                            Container(
+                                                              child: Text(
+                                                                  varietyMsg['lowPrice']
+                                                                      .toStringAsFixed(
+                                                                      2),
+                                                                  textAlign: TextAlign
+                                                                      .right,
+                                                                  style: TextStyle(
+                                                                      height: 1.2,
+                                                                      fontSize: 16.0,
+                                                                      color: Colors
+                                                                          .green,
+                                                                      fontWeight: FontWeight
+                                                                          .w700)),
+                                                            )
+
+                                                          ]),
+                                                    ]),
+                                              ),
+                                              Expanded(
+                                                child: Column(
+                                                    children: <Widget>[
+                                                      new Row(
+                                                          children: <Widget>[
+                                                            Container(
+                                                              padding: EdgeInsets
+                                                                  .symmetric(
+                                                                horizontal: 4,),
+                                                              child: Text(
+                                                                  "开",
+                                                                  textAlign: TextAlign
+                                                                      .left,
+                                                                  style: TextStyle(
+                                                                      fontSize: 16.0,
+                                                                      color: Color(
+                                                                          0xFF666666),
+                                                                      fontWeight: FontWeight
+                                                                          .w600)),
+                                                            )
+                                                            ,
+                                                            Container(
+                                                              child: Text(
+                                                                  varietyMsg['openPrice']
+                                                                      .toStringAsFixed(
+                                                                      2),
+                                                                  textAlign: TextAlign
+                                                                      .right,
+                                                                  style: TextStyle(
+                                                                      height: 1.2,
+                                                                      fontSize: 16.0,
+                                                                      color: Colors
+                                                                          .black,
+                                                                      fontWeight: FontWeight
+                                                                          .w700)),
+                                                            )
+
+                                                          ]),
+                                                      new Row(
+                                                          children: <Widget>[
+                                                            Container(
+                                                              padding: EdgeInsets
+                                                                  .symmetric(
+                                                                horizontal: 4,),
+                                                              child: Text(
+                                                                  "换",
+                                                                  textAlign: TextAlign
+                                                                      .left,
+                                                                  style: TextStyle(
+                                                                      fontSize: 16.0,
+                                                                      color: Color(
+                                                                          0xFF666666),
+                                                                      fontWeight: FontWeight
+                                                                          .w600)),
+                                                            )
+                                                            ,
+                                                            Container(
+                                                              child: Text(
+                                                                  varietyMsg['openPrice']
+                                                                      .toStringAsFixed(
+                                                                      2),
+                                                                  textAlign: TextAlign
+                                                                      .right,
+                                                                  style: TextStyle(
+                                                                      height: 1.2,
+                                                                      fontSize: 16.0,
+                                                                      color: Colors
+                                                                          .black,
+                                                                      fontWeight: FontWeight
+                                                                          .w700)),
+                                                            )
+
+                                                          ]),
+                                                    ]),
+                                              ),
+                                              Expanded(
+                                                child: Column(
+                                                    children: <Widget>[
+                                                      new Row(
+                                                          children: <Widget>[
+                                                            Container(
+                                                              padding: EdgeInsets
+                                                                  .symmetric(
+                                                                horizontal: 4,),
+                                                              child: Text(
+                                                                  "量",
+                                                                  textAlign: TextAlign
+                                                                      .left,
+                                                                  style: TextStyle(
+                                                                      fontSize: 16.0,
+                                                                      color: Color(
+                                                                          0xFF666666),
+                                                                      fontWeight: FontWeight
+                                                                          .w600)),
+                                                            )
+                                                            ,
+                                                            Container(
+                                                              padding: EdgeInsets
+                                                                  .fromLTRB(
+                                                                  0, 0, 12,
+                                                                  0),
+                                                              child: Text(
+                                                                  "27.55",
+                                                                  textAlign: TextAlign
+                                                                      .right,
+                                                                  style: TextStyle(
+                                                                      height: 1.2,
+                                                                      fontSize: 16.0,
+                                                                      color: Colors
+                                                                          .black,
+                                                                      fontWeight: FontWeight
+                                                                          .w700)),
+                                                            )
+
+                                                          ]),
+                                                      new Row(
+                                                          children: <Widget>[
+                                                            Container(
+                                                              padding: EdgeInsets
+                                                                  .symmetric(
+                                                                horizontal: 4,),
+                                                              child: Text(
+                                                                  "额",
+                                                                  textAlign: TextAlign
+                                                                      .left,
+                                                                  style: TextStyle(
+                                                                      fontSize: 16.0,
+                                                                      color: Color(
+                                                                          0xFF666666),
+                                                                      fontWeight: FontWeight
+                                                                          .w600)),
+                                                            )
+                                                            ,
+                                                            Container(
+                                                              padding: EdgeInsets
+                                                                  .fromLTRB(
+                                                                  0, 0, 12,
+                                                                  0),
+                                                              child: Text(
+                                                                  "27.55",
+                                                                  textAlign: TextAlign
+                                                                      .right,
+                                                                  style: TextStyle(
+                                                                      height: 1.2,
+                                                                      fontSize: 16.0,
+                                                                      color: Colors
+                                                                          .black,
+                                                                      fontWeight: FontWeight
+                                                                          .w700)),
+                                                            )
+
+                                                          ]),
+                                                    ]),
+                                              ),
+                                            ]),
+                                        Positioned(
+                                            right: -12.0,
+                                            bottom: -22.0,
+                                            child: new IconButton(
+                                              icon: const Icon(
+                                                  Icons.network_cell),
+                                              iconSize: 8,
+                                              color: Colors.black26,
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                            )
+                                        ),
+                                      ],)
+                                ),
+                                Container(
+                                  height: 500,
+                                  child: new Scaffold(
+                                    appBar: new AppBar(
+                                      automaticallyImplyLeading: false,
+                                      //设置标题栏的背景颜色
+                                      title: new TabBar(
+                                        controller: _tabController,
+                                        tabs: myTabs, //使用Tab类型的数组呈现Tab标签
+                                        indicatorColor: Colors.white,
+                                        isScrollable: true,
+                                      ),
+                                      elevation: 0,
+                                      primary: true,
+                                    ),
+                                    body: Container(
+                                      child: new TabBarView(
+                                        physics: new NeverScrollableScrollPhysics(),
+                                        // 禁用滑动
+                                        controller: _tabController,
+                                        children: myTabs.map((
+                                            Tab tab) { //遍历List<Tab>类型的对象myTabs并提取其属性值作为子控件的内容
+                                          return Builder(
+                                            builder: (BuildContext context) {
+                                              if (tab.text == '分时') {
+                                                return MinKLine(
+                                                    openPrice: openPrice,
+                                                    stkUniCode: widget
+                                                        .stkUniCode);
+                                              } else if (tab.text == '日K') {
+                                                return DayKLine(
+                                                  store: store,);
+                                              } else {
+                                                return Text('123');
+                                              }
+                                            },
+                                          );
+                                        }).toList(),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                              ),
+                            ),
+//                    Text('66666666666')
+                          ]
+                      )),
+                ),
+              )
+          );
+        });
+      },
+    );
+
+
 
   }
 }

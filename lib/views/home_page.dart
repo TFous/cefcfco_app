@@ -1,5 +1,6 @@
 import 'package:cefcfco_app/components/homeBottomNavigationBar.dart';
 import 'package:cefcfco_app/components/search_input.dart';
+import 'package:cefcfco_app/views/dd.dart';
 import 'package:cefcfco_app/views/list_page.dart';
 import 'package:cefcfco_app/views/show_variety_page.dart';
 import 'package:flutter/gestures.dart';
@@ -74,7 +75,7 @@ class _MyHomePageState extends State<AppPage>
           children: <Widget>[
 
             new ListDustryPage(),
-            new DayKLine(),
+            new CustomScrollViewTestRoute(),
 //        new ShowVarietyPage(),
 //            new ListPage(),
             new UserPage(),

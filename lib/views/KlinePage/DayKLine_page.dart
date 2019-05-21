@@ -13,6 +13,11 @@
 
 
 import 'dart:async';
+import 'dart:math';
+import 'package:cefcfco_app/common/model/dd.dart';
+import 'package:cefcfco_app/common/utils/HandelOnPointerDownEvent.dart';
+import 'package:cefcfco_app/common/utils/HandelOnPointerMoveEvent.dart';
+import 'package:cefcfco_app/common/utils/HandelOnPointerUpEvent.dart';
 import 'package:cefcfco_app/common/utils/router_config.dart' as routerConfig;
 import 'package:cefcfco_app/common/config/Config.dart';
 import 'package:cefcfco_app/common/model/BollPositonsModel.dart';
@@ -99,6 +104,18 @@ class DayKLineState extends State<DayKLine> {
       setState(() {
         repository = event.repository;
       });
+    });
+
+    Code.eventBus.on<HandelOnPointerDownEvent>().listen((event) {
+        _handelOnPointerDown(event.details);
+    });
+
+    Code.eventBus.on<HandelOnPointerUpEvent>().listen((event) {
+      _handelOnPointerUp(event.details);
+    });
+
+    Code.eventBus.on<HandelOnPointerMoveEvent>().listen((event) {
+      _handelOnPointerMove(event.details);
     });
 
   }
@@ -331,17 +348,21 @@ class DayKLineState extends State<DayKLine> {
   }
 
   void  _handelOnPointerDownVolume(PointerDownEvent details) {
-//    CommonUtils.setIsFocus(widget.store,false);
+    CommonUtils.setIsFocus(widget.store,false);
 
     setState(() {
         isVolume = !isVolume;
       });
   }
   Future  _handelOnPointerUp1(details) async{
+
   }
 
   /// 开始触摸
   void _handelOnPointerDown(PointerDownEvent details) {
+    CommonUtils.setIsFocus(widget.store,true);
+    new TestNotification(isFoucs: true).dispatch(anchorKey.currentContext);
+
     /// 元素位置
     RenderBox renderBox = anchorKey.currentContext.findRenderObject();
     _canvasOffset =  renderBox.localToGlobal(Offset.zero);
@@ -363,7 +384,9 @@ class DayKLineState extends State<DayKLine> {
   }
 
   /// 移动
-  Future _handelOnPointerMove(details) async {
+  Future _handelOnPointerMove(PointerMoveEvent details) async {
+    CommonUtils.setIsFocus(widget.store,true);
+    new TestNotification(isFoucs: true).dispatch(anchorKey.currentContext);
 
     endPosition = details.position;
     /// 滑动Klin, 两个手指的时候不能滑动
@@ -419,16 +442,16 @@ class DayKLineState extends State<DayKLine> {
   }
 
   /// 结束触摸
-  Future _handelOnPointerUp(details) async {
+  Future _handelOnPointerUp(PointerUpEvent details) async {
 
     pointerNum--;
     pointerDownPositions.remove(details.pointer);
-    pointerMovePositions.remove(details.pointer);
 
 
-//    if(pointerDownPositions.length==0){
-//      CommonUtils.setIsFocus(widget.store,false);
-//    }
+    if(pointerDownPositions.length==0){
+      new TestNotification(isFoucs: false).dispatch(anchorKey.currentContext);
+      CommonUtils.setIsFocus(widget.store,false);
+    }
 
 
     if(pointerDownPositions.length<2){
@@ -467,15 +490,9 @@ class DayKLineState extends State<DayKLine> {
           Container(
             height: kLineComponentHeight,
             margin: EdgeInsets.symmetric(vertical: globals.sidesDistance,horizontal: globals.horizontalDistance),
-            child: Listener(
-                child: ClipRect(
-                  key: anchorKey,
-                  child: new DayKLineComponent(_canvasModel),
-                ),
-                onPointerDown: _handelOnPointerDown,
-                onPointerUp: _handelOnPointerUp,
-                onPointerMove: _handelOnPointerMove,
-                onPointerCancel: _handelOnPointerCancel
+            child: ClipRect(
+              key: anchorKey,
+              child: new DayKLineComponent(_canvasModel),
             ),
           ),
           Container(
