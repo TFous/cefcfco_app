@@ -15,6 +15,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:cefcfco_app/common/model/dd.dart';
+import 'package:cefcfco_app/common/net/ResultData.dart';
 import 'package:cefcfco_app/common/utils/HandelOnPointerDownEvent.dart';
 import 'package:cefcfco_app/common/utils/HandelOnPointerMoveEvent.dart';
 import 'package:cefcfco_app/common/utils/HandelOnPointerUpEvent.dart';
@@ -30,6 +31,7 @@ import 'package:cefcfco_app/common/provider/repos/ReadHistoryDbProvider.dart';
 import 'package:cefcfco_app/common/utils/KLineDataInEvent.dart';
 import 'package:cefcfco_app/common/utils/MockDayData.dart';
 import 'package:cefcfco_app/routers/application.dart';
+import 'package:cefcfco_app/services/get_dustry_list.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
@@ -43,8 +45,8 @@ import 'package:cefcfco_app/common/utils/mockData.dart' as mockData;
 import 'package:cefcfco_app/common/utils/common.dart';
 
 class DayKLine extends StatefulWidget {
-  var store;
-  DayKLine({this.store});
+  String code;
+  DayKLine({this.code});
 
   @override
   State<StatefulWidget> createState() {
@@ -96,7 +98,7 @@ class DayKLineState extends State<DayKLine> {
   @override
   initState(){
     super.initState();
-    allKLineData = mockData.mockData(MockDayData.list000001);
+//    allKLineData = mockData.mockData(MockDayData.list000001);
 //    print('所有数据长度----${allKLineData.length}');
 
     // evenbus内不能用setstate,不然无限刷新
@@ -107,35 +109,41 @@ class DayKLineState extends State<DayKLine> {
     });
 
     Code.eventBus.on<HandelOnPointerDownEvent>().listen((event) {
-      if(_canvasOffset==null){
-        RenderBox renderBox = anchorKey.currentContext.findRenderObject();
-        _canvasOffset = renderBox.localToGlobal(Offset.zero);
-        _canvasSize = renderBox.size;
+      if(event.tabName =="日K"){
+        if(_canvasOffset==null){
+          RenderBox renderBox = anchorKey.currentContext.findRenderObject();
+          _canvasOffset = renderBox.localToGlobal(Offset.zero);
+          _canvasSize = renderBox.size;
+        }
+        if (isAtArea(event.details.position,_canvasOffset,_canvasSize)) {
+          _handelOnPointerDown(event.details);
+        }else{
+          pointerDownPositions.clear();
+          new TestNotification(isFoucs: false).dispatch(anchorKey.currentContext);
+        }
       }
-      if (event.tabName =="日K"&&isAtArea(event.details.position,_canvasOffset,_canvasSize)) {
-        _handelOnPointerDown(event.details);
-      }else{
-        pointerDownPositions.clear();
-        new TestNotification(isFoucs: false).dispatch(anchorKey.currentContext);
-      }
+
     });
 
     Code.eventBus.on<HandelOnPointerUpEvent>().listen((event) {
-      if (event.tabName =="日K"&&isAtArea(event.details.position,_canvasOffset,_canvasSize)) {
-        _handelOnPointerUp(event.details);
-      } else {
-        pointerDownPositions.clear();
-        new TestNotification(isFoucs: false).dispatch(anchorKey.currentContext);
+      if(event.tabName =="日K"){
+        if (isAtArea(event.details.position,_canvasOffset,_canvasSize)) {
+          _handelOnPointerUp(event.details);
+        } else {
+          pointerDownPositions.clear();
+          new TestNotification(isFoucs: false).dispatch(anchorKey.currentContext);
+        }
       }
-
     });
 
     Code.eventBus.on<HandelOnPointerMoveEvent>().listen((event) {
-      if (event.tabName =="日K"&&isAtArea(event.details.position,_canvasOffset,_canvasSize)) {
-        _handelOnPointerMove(event.details);
-      } else {
-        pointerDownPositions.clear();
-        new TestNotification(isFoucs: false).dispatch(anchorKey.currentContext);
+      if(event.tabName =="日K"){
+        if (isAtArea(event.details.position,_canvasOffset,_canvasSize)) {
+          _handelOnPointerMove(event.details);
+        } else {
+          pointerDownPositions.clear();
+          new TestNotification(isFoucs: false).dispatch(anchorKey.currentContext);
+        }
       }
     });
 
@@ -153,6 +161,12 @@ class DayKLineState extends State<DayKLine> {
 
   /// 获取初始化 画布数据
   initCanvasData(width) async{
+    ResultData dayKResult = await SinaDustryServices.getDataByCode(widget.code.split('.')[0]);
+    List<dynamic> dayKdata = parseJsonForString(dayKResult.data)['data'];
+    allKLineData = mockData.mockData(dayKdata);
+
+
+
     var kLineDistance = _canvasModel.kLineWidth+_canvasModel.kLineMargin;
     var minLeve = width~/kLineDistance; // k线数量
     firstData = allKLineData.first;
@@ -376,7 +390,6 @@ class DayKLineState extends State<DayKLine> {
   }
 
   void  _handelOnPointerDownVolume(PointerDownEvent details) {
-    CommonUtils.setIsFocus(widget.store,false);
     if(this.mounted){
       setState(() {
         isVolume = !isVolume;
@@ -387,12 +400,7 @@ class DayKLineState extends State<DayKLine> {
 
   /// 开始触摸
   void _handelOnPointerDown(PointerDownEvent details) {
-    CommonUtils.setIsFocus(widget.store,true);
     new TestNotification(isFoucs: true).dispatch(anchorKey.currentContext);
-
-//    /// 元素位置
-//    RenderBox renderBox = anchorKey.currentContext.findRenderObject();
-//    _canvasOffset =  renderBox.localToGlobal(Offset.zero);
 
     startTouchTime = getMillisecondsSinceEpoch();
     startPosition = details.position;
@@ -414,7 +422,6 @@ class DayKLineState extends State<DayKLine> {
 
   /// 移动
   Future _handelOnPointerMove(PointerMoveEvent details) async {
-    CommonUtils.setIsFocus(widget.store,true);
     new TestNotification(isFoucs: true).dispatch(anchorKey.currentContext);
 
     endPosition = details.position;
@@ -480,7 +487,6 @@ class DayKLineState extends State<DayKLine> {
 
     if(pointerDownPositions.length==0){
       new TestNotification(isFoucs: false).dispatch(anchorKey.currentContext);
-      CommonUtils.setIsFocus(widget.store,false);
     }
 
 
@@ -518,7 +524,7 @@ class DayKLineState extends State<DayKLine> {
             margin: EdgeInsets.symmetric(vertical: globals.sidesDistance,horizontal: globals.horizontalDistance),
             child: ClipRect(
               key: anchorKey,
-              child: new DayKLineComponent(_canvasModel),
+              child: allKLineData==null?Text('加载中'):new DayKLineComponent(_canvasModel),
             ),
           ),
           Container(
@@ -527,7 +533,7 @@ class DayKLineState extends State<DayKLine> {
 //            child: new VolumeComponent(_canvasModel,isVolume),
             child: Listener(
               child: ClipRect(
-                child: new VolumeComponent(_canvasModel,isVolume),
+                child: allKLineData==null?Text('加载中'):new VolumeComponent(_canvasModel,isVolume),
               ),
               onPointerDown: _handelOnPointerDownVolume,
             ),
@@ -536,7 +542,7 @@ class DayKLineState extends State<DayKLine> {
             margin: EdgeInsets.symmetric(vertical: globals.sidesDistance,horizontal: globals.horizontalDistance),
             height: figureComponentHeight ,
             child: ClipRect(
-              child: new FigureComponent(bollModel),
+              child: allKLineData==null?Text('加载中'):new FigureComponent(bollModel),
             ),
           )
         ],

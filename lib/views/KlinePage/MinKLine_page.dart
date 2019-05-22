@@ -153,13 +153,6 @@ class MinKLineState extends State<MinKLine> {
   initCanvasData() async{
     List<MInLineModel> allMinLineData = await getMinuteData(widget.stkUniCode);
 
-//    ResultData dayKResult = await SinaDustryServices.getDataByCode(widget.code.split('.')[0]);
-//
-//    Map dayKdata = parseJsonForString(dayKResult.data);
-//    print(5555555555);
-//    print(dayKdata);
-    print('widget.openPrice---${widget.openPrice}');
-
     if (this.mounted){
       setState((){
         _canvasModel = new MinCanvasModel(allMinLineData,widget.openPrice,null,false);
