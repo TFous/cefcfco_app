@@ -510,8 +510,13 @@ String priceToYi(double num){
 
 
 bool isAtArea(Offset position,Offset canvasOffset,Size canvasSize){
-  return position.dy >= canvasOffset.dy &&
-      position.dx >= canvasOffset.dx &&
-      position.dy <= canvasOffset.dy + canvasSize.height &&
-      position.dx <= canvasOffset.dx + canvasSize.width;
+  bool boolData = false;
+  if(canvasOffset!=null){
+    boolData = position.dy >= canvasOffset.dy &&
+        position.dx >= canvasOffset.dx &&
+        position.dy <= canvasOffset.dy + canvasSize.height &&
+        position.dx <= canvasOffset.dx + canvasSize.width;
+  }
+
+  return boolData;
 }
