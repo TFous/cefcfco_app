@@ -3,5 +3,6 @@ import 'package:flutter/gestures.dart';
 
 class HandelOnPointerDownEvent {
   PointerDownEvent details;
-  HandelOnPointerDownEvent(this.details);
+  String tabName;
+  HandelOnPointerDownEvent(this.details,this.tabName);
 }

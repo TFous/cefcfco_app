@@ -3,5 +3,6 @@ import 'package:flutter/gestures.dart';
 
 class HandelOnPointerUpEvent {
   PointerUpEvent details;
-  HandelOnPointerUpEvent(this.details);
+  String tabName;
+  HandelOnPointerUpEvent(this.details,this.tabName);
 }

@@ -507,3 +507,11 @@ String priceToWan(double num){
 String priceToYi(double num){
   return (num/100000000).toStringAsFixed(2)+'亿';
 }
+
+
+bool isAtArea(Offset position,Offset canvasOffset,Size canvasSize){
+  return position.dy >= canvasOffset.dy &&
+      position.dx >= canvasOffset.dx &&
+      position.dy <= canvasOffset.dy + canvasSize.height &&
+      position.dx <= canvasOffset.dx + canvasSize.width;
+}

@@ -73,7 +73,8 @@ class DayKLineState extends State<DayKLine> {
 
   CanvasBollModel bollModel = new CanvasBollModel([],[],[],[],0.0,0.0,7.0,2.0,null,false);
 
-  Offset _canvasOffset = Offset.zero;
+  Offset _canvasOffset;
+  Size _canvasSize;
   double _scale = 0.90;
   StreamSubscription stream;
 
@@ -91,7 +92,6 @@ class DayKLineState extends State<DayKLine> {
   bool isScale = false;  // 是否缩放
   Map<num,dynamic> pointerDownPositions = {};
   Map<num,dynamic> pointerMovePositions = {};
-  int pointerNum = 0; // 手指数量
 
   @override
   initState(){
@@ -107,15 +107,36 @@ class DayKLineState extends State<DayKLine> {
     });
 
     Code.eventBus.on<HandelOnPointerDownEvent>().listen((event) {
+      if(_canvasOffset==null){
+        RenderBox renderBox = anchorKey.currentContext.findRenderObject();
+        _canvasOffset = renderBox.localToGlobal(Offset.zero);
+        _canvasSize = renderBox.size;
+      }
+      if (event.tabName =="日K"&&isAtArea(event.details.position,_canvasOffset,_canvasSize)) {
         _handelOnPointerDown(event.details);
+      }else{
+        pointerDownPositions.clear();
+        new TestNotification(isFoucs: false).dispatch(anchorKey.currentContext);
+      }
     });
 
     Code.eventBus.on<HandelOnPointerUpEvent>().listen((event) {
-      _handelOnPointerUp(event.details);
+      if (event.tabName =="日K"&&isAtArea(event.details.position,_canvasOffset,_canvasSize)) {
+        _handelOnPointerUp(event.details);
+      } else {
+        pointerDownPositions.clear();
+        new TestNotification(isFoucs: false).dispatch(anchorKey.currentContext);
+      }
+
     });
 
     Code.eventBus.on<HandelOnPointerMoveEvent>().listen((event) {
-      _handelOnPointerMove(event.details);
+      if (event.tabName =="日K"&&isAtArea(event.details.position,_canvasOffset,_canvasSize)) {
+        _handelOnPointerMove(event.details);
+      } else {
+        pointerDownPositions.clear();
+        new TestNotification(isFoucs: false).dispatch(anchorKey.currentContext);
+      }
     });
 
   }
@@ -123,11 +144,10 @@ class DayKLineState extends State<DayKLine> {
   @override
   void dispose() {
     super.dispose();
-    if(stream != null) {
-      stream.cancel();
-      stream = null;
-      _canvasModel = null;
-    }
+//    if(stream != null) {
+//      stream.cancel();
+//      stream = null;
+//    }
   }
 
 
@@ -175,10 +195,12 @@ class DayKLineState extends State<DayKLine> {
         _canvasModel.isShowCross);
 
 
-    setState(() {
-      _canvasModel = newCanvasModel;
-      bollModel = newBollModel;
-    });
+    if(this.mounted){
+      setState(() {
+        bollModel = newBollModel;
+        _canvasModel = newCanvasModel;
+      });
+    }
 
   }
 
@@ -240,10 +262,12 @@ class DayKLineState extends State<DayKLine> {
         _canvasModel.onTapDownDtails,
         _canvasModel.isShowCross);
 
-    setState(() {
-      _canvasModel = newCanvasModel;
-      bollModel = newBollModel;
-    });
+    if(this.mounted){
+      setState(() {
+        bollModel = newBollModel;
+        _canvasModel = newCanvasModel;
+      });
+    }
 
     maxKlineNum = minLeve;
   }
@@ -293,10 +317,12 @@ class DayKLineState extends State<DayKLine> {
             _canvasModel.onTapDownDtails,
             _canvasModel.isShowCross);
 
-        setState(() {
-          bollModel = newBollModel;
-          _canvasModel = newCanvasModel;
-        });
+        if(this.mounted){
+          setState(() {
+            bollModel = newBollModel;
+            _canvasModel = newCanvasModel;
+          });
+        }
       }
     }else{  /// 向右滑动，旧数据
       if(_canvasModel.showKLineData.first.date == firstData.date){
@@ -338,23 +364,24 @@ class DayKLineState extends State<DayKLine> {
               _canvasModel.kLineMargin,
               _canvasModel.onTapDownDtails,
               _canvasModel.isShowCross);
+          if(this.mounted){
+            setState(() {
+              bollModel = newBollModel;
+              _canvasModel = newCanvasModel;
+            });
+          }
 
-          setState(() {
-            bollModel = newBollModel;
-            _canvasModel = newCanvasModel;
-          });
         }
     }
   }
 
   void  _handelOnPointerDownVolume(PointerDownEvent details) {
     CommonUtils.setIsFocus(widget.store,false);
-
-    setState(() {
+    if(this.mounted){
+      setState(() {
         isVolume = !isVolume;
       });
-  }
-  Future  _handelOnPointerUp1(details) async{
+    }
 
   }
 
@@ -363,20 +390,22 @@ class DayKLineState extends State<DayKLine> {
     CommonUtils.setIsFocus(widget.store,true);
     new TestNotification(isFoucs: true).dispatch(anchorKey.currentContext);
 
-    /// 元素位置
-    RenderBox renderBox = anchorKey.currentContext.findRenderObject();
-    _canvasOffset =  renderBox.localToGlobal(Offset.zero);
+//    /// 元素位置
+//    RenderBox renderBox = anchorKey.currentContext.findRenderObject();
+//    _canvasOffset =  renderBox.localToGlobal(Offset.zero);
 
     startTouchTime = getMillisecondsSinceEpoch();
     startPosition = details.position;
-    pointerNum++;
     pointerDownPositions[details.pointer] = details;
 
     if(pointerDownPositions.length>=2){
       isScale = true;
-      setState(() {
-        bollModel.isShowCross=_canvasModel.isShowCross = false;  //两个手指的时候不显示十字坐标
-      });
+      if(this.mounted){
+        setState(() {
+          bollModel.isShowCross=_canvasModel.isShowCross = false;  //两个手指的时候不显示十字坐标
+        });
+      }
+
     }else{
       isScale = false;
     }
@@ -434,9 +463,11 @@ class DayKLineState extends State<DayKLine> {
         }
       }
     }else{
-      setState(() {
-        bollModel.onTapDownDtails = _canvasModel.onTapDownDtails = details.position - _canvasOffset;
-      });
+      if(this.mounted){
+        setState(() {
+          bollModel.onTapDownDtails = _canvasModel.onTapDownDtails = details.position - _canvasOffset;
+        });
+      }
     }
     /// 缩放动作
   }
@@ -444,7 +475,6 @@ class DayKLineState extends State<DayKLine> {
   /// 结束触摸
   Future _handelOnPointerUp(PointerUpEvent details) async {
 
-    pointerNum--;
     pointerDownPositions.remove(details.pointer);
 
 
@@ -459,8 +489,8 @@ class DayKLineState extends State<DayKLine> {
     }
     endTouchTime = getMillisecondsSinceEpoch();
     endPosition = details.position;
-    // 十字坐标
-    if(endTouchTime-startTouchTime< minTouchTime ){
+    // 十字坐标if (this.mounted){
+    if(endTouchTime-startTouchTime< minTouchTime && this.mounted){
       setState(() {
         _canvasModel.isShowCross = !_canvasModel.isShowCross;
         if(_canvasModel.isShowCross){
@@ -471,10 +501,6 @@ class DayKLineState extends State<DayKLine> {
       });
     }
 
-  }
-
-  void _handelOnPointerCancel(details) {
-    print('_handelOnPointerCancel --------$details');
   }
 
   @override
@@ -498,12 +524,12 @@ class DayKLineState extends State<DayKLine> {
           Container(
             margin: EdgeInsets.symmetric(horizontal: globals.horizontalDistance),
             height: figureComponentHeight ,
+//            child: new VolumeComponent(_canvasModel,isVolume),
             child: Listener(
               child: ClipRect(
                 child: new VolumeComponent(_canvasModel,isVolume),
               ),
               onPointerDown: _handelOnPointerDownVolume,
-              onPointerUp: _handelOnPointerUp1,
             ),
           ),
           Container(

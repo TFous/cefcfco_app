@@ -53,6 +53,9 @@ class ShowVarietyPageState extends State<ShowVarietyPage> with AutomaticKeepAliv
     "60分":"sme",
     "年K":"sme"
   };
+
+  String tabName = '分时';  // 当前选中的tab
+
   Map varietyMsg ={
     "changeRate": -5.93080724876442,
     "curPrice": 5.71,
@@ -94,7 +97,9 @@ class ShowVarietyPageState extends State<ShowVarietyPage> with AutomaticKeepAliv
         length: myTabs.length      //需要控制的Tab页数量
     )
       ..addListener((){
-
+        if (_tabController.indexIsChanging) {
+          tabName = tabs.keys.toList()[_tabController.index];
+        }
       });
 
     initData();
@@ -104,17 +109,7 @@ class ShowVarietyPageState extends State<ShowVarietyPage> with AutomaticKeepAliv
   void dispose() {
     super.dispose();
   }
-  void  _handelOnPointerDownVolume(PointerDownEvent details) {
-    setState(() {
-      isFocus = true;
-    });
 
-  }
-  Future  _handelOnPointerUp1(details) async{
-    setState(() {
-      isFocus = false;
-    });
-  }
   initData() async{
     ResultData result = await SinaDustryServices.getCodeData(widget.stkUniCode);
     setState(() {
@@ -125,26 +120,14 @@ class ShowVarietyPageState extends State<ShowVarietyPage> with AutomaticKeepAliv
 
 
   void _handelOnPointerDown(PointerDownEvent details){
-    if(details.position.dy>300){
-      print('PointerDownEvent--------$details');
-//      setState((){
-//        isFocus = true;
-//      });
-    }
-
-    Code.eventBus.fire(HandelOnPointerDownEvent(details));
-
+    Code.eventBus.fire(HandelOnPointerDownEvent(details,tabName));
   }
 
   Future _handelOnPointerUp(PointerUpEvent details) async {
-//    setState((){
-//      isFocus = false;
-//    });
-
-    Code.eventBus.fire(HandelOnPointerUpEvent(details));
+    Code.eventBus.fire(HandelOnPointerUpEvent(details,tabName));
   }
   Future _handelOnPointerMove(PointerMoveEvent details) async {
-    Code.eventBus.fire(HandelOnPointerMoveEvent(details));
+    Code.eventBus.fire(HandelOnPointerMoveEvent(details,tabName));
   }
 
   @override
