@@ -8,7 +8,7 @@ import 'package:cefcfco_app/common/utils/shared_preferences.dart';
 import 'package:cefcfco_app/views/home_page.dart';
 import 'package:cefcfco_app/views/login_page.dart';
 import 'package:cefcfco_app/common/utils/globals.dart' as globals;
-import 'package:flutter_jpush/flutter_jpush.dart';
+//import 'package:flutter_jpush/flutter_jpush.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:cefcfco_app/common/localization/LanguageLocalizationsDelegate.dart';
 import 'package:flutter_redux/flutter_redux.dart';
@@ -46,13 +46,13 @@ class _MyAppState extends State<MyApp>{
   @override
   void initState() {
     super.initState();
-    _startupJpush();
+//    _startupJpush();
     _initRouter();
   }
 
   void _startupJpush() async {
     print("初始化jpush");
-    await FlutterJPush.startup();
+//    await FlutterJPush.startup();
     print("初始化jpush成功");
   }
 
